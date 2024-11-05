@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		43538C6D2CD9D76500821BF0 /* Exceptions for "Cakey" folder in "Cakey" target */ = {
+		43538C982CDA4A8100821BF0 /* Exceptions for "Cakey" folder in "Cakey" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -24,7 +24,7 @@
 		431436782CD79EED00413602 /* Cakey */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				43538C6D2CD9D76500821BF0 /* Exceptions for "Cakey" folder in "Cakey" target */,
+				43538C982CDA4A8100821BF0 /* Exceptions for "Cakey" folder in "Cakey" target */,
 			);
 			path = Cakey;
 			sourceTree = "<group>";
@@ -268,7 +268,6 @@
 				DEVELOPMENT_TEAM = 6CQ3CNQ79S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Cakey/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -298,7 +297,6 @@
 				DEVELOPMENT_TEAM = 6CQ3CNQ79S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Cakey/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
