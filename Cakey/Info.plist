@@ -4,12 +4,12 @@
 <dict>
 	<key>UIAppFonts</key>
 	<array>
-		<string>SFProDisplay-Semibold.otf</string>
-		<string>SFProDisplay-Regular.otf</string>
-		<string>SFProDisplay-Medium.otf</string>
 		<string>JCfg.ttf</string>
 		<string>Hakgyoansim Dunggeunmiso OTF B.otf</string>
 		<string>GmarketSansMedium.otf</string>
+		<string>SFProDisplay-Regular.otf</string>
+		<string>SFProDisplay-Medium.otf</string>
+		<string>SFProDisplay-Semibold.otf</string>
 	</array>
 </dict>
 </plist>
