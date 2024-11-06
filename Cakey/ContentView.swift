@@ -11,7 +11,7 @@ struct ContentView: View {
     var body: some View {
         VStack {
             Text("Cakey")
-                .customStyledFont(font: .letteringText, color: .pickerPink)
+                
         }
         .padding()
     }
