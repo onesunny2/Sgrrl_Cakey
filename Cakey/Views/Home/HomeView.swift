@@ -68,6 +68,8 @@ struct HomeView: View {
                         ArchieveView()
                     } else if value == 2 {
                         CakeColorView(value: value, path: $path)
+                    } else if value == 3 {
+                        CakeImageView(value: value, path: $path)
                     }
                 }
                 
