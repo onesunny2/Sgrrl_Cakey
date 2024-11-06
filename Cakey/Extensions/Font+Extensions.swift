@@ -37,40 +37,36 @@ extension Font {
         return pilgiFont(size: 48)
     }
     
-    static var symbol1: Font {
-        return displayRFont(size: 40)
-    }
-    
     static var cakeyTitle1: Font {
         return gmarketMFont(size: 32)
     }
     
-    static var letteringText: Font {
+    static var cakeyTitle2: Font {
+        return displayRFont(size: 40)
+    }
+
+    static var cakeyTitle3: Font {
         return hakgyoFont(size: 30)
     }
     
-    static var guideText1: Font {
+    static var cakeyHeadline: Font {
         return displaySMFont(size: 24)
     }
     
-    static var nextButtonText: Font {
+    static var cakeyBody: Font {
         return displaySMFont(size: 20)
     }
     
-    static var skipButtonText: Font {
-        return displayMFont(size: 18)
-    }
-    
-    static var guideText2: Font {
+    static var cakeyCallout: Font {
         return displayRFont(size: 17)
     }
     
-    static var addImgText: Font {
+    static var cakeySubhead: Font {
         return displaySMFont(size: 14)
     }
     
-    static var textLimit: Font {
-        return displayRFont(size: 12)
+    static var cakeyCaption1: Font {
+        return displayRFont(size: 14)
     }
 }
 
