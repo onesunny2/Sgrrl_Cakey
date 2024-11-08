@@ -19,7 +19,11 @@ struct CakeImageView: View {
             
             ProgressBarCell(currentStep: 2)
             
-            Text("케이크 이미지와 키워드 추가하는 뷰 입니다.")
+            VStack {
+                NoticeCelll(notice1: "원하는 데코가 있나요?", notice2: "최대  6개까지 추가할 수 있어요")
+                
+                NextButtonCell(nextValue: {path.append(4)})
+            }
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -31,6 +35,16 @@ struct CakeImageView: View {
                         .font(.cakeyCallout)
                         .foregroundStyle(.cakeyOrange1)
                 }
+            }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    // TODO: 스킵 기능 구현 필요
+                } label: {
+                    Text("SKIP")
+                        .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
+                }
+
             }
         }
     }
