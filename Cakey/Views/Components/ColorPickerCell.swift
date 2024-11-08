@@ -50,9 +50,9 @@ struct ColorPickerCell: View {
                         .frame(width: 8)
                 }
                 
-                ColorPicker("", selection: $pickerColor, supportsOpacity: false)
+                ColorPicker("", selection: $pickerColor)
                     .labelsHidden()
-                    .onChange(of: pickerColor) { newColor in
+                    .onChange(of: pickerColor, initial: false) { newColor, oldColor in
                         selectedColor = newColor
                         selectedColorIndex = colorList.count
                     }
