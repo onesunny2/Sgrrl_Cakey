@@ -42,10 +42,6 @@ extension Font {
     }
     
     static var cakeyTitle2: Font {
-        return displayRFont(size: 40)
-    }
-
-    static var cakeyTitle3: Font {
         return hakgyoFont(size: 30)
     }
     
@@ -62,11 +58,28 @@ extension Font {
     }
     
     static var cakeySubhead: Font {
-        return displaySMFont(size: 14)
+        return displayMFont(size: 17)
     }
     
     static var cakeyCaption1: Font {
         return displayRFont(size: 14)
+    }
+    
+    // symbol 전용
+    static var symbolLargeTitle: Font {
+        return displayRFont(size: 40)
+    }
+    
+    static var symbolTitle1: Font {
+        return displaySMFont(size: 24)
+    }
+    
+    static var symbolTitle2: Font {
+        return displayRFont(size: 24)
+    }
+    
+    static var symbolHeadLine: Font {
+        return displaySMFont(size: 14)
     }
 }
 
