@@ -11,6 +11,7 @@ struct CakeImageView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     let value: Int
     @Binding var path: [Int]
+    @State private var keyboardHeight: CGFloat = 0
     
     var body: some View {
         ZStack {
@@ -24,6 +25,10 @@ struct CakeImageView: View {
                     .padding(.bottom, 54)
                 
                 DecoCarouselCell()
+                    .padding(.bottom, 60)
+                
+                textFieldCell()
+                    .padding(.bottom, keyboardHeight - 200)
                 
                 Spacer()
                 
@@ -42,6 +47,7 @@ struct CakeImageView: View {
                         .font(.cakeyCallout)
                         .foregroundStyle(.cakeyOrange1)
                 }
+                .padding(.bottom, keyboardHeight)
             }
             
             ToolbarItem(placement: .topBarTrailing) {
@@ -51,8 +57,29 @@ struct CakeImageView: View {
                     Text("SKIP")
                         .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
                 }
+                .padding(.bottom, keyboardHeight)
 
             }
+        }
+        .onAppear {
+            // 키보드 높이 감지
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
+                if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                    withAnimation {
+                        self.keyboardHeight = keyboardFrame.height
+                    }
+                }
+            }
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+                withAnimation {
+                    self.keyboardHeight = 0
+                }
+            }
+        }
+        .onDisappear {
+            // 옵저버 제거
+            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
         }
     }
 }
