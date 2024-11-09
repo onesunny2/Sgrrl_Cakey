@@ -19,11 +19,18 @@ struct CakeImageView: View {
             
             ProgressBarCell(currentStep: 2)
             
-            VStack {
+            VStack(spacing: 0) {
                 NoticeCelll(notice1: "원하는 데코가 있나요?", notice2: "최대  6개까지 추가할 수 있어요")
+                    .padding(.bottom, 54)
+                
+                DecoCarouselCell()
+                
+                Spacer()
                 
                 NextButtonCell(nextValue: {path.append(4)})
             }
+            .padding(.top, 86)
+            .padding(.bottom, 20)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
