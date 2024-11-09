@@ -13,7 +13,7 @@ struct DecoImageCell: View {
     var imgTouchAction: () -> Void = { }
     
     var body: some View {
-        HStack {
+        HStack(spacing: 8) {
             ForEach(imgList, id: \.self) { img in
                 RoundedRectangle(cornerRadius: 10)
                     .fill(.clear)
@@ -28,10 +28,22 @@ struct DecoImageCell: View {
                             
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color.cakeyOrange1, lineWidth: 2)
+                                .padding(1)
                         }
                     }
                     .onTapGesture {
                         imgTouchAction()
+                    }
+            }
+            
+            ForEach(0..<(5 - imgList.count), id: \.self) { _ in
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(.cakeyOrange2)
+                    .frame(width: 80, height: 80)
+                    .overlay {
+                        Image(systemName: "photo")
+                            .font(.symbolTitle2)
+                            .foregroundStyle(.cakeyOrange3)
                     }
             }
         }
