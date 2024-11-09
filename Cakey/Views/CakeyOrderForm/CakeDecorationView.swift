@@ -26,6 +26,14 @@ struct CakeDecorationView: View {
                 Rectangle()
                     .fill(.pickerPurple)
                     .frame(width: 345, height: 282)
+                
+                // MARK: 데코레이션 버튼 3개
+                // TODO: 각 버튼별 액션 도라미가 해줘야함
+                HStack(spacing: 14) {
+                    DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.trianglehead.2.clockwise.rotate.90", buttonAction: { })
+                    DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.uturn.left", buttonAction: { })
+                    DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "checkmark", buttonAction: { })
+                }
             }
         }
         .navigationBarBackButtonHidden(true)
