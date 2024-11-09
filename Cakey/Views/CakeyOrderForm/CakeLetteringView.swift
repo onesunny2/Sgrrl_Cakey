@@ -1,13 +1,13 @@
 //
-//  CakeDecorationView.swift
+//  CakeLetteringView.swift
 //  Cakey
 //
-//  Created by Lee Wonsun on 11/9/24.
+//  Created by Lee Wonsun on 11/10/24.
 //
 
 import SwiftUI
 
-struct CakeDecorationView: View {
+struct CakeLetteringView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     let value: Int
     @Binding var path: [Int]
@@ -17,16 +17,7 @@ struct CakeDecorationView: View {
             Color.cakeyYellow1
                 .ignoresSafeArea(.all)
             
-            ProgressBarCell(currentStep: 3)
-            
-            VStack(spacing: 0) {
-                NoticeCelll(notice1: "케이크 도안을 만들어 보세요!", notice2: "이미지를 케이크에 자유롭게 배치할 수 있어요")
-                
-                // TODO: 도라미 3D 케이크 들어갈 자리
-                Rectangle()
-                    .fill(.pickerPurple)
-                    .frame(width: 345, height: 282)
-            }
+            Text("케이크 레터링 꾸미는 화면입니다.")
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -42,10 +33,9 @@ struct CakeDecorationView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    path.append(5)
-                    // TODO: 완료 기능 구현 필요
+                    // TODO: 스킵 기능 구현 필요
                 } label: {
-                    Text("완료")
+                    Text("SKIP")
                         .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
                 }
             }
@@ -54,5 +44,5 @@ struct CakeDecorationView: View {
 }
 
 #Preview {
-    CakeDecorationView(value: 4, path: .constant([4]))
+    CakeLetteringView(value: 5, path: .constant([5]))
 }
