@@ -47,7 +47,7 @@ struct DecoCarouselCell: View {
                         .frame(width: 230, height: 230) // geometry로 인해 무너지는 프레임 재설정
                     }
                 }
-                .padding(.leading, (UIScreen.main.bounds.width - 230) / 2)
+                .padding(.horizontal, (UIScreen.main.bounds.width - 230) / 2)
                 .scrollTargetLayout()
             }
             .scrollTargetBehavior(.viewAligned)
