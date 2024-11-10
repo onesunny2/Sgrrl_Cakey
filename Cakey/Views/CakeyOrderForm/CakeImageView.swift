@@ -11,6 +11,7 @@ struct CakeImageView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     let value: Int
     @Binding var path: [Int]
+    @State private var keyboardHeight: CGFloat = 0
     
     var body: some View {
         ZStack {
@@ -19,7 +20,22 @@ struct CakeImageView: View {
             
             ProgressBarCell(currentStep: 2)
             
-            Text("케이크 이미지와 키워드 추가하는 뷰 입니다.")
+            VStack(spacing: 0) {
+                NoticeCelll(notice1: "원하는 데코가 있나요?", notice2: "최대  6개까지 추가할 수 있어요")
+                    .padding(.bottom, 54)
+                
+                DecoCarouselCell()
+                    .padding(.bottom, 60)
+                
+                textFieldCell()
+                    .padding(.bottom, keyboardHeight - 200)
+                
+                Spacer()
+                
+                NextButtonCell(nextValue: {path.append(4)})
+            }
+            .padding(.top, 86)
+            .padding(.bottom, 20)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -31,7 +47,39 @@ struct CakeImageView: View {
                         .font(.cakeyCallout)
                         .foregroundStyle(.cakeyOrange1)
                 }
+                .padding(.bottom, keyboardHeight)
             }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    // TODO: 스킵 기능 구현 필요
+                } label: {
+                    Text("SKIP")
+                        .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
+                }
+                .padding(.bottom, keyboardHeight)
+
+            }
+        }
+        .onAppear {
+            // 키보드 높이 감지
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
+                if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                    withAnimation {
+                        self.keyboardHeight = keyboardFrame.height
+                    }
+                }
+            }
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+                withAnimation {
+                    self.keyboardHeight = 0
+                }
+            }
+        }
+        .onDisappear {
+            // 옵저버 제거
+            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
         }
     }
 }
