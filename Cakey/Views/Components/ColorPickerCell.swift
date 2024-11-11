@@ -11,7 +11,7 @@ struct ColorPickerCell: View {
     let colorList: [Color] = [.pickerWhite, .pickerPink, .pickerYellow, .pickerBlue, .pickerPurple]
     @Binding var selectedColor: Color
     @Binding var pickerColor: Color
-    @State var selectedColorIndex: Int = 0
+    @Binding var selectedColorIndex: Int
     
     var body: some View {
         HStack(spacing: 20) {
@@ -52,7 +52,7 @@ struct ColorPickerCell: View {
                 
                 ColorPicker("", selection: $pickerColor)
                     .labelsHidden()
-                    .onChange(of: pickerColor, initial: false) { newColor, oldColor in
+                    .onChange(of: pickerColor, initial: false) { oldColor, newColor in
                         selectedColor = newColor
                         selectedColorIndex = colorList.count
                     }
@@ -66,6 +66,6 @@ struct ColorPickerCell: View {
         Color.cakeyYellow1
             .ignoresSafeArea(.all)
         
-        ColorPickerCell(selectedColor: .constant(.pickerWhite), pickerColor: .constant(.white))
+        ColorPickerCell(selectedColor: .constant(.pickerWhite), pickerColor: .constant(.white), selectedColorIndex: .constant(0))
     }
 }

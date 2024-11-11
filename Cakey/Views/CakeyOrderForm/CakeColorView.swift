@@ -13,6 +13,7 @@ struct CakeColorView: View {
     @Binding var path: [Int]
     @State private var selectedColor: Color = .pickerWhite
     @State private var pickerColor: Color = .white
+    @State private var selectedColorIndex: Int = 0
     
     var body: some View {
         ZStack {
@@ -37,7 +38,7 @@ struct CakeColorView: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 50)
                 
-                ColorPickerCell(selectedColor: $selectedColor, pickerColor: $pickerColor)
+                ColorPickerCell(selectedColor: $selectedColor, pickerColor: $pickerColor, selectedColorIndex: $selectedColorIndex)
                     .padding(.bottom, 70)
                 
                 NextButtonCell(nextValue: { path.append(3)} )
