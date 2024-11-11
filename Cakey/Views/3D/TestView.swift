@@ -11,7 +11,10 @@ struct TestView: View {
     @State private var cameraMode: CameraMode = .topDownView
     
     var body: some View {
-        Cake3DView(cameraMode: cameraMode)
+        Cake3DView()
+            .frame(maxWidth: 380, maxHeight: 380)
+            .padding(.horizontal, 20)
+            .padding(.bottom, 50)
         
         HStack{
             Button(action: {

@@ -33,7 +33,7 @@ struct CakeColorView: View {
 //                    .frame(maxWidth: .infinity, maxHeight: .infinity)
 //                    .padding(.horizontal, 20)
 //                    .padding(.bottom, 50)
-                Cake3DView(cameraMode: .topDownView)
+                Cake3DView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(.horizontal, 20)
                     .padding(.bottom, 50)
