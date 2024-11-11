@@ -23,24 +23,40 @@ struct ARViewContainer: UIViewRepresentable {
     func makeUIView(context: Context) -> ARView {
         
         let arView = ARView(frame: .zero, cameraMode: .nonAR, automaticallyConfigureSession: false)
-        arView.environment.background = .color(.clear)
+        //arView.environment.background = .color(.clear)
+        arView.environment.background = .color(.black)
         
         let selectedMaterial = SimpleMaterial(color: .cakeyOrange1, isMetallic: false)
+        
+        let cakeParentEntity = ModelEntity()
         
         /// Cake model
         let cakeModel = try! ModelEntity.loadModel(named: "cakeModel")
         cakeModel.scale = SIMD3(x: 0.4, y: 0.4, z: 0.4)
-        cakeModel.generateCollisionShapes(recursive: true)
+        //cakeModel.generateCollisionShapes(recursive: true)
         cakeModel.model?.materials = [selectedMaterial]
         
         let cakeTrayModel = try! ModelEntity.loadModel(named: "cakeTray")
         cakeTrayModel.scale = SIMD3(x: 0.4, y: 0.4, z: 0.4)
-        cakeTrayModel.generateCollisionShapes(recursive: true)
+        //cakeTrayModel.generateCollisionShapes(recursive: true)
+        
+        
+        
+        cakeParentEntity.addChild(cakeModel)
+        cakeParentEntity.addChild(cakeTrayModel)
+        cakeParentEntity.generateCollisionShapes(recursive: true)
         
         let anchor = AnchorEntity(world: [0, 0, 0])
-        anchor.addChild(cakeModel)
-        anchor.addChild(cakeTrayModel)
+        //anchor.addChild(cakeModel)
+        //anchor.addChild(cakeTrayModel)
+        anchor.addChild(cakeParentEntity)
         arView.scene.anchors.append(anchor)
+        
+        //cakeParentEntity.generateCollisionShapes(recursive: true)
+        
+        //arView.installGestures(.all, for: cakeModel)
+        arView.installGestures(.all, for: cakeParentEntity)
+        
         
         /// Camera setup
         let camera = PerspectiveCamera()
@@ -55,8 +71,7 @@ struct ARViewContainer: UIViewRepresentable {
         // Set up the coordinator’s camera anchor reference
         context.coordinator.cameraAnchor = cameraAnchor
         
-        arView.installGestures(.all, for: cakeModel)
-        
+       
         return arView
     }
     
@@ -88,7 +103,7 @@ enum CameraMode {
     var angle: Double {
         switch self {
         case .quarterView:
-            return -35.0 * .pi / 180.0
+            return -45.0 * .pi / 180.0
         case .topDownView:
             return -90.0 * .pi / 180.0
         }
@@ -97,9 +112,9 @@ enum CameraMode {
     var position: SIMD3<Float> {
         switch self {
         case .quarterView:
-            return [0, 2, 2]
+            return [0, 0.5, 0.5]
         case .topDownView:
-            return [0, 3, 0]
+            return [0, 0.65, 0]
         }
     }
     
@@ -139,5 +154,5 @@ enum GestureMode {
 
 
 #Preview {
-    Cake3DView(cameraMode: .topDownView)
+    Cake3DView(cameraMode: .quarterView)
 }

@@ -27,8 +27,12 @@ struct CakeColorView: View {
                     .padding(.bottom, 30)
                 
                 // TODO: 람지의 3D케이크 자리
-                Rectangle()
-                    .fill(selectedColor)
+//                Rectangle()
+//                    .fill(selectedColor)
+//                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+//                    .padding(.horizontal, 20)
+//                    .padding(.bottom, 50)
+                Cake3DView(cameraMode: .topDownView)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(.horizontal, 20)
                     .padding(.bottom, 50)
