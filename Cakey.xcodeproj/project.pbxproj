@@ -6,11 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		4369D6D52CE2619C00B857C3 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 4369D6D42CE2619C00B857C3 /* Realm */; };
-		4369D6D72CE2619C00B857C3 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4369D6D62CE2619C00B857C3 /* RealmSwift */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
 		431436762CD79EED00413602 /* Cakey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cakey.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -41,8 +36,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4369D6D72CE2619C00B857C3 /* RealmSwift in Frameworks */,
-				4369D6D52CE2619C00B857C3 /* Realm in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,8 +78,6 @@
 			);
 			name = Cakey;
 			packageProductDependencies = (
-				4369D6D42CE2619C00B857C3 /* Realm */,
-				4369D6D62CE2619C00B857C3 /* RealmSwift */,
 			);
 			productName = Cakey;
 			productReference = 431436762CD79EED00413602 /* Cakey.app */;
@@ -116,9 +107,6 @@
 			);
 			mainGroup = 4314366D2CD79EED00413602;
 			minimizedProjectReferenceProxies = 1;
-			packageReferences = (
-				4369D6D32CE2619C00B857C3 /* XCRemoteSwiftPackageReference "realm-swift" */,
-			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 431436772CD79EED00413602 /* Products */;
 			projectDirPath = "";
@@ -353,30 +341,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		4369D6D32CE2619C00B857C3 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/realm/realm-swift.git";
-			requirement = {
-				kind = exactVersion;
-				version = 10.33.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		4369D6D42CE2619C00B857C3 /* Realm */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4369D6D32CE2619C00B857C3 /* XCRemoteSwiftPackageReference "realm-swift" */;
-			productName = Realm;
-		};
-		4369D6D62CE2619C00B857C3 /* RealmSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4369D6D32CE2619C00B857C3 /* XCRemoteSwiftPackageReference "realm-swift" */;
-			productName = RealmSwift;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4314366E2CD79EED00413602 /* Project object */;
 }
