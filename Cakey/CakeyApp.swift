@@ -12,7 +12,7 @@ struct CakeyApp: App {
     var body: some Scene {
         WindowGroup {
 
-            ContentView()
+            HomeView()
 
         }
     }
