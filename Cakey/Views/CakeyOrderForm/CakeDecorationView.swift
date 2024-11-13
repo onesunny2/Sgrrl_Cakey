@@ -64,7 +64,7 @@ struct CakeDecorationView: View {
                     path.append(5)
                     // TODO: 완료 기능 구현 필요
                 } label: {
-                    Text("완료")
+                    Text("다음")
                         .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
                 }
             }

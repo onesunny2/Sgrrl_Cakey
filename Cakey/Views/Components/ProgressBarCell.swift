@@ -18,7 +18,7 @@ struct ProgressBarCell: View {
                     .frame(maxWidth: .infinity, maxHeight: 4)
                 
                 HStack(spacing: 0) {
-                    ForEach(0..<4) { step in
+                    ForEach(0..<5) { step in
                         Rectangle()
                             .fill(step < currentStep ? .cakeyOrange1 : .cakeyOrange1.opacity(0))
                             .frame(maxWidth: .infinity, maxHeight: 4)
