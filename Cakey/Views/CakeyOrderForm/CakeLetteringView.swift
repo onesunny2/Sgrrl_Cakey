@@ -11,13 +11,24 @@ struct CakeLetteringView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     let value: Int
     @Binding var path: [Int]
+    @State private var selectedColor: Color = .pickerBlack
+    @State private var pickerColor: Color = .white
+    @State private var selectedColorIndex: Int = 0
     
     var body: some View {
         ZStack {
             Color.cakeyYellow1
                 .ignoresSafeArea(.all)
             
-            Text("케이크 레터링 꾸미는 화면입니다.")
+            ProgressBarCell(currentStep: 4)
+            
+            NoticeCelll(notice1: "원하는 문구가 있나요?", notice2: "문구를 적고, 케이크 위에 배치해 보세요")
+            
+            // TODO: 라미 케이크 자리
+            
+            
+            LetteringColorPickerCell(selectedColor: $selectedColor, pickerColor: $pickerColor, selectedColorIndex: $selectedColorIndex)
+            
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -43,6 +54,6 @@ struct CakeLetteringView: View {
     }
 }
 
-#Preview {
-    CakeLetteringView(value: 5, path: .constant([5]))
-}
+//#Preview {
+//    CakeLetteringView(value: 5, path: .constant([5]))
+//}

@@ -27,7 +27,7 @@ struct CakeImageView: View {
                 DecoCarouselCell()
                     .padding(.bottom, 60)
                 
-                textFieldCell()
+                TextFieldCell()
                     .padding(.bottom, keyboardHeight - 200)
                 
                 Spacer()

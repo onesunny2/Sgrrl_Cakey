@@ -38,7 +38,7 @@ struct CakeColorView: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 50)
                 
-                ColorPickerCell(selectedColor: $selectedColor, pickerColor: $pickerColor, selectedColorIndex: $selectedColorIndex)
+                CakeColorPickerCell(selectedColor: $selectedColor, pickerColor: $pickerColor, selectedColorIndex: $selectedColorIndex)
                     .padding(.bottom, 70)
                 
                 NextButtonCell(nextValue: { path.append(3)} )
