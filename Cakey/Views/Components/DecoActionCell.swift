@@ -10,20 +10,29 @@ import SwiftUI
 struct DecoActionCell: View {
     var buttonColor: Color = .cakeyOrange3
     var symbolName: String = "arrow.trianglehead.2.clockwise.rotate.90"
+    var buttonText: String = "전체삭제"
     var buttonAction: () -> Void = { }
     
     var body: some View {
         Button {
             buttonAction()
         } label: {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(buttonColor)
-                .frame(width: 88, height: 54)
-                .overlay {
-                    Image(systemName: symbolName)
-                        .font(.symbolTitle1)
-                        .foregroundStyle(.cakeyYellow1)
-                }
+            VStack{
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(buttonColor)
+                    .frame(width: 88, height: 64)
+                    .overlay {
+                        VStack{
+                            Image(systemName: symbolName)
+                                .font(.symbolTitle1)
+                                .foregroundStyle(.cakeyYellow1)
+                                .padding(.bottom, 0.5)
+                            Text(buttonText)
+                                .font(.cakeyCaption1)
+                                .foregroundColor(.cakeyYellow2)
+                        }
+                    }
+            }
         }
     }
 }
