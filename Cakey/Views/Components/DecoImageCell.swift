@@ -36,7 +36,7 @@ struct DecoImageCell: View {
                     }
             }
             
-            ForEach(0..<(5 - imgList.count), id: \.self) { _ in
+            ForEach(0..<(6 - imgList.count), id: \.self) { _ in
                 RoundedRectangle(cornerRadius: 10)
                     .fill(.cakeyOrange2)
                     .frame(width: 80, height: 80)
@@ -47,6 +47,7 @@ struct DecoImageCell: View {
                     }
             }
         }
+        .padding(.trailing, (UIScreen.main.bounds.width - 292) / 2)
     }
 }
 
