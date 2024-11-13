@@ -17,7 +17,7 @@ struct VerticalSlider: View {
             VStack {
                 Spacer(minLength: 0)
                 Rectangle()
-                    .fill(Color.orange)
+                    .fill(.cakeyOrange1)
                     .frame(height: CGFloat((value - range.lowerBound) / (range.upperBound - range.lowerBound)) * geometry.size.height)
                     .cornerRadius(5)
             }

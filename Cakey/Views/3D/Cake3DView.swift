@@ -12,10 +12,11 @@ import Combine
 
 struct Cake3DView: View {
     @State private var cameraHeight: Float = 0.5
+    @Binding var selectedColor:Color
     
     var body: some View {
         ZStack{
-            ARViewContainer(cameraHeight: $cameraHeight).ignoresSafeArea()
+            ARViewContainer(cameraHeight: $cameraHeight, selectedColor: $selectedColor).ignoresSafeArea()
             HStack{
                 Spacer()
                 VerticalSlider(value: $cameraHeight, range: 0.5...2.0)
@@ -29,6 +30,7 @@ struct Cake3DView: View {
 
 struct ARViewContainer: UIViewRepresentable {
     @Binding var cameraHeight: Float
+    @Binding var selectedColor:Color
     
     func makeUIView(context: Context) -> ARView {
         
@@ -42,6 +44,7 @@ struct ARViewContainer: UIViewRepresentable {
         let cakeModel = try! ModelEntity.loadModel(named: "cakeModel")
         cakeModel.scale = SIMD3(x: 0.4, y: 0.4, z: 0.4)
         cakeModel.model?.materials = [selectedMaterial]
+        context.coordinator.cakeEntity = cakeModel
         
         let cakeTrayModel = try! ModelEntity.loadModel(named: "cakeTray")
         cakeTrayModel.scale = SIMD3(x: 0.4, y: 0.4, z: 0.4)
@@ -55,7 +58,7 @@ struct ARViewContainer: UIViewRepresentable {
         anchor.addChild(cakeParentEntity)
         arView.scene.anchors.append(anchor)
         
-        context.coordinator.cakeEntity = cakeParentEntity
+        context.coordinator.cakeParentEntity = cakeParentEntity
         arView.installGestures([.rotation, .scale], for: cakeParentEntity)
         
         /// Camera setup
@@ -79,6 +82,9 @@ struct ARViewContainer: UIViewRepresentable {
     func updateUIView(_ uiView: ARView, context: Context) {
         context.coordinator.camera?.position.y = cameraHeight
         context.coordinator.camera?.position.x = cameraHeight * 0.6
+        
+        let selectedMaterial = SimpleMaterial(color: UIColor(selectedColor), isMetallic: false)
+        context.coordinator.cakeEntity?.model?.materials = [selectedMaterial]
     }
     
     func makeCoordinator() -> Coordinator {
@@ -87,12 +93,13 @@ struct ARViewContainer: UIViewRepresentable {
 }
 
 class Coordinator: NSObject {
+    var cakeParentEntity: ModelEntity?
     var cakeEntity: ModelEntity?
     var camera: PerspectiveCamera?
     var cancellable: AnyCancellable?
     
     func clampModelSize() {
-        guard let model = cakeEntity else { return }
+        guard let model = cakeParentEntity else { return }
         
         let currentScale = model.scale.x
         var newScale = currentScale
@@ -160,5 +167,5 @@ enum GestureMode {
 
 
 #Preview {
-    Cake3DView()
+    //Cake3DView()
 }
