@@ -40,7 +40,7 @@ struct CakeDecorationView: View {
                     } .padding(.bottom, 40)
                     
                     ScrollView(.horizontal, showsIndicators: false) {
-                        DecoImageCell()
+                        //DecoImageCell()
                     } .padding(.leading, (UIScreen.main.bounds.width - 292) / 2)
                 }
             }

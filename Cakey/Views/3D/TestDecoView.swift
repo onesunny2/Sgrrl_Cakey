@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TestDecoView: View {
+    @StateObject var coordinator2 = Coordinator2()
     
     var body: some View {
         ZStack {
@@ -32,7 +33,7 @@ struct TestDecoView: View {
                     } .padding(.bottom, 40)
                     
                     ScrollView(.horizontal, showsIndicators: false) {
-                        DecoImageCell()
+                        DecoImageCell(coordinator: coordinator2)
                     } .padding(.leading, (UIScreen.main.bounds.width - 292) / 2)
                 }
             }

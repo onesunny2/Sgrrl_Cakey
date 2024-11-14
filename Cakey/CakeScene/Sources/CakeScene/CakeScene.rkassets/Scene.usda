@@ -10,9 +10,9 @@
 
 def Xform "Root"
 {
+    reorder nameChildren = ["cakeTray", "cakeModel", "cakeSurface"]
     def "cakeTray" (
-        active = true
-        prepend references = @cakeTray.usdz@
+        references = @cakeTray.usdz@
     )
     {
         float3 xformOp:scale = (1, 1, 1)
@@ -20,12 +20,37 @@ def Xform "Root"
     }
 
     def "cakeModel" (
-        active = true
-        prepend references = @cakeModel.usdz@
+        references = @cakeModel.usdz@
     )
     {
         float3 xformOp:scale = (1, 1, 1)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Cylinder "cakeSurface" (
+        active = true
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        uniform token axis = "Y"
+        double height = 0.01
+        rel material:binding = </Root/cakeSurface/DefaultMaterial>
+        double radius = 1.18
+        float3 xformOp:translate = (0, 0.79, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Material "DefaultMaterial"
+        {
+            token outputs:surface.connect = </Root/cakeSurface/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+            def Shader "DefaultSurfaceShader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (1, 1, 1)
+                float inputs:roughness = 0.75
+                token outputs:surface
+            }
+        }
     }
 }
 
