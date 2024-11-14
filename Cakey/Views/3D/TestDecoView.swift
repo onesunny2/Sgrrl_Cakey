@@ -33,7 +33,7 @@ struct TestDecoView: View {
                     } .padding(.bottom, 40)
                     
                     ScrollView(.horizontal, showsIndicators: false) {
-                        DecoImageCell(coordinator: coordinator2)
+                        DecoImageCell(/*coordinator: coordinator2*/)
                     } .padding(.leading, (UIScreen.main.bounds.width - 292) / 2)
                 }
             }

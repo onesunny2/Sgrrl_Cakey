@@ -24,11 +24,12 @@ struct CakeDecorationView: View {
                     .padding(.bottom, 40)
                 
                 // TODO: 도라미 3D 케이크 들어갈 자리(크기는 알아서 수정해도 돼)
-                Rectangle()
-                    .fill(.pickerPurple)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 70)
+//                Rectangle()
+//                    .fill(.pickerPurple)
+//                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+//                    .padding(.horizontal, 24)
+//                    .padding(.bottom, 70)
+                Cake3DDecoView()
                 
                 // MARK: 데코레이션 버튼 3개
                 // TODO: 각 버튼별 액션 도라미가 해줘야함
@@ -40,7 +41,7 @@ struct CakeDecorationView: View {
                     } .padding(.bottom, 40)
                     
                     ScrollView(.horizontal, showsIndicators: false) {
-                        //DecoImageCell()
+                        DecoImageCell()
                     } .padding(.leading, (UIScreen.main.bounds.width - 292) / 2)
                 }
             }

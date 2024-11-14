@@ -28,7 +28,7 @@ struct CakeColorView: View {
                     .padding(.bottom, 30)
                 
                 // MARK: 람지의 3D케이크 자리
-                Cake3DView(selectedColor: $selectedColor)
+                Cake3DColorView(selectedColor: $selectedColor)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(.horizontal, 20)
                     .padding(.bottom, 50)

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DecoImageCell: View {
-    @ObservedObject var coordinator: Coordinator2
+    //@ObservedObject var coordinator: Coordinator2
     
     // 임시 데이터
     var imgList: [String] = ["zzamong", "cakeBG"]
@@ -35,7 +35,7 @@ struct DecoImageCell: View {
                     }
                     .onTapGesture {
                         imgTouchAction(img)
-                        coordinator.addDecoEntity(imgName: img)
+                        //coordinator.addDecoEntity(imgName: img)
                     }
             }
             
@@ -58,7 +58,7 @@ struct DecoImageCell: View {
         Color.cakeyYellow1
             .ignoresSafeArea(.all)
         
-        DecoImageCell(coordinator: Coordinator2()) { imgName in
+        DecoImageCell(/*coordinator: Coordinator2()*/) { imgName in
             print("Tapped image name: \(imgName)")
         }
     }
