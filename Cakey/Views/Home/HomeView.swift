@@ -74,6 +74,8 @@ struct HomeView: View {
                         CakeDecorationView(value: value, path: $path)
                     } else if value == 5 {
                         CakeLetteringView(value: value, path: $path)
+                    } else if value == 6 {
+                        CakeOrderformView(value: value, path: $path)
                     }
                 }
                 
