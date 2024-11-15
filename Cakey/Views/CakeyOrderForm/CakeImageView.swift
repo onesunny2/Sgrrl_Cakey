@@ -61,6 +61,9 @@ struct CakeImageView: View {
 
             }
         }
+        .onTapGesture {
+            hideKeyboard()  // 화면 터치하면 키보드 내려가게
+        }
         .onAppear {
             // 키보드 높이 감지
             NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in

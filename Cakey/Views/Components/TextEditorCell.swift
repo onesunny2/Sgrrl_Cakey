@@ -36,6 +36,14 @@ struct TextEditorCell: View {
                         .overlay {
                             RoundedRectangle(cornerRadius: 12).stroke(Color.cakeyOrange1, lineWidth: 3)
                         }
+                        .background(
+                            Button(action: {
+                                // 빈 공간을 터치해도 키보드가 올라오도록 설정
+                                UIApplication.shared.sendAction(#selector(UIResponder.becomeFirstResponder), to: nil, from: nil, for: nil)
+                            }) {
+                                Color.clear
+                            }
+                        )
                     
                     Text("예시) HAPPY\nBIRTH\nDAY")
                         .customStyledFont(font: .cakeyCallout, color: text.isEmpty ? .textFieldGray : .clear)
