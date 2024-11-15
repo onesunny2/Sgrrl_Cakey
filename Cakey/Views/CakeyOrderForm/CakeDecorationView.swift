@@ -69,6 +69,9 @@ struct CakeDecorationView: View {
                 }
             }
         }
+        .onTapGesture {
+            hideKeyboard()
+        }
     }
 }
 

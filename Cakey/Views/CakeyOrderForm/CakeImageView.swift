@@ -27,7 +27,7 @@ struct CakeImageView: View {
                 DecoCarouselCell()
                     .padding(.bottom, 60)
                 
-                textFieldCell()
+                TextFieldCell()
                     .padding(.bottom, keyboardHeight - 200)
                 
                 Spacer()
@@ -60,6 +60,9 @@ struct CakeImageView: View {
                 .padding(.bottom, keyboardHeight)
 
             }
+        }
+        .onTapGesture {
+            hideKeyboard()  // 화면 터치하면 키보드 내려가게
         }
         .onAppear {
             // 키보드 높이 감지

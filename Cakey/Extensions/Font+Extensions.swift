@@ -42,7 +42,7 @@ extension Font {
     }
     
     static var cakeyTitle2: Font {
-        return hakgyoFont(size: 30)
+        return hakgyoFont(size: 25)
     }
     
     static var cakeyHeadline: Font {

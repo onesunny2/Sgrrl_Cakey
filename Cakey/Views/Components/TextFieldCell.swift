@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct textFieldCell: View {
+struct TextFieldCell: View {
     @State private var text: String = ""
     
     var body: some View {
@@ -41,6 +41,6 @@ struct textFieldCell: View {
         Color.cakeyYellow1
             .ignoresSafeArea(.all)
         
-        textFieldCell()
+        TextFieldCell()
     }
 }
