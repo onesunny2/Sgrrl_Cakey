@@ -19,30 +19,34 @@ struct CakeOrderformView: View {
         ZStack {
             Color.cakeyYellow1
                 .ignoresSafeArea(.all)
-            
-            VStack(spacing: 0) {
-                HStack {
-                    orderformTitle()
-                    Spacer()
-                } .padding(.leading, 17)
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 0) {
+                    HStack {
+                        orderformTitle()
+                        Spacer()
+                    }
+                    .padding(.leading, 17)
                     .padding(.bottom, -20)
-                
-                imageTabview()  // TODO: 안에 도라미 케이크 삽입 자리 있음
-                
-                designKeywordLists()
-                
-                Spacer()
-                
-                saveButton()
+                    
+                    imageTabview()  // TODO: 안에 도라미 케이크 삽입 자리 있음
+                    
+                    designKeywordLists()
+                    
+                    Spacer()
+                    
+                    saveButton()
+                }
+                .padding(.top, 20)
+                .padding(.bottom, 10)
             }
-            .padding(.top, 20)
-            .padding(.bottom, 10)
         }
         .onAppear {
             UIPageControl.appearance().currentPageIndicatorTintColor = UIColor.cakeyOrange1 // 현재 페이지 색상
             UIPageControl.appearance().pageIndicatorTintColor = UIColor.cakeyOrange3 // 나머지 페이지 색상
         }
         .navigationBarBackButtonHidden(true)
+        .toolbarBackground(.cakeyYellow1, for: .navigationBar)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
@@ -91,27 +95,27 @@ struct CakeOrderformView: View {
         TabView {
             Rectangle()
                 .fill(.pickerPink)
-                .frame(width: 250, height: 200)
+                .frame(width: 300, height: 250)
                 .overlay {
                     Text("1")
                 }
             
             Rectangle()
                 .fill(.pickerPink)
-                .frame(width: 250, height: 200)
+                .frame(width: 300, height: 250)
                 .overlay {
                     Text("2")
                 }
         }
         .tabViewStyle(PageTabViewStyle())
-        .frame(height: 300)
+        .frame(height: 350)
     }
     
     @ViewBuilder
     func designKeywordLists() -> some View {
         Text("이런 디자인이 들어갔으면 좋겠어요!")
             .customStyledFont(font: .cakeyBody, color: .cakeyOrange1)
-            .padding(.bottom, 18)
+            .padding(.bottom, 28)
         
         // 키워드 리스트
         VStack(alignment: .leading, spacing: 8) {
