@@ -9,12 +9,13 @@ import SwiftUI
 
 struct NextButtonCell: View {
     var nextValue: () -> Void
+    @State var buttonLabel: String = "다음"
     
     var body: some View {
         Button {
             nextValue()
         } label: {
-            Text("다음")
+            Text("\(buttonLabel)")
                 .customStyledFont(font: .cakeyBody, color: .cakeyYellow1)
                 .padding(.vertical, 13)
                 .frame(maxWidth: .infinity)

@@ -64,18 +64,21 @@ struct HomeView: View {
                     
                 }
                 .navigationDestination(for: Int.self) { value in
-                    if value == 1 {
+                    switch value {
+                    case 1:
                         ArchieveView()
-                    } else if value == 2 {
+                    case 2:
                         CakeColorView(value: value, path: $path)
-                    } else if value == 3 {
+                    case 3:
                         CakeImageView(value: value, path: $path)
-                    } else if value == 4 {
+                    case 4:
                         CakeDecorationView(value: value, path: $path)
-                    } else if value == 5 {
+                    case 5:
                         CakeLetteringView(value: value, path: $path)
-                    } else if value == 6 {
+                    case 6:
                         CakeOrderformView(value: value, path: $path)
+                    default:
+                        EmptyView()
                     }
                 }
                 
@@ -97,7 +100,7 @@ struct HomeView: View {
             }
             .padding(.horizontal, 20)
         }
-        .padding(.bottom, 20)
+        .padding(.bottom, 10)
     }
 }
 

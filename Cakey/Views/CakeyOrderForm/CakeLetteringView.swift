@@ -54,7 +54,7 @@ struct CakeLetteringView: View {
                 NextButtonCell(nextValue: {path.append(6)})
             }
             .padding(.top, 86)
-            .padding(.bottom, 20)
+            .padding(.bottom, 10)
             
         }
         .navigationBarBackButtonHidden(true)

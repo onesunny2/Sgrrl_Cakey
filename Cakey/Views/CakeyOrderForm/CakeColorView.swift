@@ -44,7 +44,7 @@ struct CakeColorView: View {
                 NextButtonCell(nextValue: { path.append(3)} )
             }
             .padding(.top, 86)
-            .padding(.bottom, 20)
+            .padding(.bottom, 10)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
