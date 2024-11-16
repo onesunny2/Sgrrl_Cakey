@@ -32,7 +32,7 @@ struct CakeOrderformView: View {
                     
                     designKeywordLists()
                     
-                    Spacer()
+                    Spacer(minLength: 16)
                     
                     saveButton()
                 }
