@@ -12,7 +12,7 @@ struct CakeOrderformView: View {
     let value: Int
     @Binding var path: [Int]
     @State var isOnLastPage: Bool = true
-    @State var keywords: [String] = ["케이키", "무사출시기원일곱여덟일이삼사오"]
+    @State var keywords: [String] = ["타이니는 개발을 해", "티나는 원피엠", "이브는 디자인피엠", "도라미는 케이크를 그려", "케이키", "무사출시기원일곱여덟일이삼사오"]
     
     
     var body: some View {
@@ -21,7 +21,11 @@ struct CakeOrderformView: View {
                 .ignoresSafeArea(.all)
             
             VStack(spacing: 0) {
-                orderformTitle()
+                HStack {
+                    orderformTitle()
+                    Spacer()
+                } .padding(.leading, 17)
+                    .padding(.bottom, -20)
                 
                 imageTabview()  // TODO: 안에 도라미 케이크 삽입 자리 있음
                 
@@ -31,6 +35,8 @@ struct CakeOrderformView: View {
                 
                 saveButton()
             }
+            .padding(.top, 20)
+            .padding(.bottom, 10)
         }
         .onAppear {
             UIPageControl.appearance().currentPageIndicatorTintColor = UIColor.cakeyOrange1 // 현재 페이지 색상
