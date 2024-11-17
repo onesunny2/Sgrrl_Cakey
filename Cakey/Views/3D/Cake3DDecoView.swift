@@ -39,8 +39,12 @@ struct Cake3DDecoView: View {
         VStack {
             // MARK: 전체, 개별 삭제
             HStack(spacing: 30) {
-                DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.trianglehead.2.clockwise.rotate.90", buttonAction: { })
-                DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "trash",buttonText: "선택 삭제", buttonAction: { })
+                DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.trianglehead.2.clockwise.rotate.90", buttonAction: {
+                    coordinator_deco.deleteAll()
+                })
+                DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "trash",buttonText: "선택 삭제", buttonAction: {
+                    coordinator_deco.deleteOne()
+                })
             } .padding(.bottom, 40)
             
             // MARK: 이미지 Cell
@@ -154,6 +158,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
         } as? AnyCancellable
         
         coordinator_deco.arView = arView
+        coordinator_deco.setupLongPressGeture()
 
         return arView
     }
@@ -177,13 +182,22 @@ class Coordinator_deco: NSObject, ObservableObject {
     var camera: PerspectiveCamera?
     var cancellable: AnyCancellable?
     
+    @Published var selectedEntity: ModelEntity? {
+        // MARK: 변경된 직후에 실행되는 관찰자
+        didSet {
+            if selectedEntity != oldValue {
+                blinkEntity(selectedEntity)
+            }
+        }
+    }
+
+    // MARK: 데코 추가 함수
     func addDecoEntity(imgName: String) {
         guard let arView = arView else { return }
 
         let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
         let plane = ModelEntity(mesh: planeMesh)
         
-        //let material = SimpleMaterial(color: .blue, isMetallic: true)
         if let texture = try? TextureResource.load(named: imgName) {
             var material = UnlitMaterial()
             material.color = .init(tint: .white, texture: .init(texture))
@@ -198,11 +212,61 @@ class Coordinator_deco: NSObject, ObservableObject {
         arView.installGestures([.all], for: plane)
 
         emptyAnchor?.addChild(plane)
-
-        print("addDecoEntity")
-        print("빈앵커에 추가된 것은: \(emptyAnchor?.children.count ?? 0)")
+    }
+    
+    // MARK: 전체 삭제
+    func deleteAll(){
+        guard let emptyAnchor = emptyAnchor else { return }
+        emptyAnchor.children.removeAll()
+    }
+    
+    // MARK: 선택 삭제 - 다시 보기!
+    func deleteOne(){
+        guard let selectedEntity = selectedEntity else { return }
+        emptyAnchor?.removeChild(selectedEntity)
+        self.selectedEntity = nil
+    }
+    
+    private func selectEntity(_ entity: ModelEntity) {
+        selectedEntity = entity
     }
 
+    private func blinkEntity(_ entity: ModelEntity?) {
+        guard let entity = entity else { return }
+        let originalMaterial = entity.model?.materials.first
+        var isRed = false
+
+        Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { timer in
+            guard self.selectedEntity == entity else {
+                timer.invalidate()
+                entity.model?.materials = [originalMaterial!]
+                return
+            }
+            
+            isRed.toggle()
+            var selectedMaterial = UnlitMaterial(color: .orange)
+            selectedMaterial.opacityThreshold = 0.1
+            
+            entity.model?.materials = [isRed ? selectedMaterial : originalMaterial!]
+        }
+    }
+    
+    
+    // MARK: LongPress 제스처 추가 함수
+    func setupLongPressGeture(){
+        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
+        arView?.addGestureRecognizer(longPressRecognizer)
+    }
+    
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began, let arView = arView else { return }
+        let location = gesture.location(in: arView)
+
+        if let entity = arView.entity(at: location) as? ModelEntity {
+            selectEntity(entity)
+        }
+    }
+    
         
     // MARK: 모델 사이즈 Clamp
     func clampCakeSize() {
