@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ArchieveView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    let value: Int
+    @Binding var path: [Int]
     
     var archieveColums: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
     
