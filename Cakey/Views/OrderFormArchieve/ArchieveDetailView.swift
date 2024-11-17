@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Photos
 
 struct ArchieveDetailView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -21,16 +22,7 @@ struct ArchieveDetailView: View {
                 .ignoresSafeArea(.all)
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 0) {
-                    HStack {
-                        orderformTitle()
-                        Spacer()
-                    }
-                    .padding(.leading, 17)
-                    .padding(.bottom, -20)
-                    
-                    imageTabview()  // TODO: 안에 도라미 케이크 삽입 자리 있음
-                    
-                    designKeywordLists()
+                    captureContent()  // 캡처 대상 뷰
                     
                     Spacer(minLength: 16)
                     
@@ -78,6 +70,39 @@ struct ArchieveDetailView: View {
                     }
                 }
             }
+        }
+        .confirmationDialog("", isPresented: $showActionSheet) {
+            Button("취소", role: .cancel) {}
+            Button("스크린샷 저장") {
+                let hostingController = UIHostingController(rootView: captureContent())
+                 let targetSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                 hostingController.view.frame = CGRect(origin: .zero, size: targetSize)
+                hostingController.view.backgroundColor = .cakeyYellow1
+                 
+                 // 현재 화면의 뷰 계층에 추가
+                 guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                       let window = windowScene.windows.first else {
+                     print("Failed to access UIWindow")
+                     return
+                 }
+                 window.addSubview(hostingController.view)
+
+                 // 캡처
+                 DispatchQueue.main.async {
+                     hostingController.view.layoutIfNeeded()
+                     if let capturedImage = hostingController.view.captureAsImage() {
+                         saveScreenShotToAlbum(capturedImage)
+                         print("Image captured and saved successfully.")
+                     } else {
+                         print("Failed to capture image.")
+                     }
+
+                     // 뷰 계층에서 제거
+                     hostingController.view.removeFromSuperview()
+                 }
+            }
+            // TODO: 3D 케이크 자리
+            Button("케이크만 저장") { }
         }
     }
     
@@ -143,6 +168,23 @@ struct ArchieveDetailView: View {
         }
     }
     
+    // 캡처 대상 뷰
+    func captureContent() -> some View {
+        VStack(spacing: 0) {
+            HStack {
+                orderformTitle()
+                Spacer()
+            }
+            .padding(.leading, 17)
+            .padding(.bottom, -20)
+            
+            imageTabview()
+            
+            designKeywordLists()
+        }
+        .background(Color.cakeyYellow1)
+    }
+    
     func saveButton() -> some View {
         VStack {
             Text("주문서를 저장하고, 사장님과 공유해보세요!")
@@ -167,14 +209,14 @@ struct ArchieveDetailView: View {
                         .fill(.cakeyOrange1)
                 }
                 .padding(.horizontal, 24)
-                .confirmationDialog("", isPresented: $showActionSheet) {
-                    Button("취소", role: .cancel) {}
-                    Button("스크린샷 저장") {}
-                    Button("케이크만 저장") {}
-                }
             }
         }
     }
+}
+
+func saveScreenShotToAlbum(_ screenShot: UIImage) {
+    UIImageWriteToSavedPhotosAlbum(screenShot, nil, nil, nil)
+    print("정상적으로 앨범에 저장되었습니다.")
 }
 
 //#Preview {
