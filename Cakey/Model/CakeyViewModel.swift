@@ -21,18 +21,8 @@ class CakeyViewModel {
         self.realm.addCakey(cakeyModel)  // Create
     }
     
-    // Read
-    func readSortedCakeys() -> [CakeyModel] {
-        self.realm.readCakey().sorted(by: {$0.saveDate > $1.saveDate} )
-    }
-    
     // Update
     func updateCakey() {
         self.realm.updateCakey(self.cakeyModel)
-    }
-    
-    // Delete
-    func deleteCakey(key: String) {
-        self.realm.deleteCakey(key)
     }
 }

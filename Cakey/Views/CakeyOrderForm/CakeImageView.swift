@@ -12,6 +12,7 @@ struct CakeImageView: View {
     let value: Int
     @Binding var path: [Int]
     @State private var keyboardHeight: CGFloat = 0
+    var viewModel: CakeyViewModel
     
     var body: some View {
         ZStack {
@@ -87,6 +88,6 @@ struct CakeImageView: View {
     }
 }
 
-#Preview {
-    CakeImageView(value: 3, path: .constant([3]))
-}
+//#Preview {
+//    CakeImageView(value: 3, path: .constant([3]))
+//}

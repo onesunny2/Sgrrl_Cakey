@@ -11,6 +11,7 @@ struct CakeDecorationView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     let value: Int
     @Binding var path: [Int]
+    var viewModel: CakeyViewModel
     
     var body: some View {
         ZStack {
@@ -40,7 +41,7 @@ struct CakeDecorationView: View {
                     } .padding(.bottom, 40)
                     
                     ScrollView(.horizontal, showsIndicators: false) {
-                        DecoImageCell()
+                        DecoImageCell(imgList: viewModel.cakeyModel.cakeImages)
                     } .padding(.leading, (UIScreen.main.bounds.width - 292) / 2)
                 }
             }
@@ -75,6 +76,6 @@ struct CakeDecorationView: View {
     }
 }
 
-#Preview {
-    CakeDecorationView(value: 4, path: .constant([4]))
-}
+//#Preview {
+//    CakeDecorationView(value: 4, path: .constant([4]))
+//}

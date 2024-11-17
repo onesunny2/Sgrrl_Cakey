@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct DecoCarouselCell: View {
     @State private var currentIndex: Int = 0

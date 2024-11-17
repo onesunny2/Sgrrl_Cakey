@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var path: [Int] = []
+    @Bindable var viewModel = CakeyViewModel(cakeyModel: CakeyModel())
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -68,15 +69,15 @@ struct HomeView: View {
                     case 1:
                         ArchieveView(value: value, path: $path)
                     case 2:
-                        CakeColorView(value: value, path: $path)
+                        CakeColorView(value: value, path: $path, viewModel: viewModel)
                     case 3:
-                        CakeImageView(value: value, path: $path)
+                        CakeImageView(value: value, path: $path, viewModel: viewModel)
                     case 4:
-                        CakeDecorationView(value: value, path: $path)
+                        CakeDecorationView(value: value, path: $path, viewModel: viewModel)
                     case 5:
-                        CakeLetteringView(value: value, path: $path)
+                        CakeLetteringView(value: value, path: $path, viewModel: viewModel)
                     case 6:
-                        CakeOrderformView(value: value, path: $path)
+                        CakeOrderformView(value: value, path: $path, viewModel: viewModel)
                     case 7:
                         ArchieveDetailView(value: value, path: $path)
                     default:
