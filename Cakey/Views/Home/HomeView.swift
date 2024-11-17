@@ -66,7 +66,7 @@ struct HomeView: View {
                 .navigationDestination(for: Int.self) { value in
                     switch value {
                     case 1:
-                        ArchieveView()
+                        ArchieveView(value: value, path: $path)
                     case 2:
                         CakeColorView(value: value, path: $path)
                     case 3:
@@ -77,6 +77,8 @@ struct HomeView: View {
                         CakeLetteringView(value: value, path: $path)
                     case 6:
                         CakeOrderformView(value: value, path: $path)
+                    case 7:
+                        ArchieveDetailView(value: value, path: $path)
                     default:
                         EmptyView()
                     }

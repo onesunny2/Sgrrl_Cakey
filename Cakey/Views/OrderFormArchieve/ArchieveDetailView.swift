@@ -1,19 +1,18 @@
 //
-//  CakeOrderformView.swift
+//  ArchieveDetailView.swift
 //  Cakey
 //
-//  Created by Lee Wonsun on 11/14/24.
+//  Created by Lee Wonsun on 11/17/24.
 //
 
 import SwiftUI
 
-struct CakeOrderformView: View {
+struct ArchieveDetailView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     let value: Int
     @Binding var path: [Int]
     @State var isOnLastPage: Bool = true
     @State var keywords: [String] = ["타이니는 개발을 해", "티나는 원피엠", "이브는 디자인피엠", "도라미는 케이크를 그려", "케이키", "무사출시기원일곱여덟일이삼사오"]
-    
     
     var body: some View {
         ZStack {
@@ -59,13 +58,24 @@ struct CakeOrderformView: View {
             }
             
             ToolbarItem(placement: .topBarTrailing) {
+                HStack(spacing: 8) {
                     Button {
-                        path.removeAll() // 홈으로 돌아가기
+                        // TODO: 삭제하기 기능 추가 필요
+                    } label: {
+                        Image(systemName: "trash")
+                            .font(.cakeyCallout)
+                            .foregroundStyle(.cakeyOrange1)
+                    }
+
+                    
+                    Button {
+                        path.removeAll()
                     } label: {
                         Image(systemName: "house")
                             .font(.cakeyCallout)
                             .foregroundStyle(.cakeyOrange1)
                     }
+                }
             }
         }
     }
@@ -162,5 +172,5 @@ struct CakeOrderformView: View {
 }
 
 //#Preview {
-//    CakeOrderformView(value: 6, path: .constant([6]))
+//    ArchieveDetailView()
 //}

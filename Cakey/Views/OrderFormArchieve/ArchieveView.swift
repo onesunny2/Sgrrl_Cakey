@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ArchieveView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    let value: Int
+    @Binding var path: [Int]
     
     var archieveColums: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
     
@@ -17,7 +19,7 @@ struct ArchieveView: View {
             Color.cakeyYellow1
                 .ignoresSafeArea(.all)
             
-            VStack(spacing: 32) {
+            VStack(spacing: 13) {
                 HStack {
                     Text("나의 케이크 도안")
                         .customStyledFont(font: .cakeyTitle1, color: .cakeyOrange1)
@@ -30,8 +32,9 @@ struct ArchieveView: View {
                             ArchieveCell()
                         }
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 10)
                 }
-                .padding(.horizontal, 20)
             }
             .padding(.top, 28)
         }
@@ -50,6 +53,6 @@ struct ArchieveView: View {
     }
 }
 
-#Preview {
-    ArchieveView()
-}
+//#Preview {
+//    ArchieveView()
+//}
