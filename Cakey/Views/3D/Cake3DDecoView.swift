@@ -10,19 +10,23 @@ import ARKit
 import RealityKit
 import Combine
 
+// 수정 모드를 나누거나, cake와 plane같이 스케일 조정할 수 있게 해야함.
+
 // MARK: - CakeDecoView에 들어갈 3D
 struct Cake3DDecoView: View {
     @StateObject private var coordinator_deco = Coordinator_deco()
-    
     @State private var cameraHeight: Float = 0.8
+    
     var topView: CameraMode = CameraMode.topView
     var sideView: CameraMode = CameraMode.sideView
+    
+    // TODO: - 데이터에서 불러오기
     var imgList: [String] = ["p1"]
     
     var body: some View {
         ZStack{
-            ARViewContainer_deco(cameraHeight: $cameraHeight).ignoresSafeArea()
-            
+            ARViewContainer_deco(coordinator_deco: coordinator_deco, cameraHeight: $cameraHeight).ignoresSafeArea()
+        
             HStack{
                 Spacer()
                 VerticalSlider(value: $cameraHeight, range: sideView.cameraHeight...topView.cameraHeight)
@@ -33,11 +37,13 @@ struct Cake3DDecoView: View {
         }
         
         VStack {
+            // MARK: 전체, 개별 삭제
             HStack(spacing: 30) {
                 DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.trianglehead.2.clockwise.rotate.90", buttonAction: { })
                 DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "trash",buttonText: "선택 삭제", buttonAction: { })
             } .padding(.bottom, 40)
             
+            // MARK: 이미지 Cell
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(0..<5, id: \.self) { index in
@@ -77,65 +83,73 @@ struct Cake3DDecoView: View {
                     }
 
                 }
-            } .padding(.leading, (UIScreen.main.bounds.width - 292) / 2)
+            }
+                .padding(.leading, (UIScreen.main.bounds.width - 292) / 2)
         }
     }
 }
 
 // MARK: - ARViewContainer
 struct ARViewContainer_deco: UIViewRepresentable {
+    @ObservedObject var coordinator_deco: Coordinator_deco  // 코오디네이터 1
     @Binding var cameraHeight: Float
     
-    // TODO: - 타이니 클래스에서 색상 불러오기
-    var selectedColor:Color = .white
+    // TODO: - 색상 데이터 불러오기
+    var selectedColor: Color = .white
     
     func makeUIView(context: Context) -> ARView {
         // MARK: ARView 초기화
         let arView = ARView(frame: .zero, cameraMode: .nonAR, automaticallyConfigureSession: false)
         arView.environment.background = .color(.clear)
         
-        // MARK: CakeModel
+        // MARK: CakeModel - Cake
         let cakeModel = try! ModelEntity.loadModel(named: "cakeModel")
         cakeModel.scale = SIMD3(repeating: 0.43)
         let selectedMaterial = SimpleMaterial(color: UIColor(selectedColor), isMetallic: false)
         cakeModel.model?.materials = [selectedMaterial]
         
+        // MARK: CakeModel - CakeTray
         let cakeTrayModel = try! ModelEntity.loadModel(named: "cakeTray")
         cakeTrayModel.scale = SIMD3(repeating: 0.43)
         
+        // MARK: CakeModel - Cake + CakeTray
         let cakeParentEntity = ModelEntity()
         cakeParentEntity.addChild(cakeModel)
         cakeParentEntity.addChild(cakeTrayModel)
-        
         cakeParentEntity.generateCollisionShapes(recursive: true)
         
         arView.installGestures([.rotation, .scale], for: cakeParentEntity)
         
         // MARK: TODO: CakeSurface
-        let cakeSurfaceModel = try! ModelEntity.loadModel(named: "cakeSurface")
-        cakeSurfaceModel.scale = SIMD3(repeating: 0.43)
-        let cakeWholeEntity = ModelEntity()
+//        let cakeSurfaceModel = try! ModelEntity.loadModel(named: "cakeSurface")
+//        cakeSurfaceModel.scale = SIMD3(repeating: 0.43)
+//        let cakeWholeEntity = ModelEntity()
         
-        // TEST
-        let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
-        let planeMaterial = SimpleMaterial(color: .pickerBlue, isMetallic: true)
-        let planeModel = ModelEntity(mesh: planeMesh, materials:[planeMaterial])
-        planeModel.position.y += 0.79 * 0.43    // 높이
-        cakeParentEntity.addChild(planeModel)
+        // TEST이부분을 Coordinator의 함수로 바꾸고,
+        //  Cake3DDecoView의 버튼을 누르면 함수가 호출되도록 해줘!
+//        let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
+//        let planeMaterial = SimpleMaterial(color: .pickerBlue, isMetallic: true)
+//        let planeModel = ModelEntity(mesh: planeMesh, materials:[planeMaterial])
+//        planeModel.position.y += 0.79 * 0.43    // 높이
+//        cakeParentEntity.addChild(planeModel)
         
-        cakeWholeEntity.addChild(cakeParentEntity)
-        cakeWholeEntity.addChild(cakeSurfaceModel)
-        context.coordinator.cakeWholeEntity = cakeWholeEntity
+        //cakeWholeEntity.addChild(cakeParentEntity)
+        //cakeWholeEntity.addChild(cakeSurfaceModel)
+        coordinator_deco.cakeParentEntity = cakeParentEntity
         
+        // MARK: 데코 달아줄 entity
+        let emptyAnchor = AnchorEntity(world: [0,0,0])
+        coordinator_deco.emptyAnchor = emptyAnchor
+        arView.scene.addAnchor(emptyAnchor)
+        
+        // MARK: CakeAnchor
         let cakeAnchor = AnchorEntity(world: [0, 0, 0])
         cakeAnchor.addChild(cakeParentEntity)
-        cakeAnchor.addChild(cakeSurfaceModel)
-        //arView.scene.anchors.append(cakeAnchor)
+        cakeAnchor.addChild(emptyAnchor)
+        
         arView.scene.addAnchor(cakeAnchor)
         
-        //test
-        context.coordinator.emptyAnchor = cakeAnchor
-        
+    
         // MARK: Virtual Camera
         let camera = PerspectiveCamera()
         camera.position = [0, cameraHeight, 1]
@@ -145,6 +159,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
         cameraAnchor.addChild(camera)
         arView.scene.addAnchor(cameraAnchor)
         
+        
         // MARK: updateUI에서 감지 못하는 SceneEvent 구독
         context.coordinator.cancellable = arView.scene.subscribe(to: SceneEvents.Update.self) { _ in
             // MARK: 카메라 각도 조정
@@ -152,6 +167,8 @@ struct ARViewContainer_deco: UIViewRepresentable {
             // MARK: 모델 사이즈 Clamp
             context.coordinator.clampCakeSize()
         } as? AnyCancellable
+        
+        coordinator_deco.arView = arView
 
         return arView
     }
@@ -164,44 +181,38 @@ struct ARViewContainer_deco: UIViewRepresentable {
     }
     
     func makeCoordinator() -> Coordinator_deco {
-        return Coordinator_deco()
+        return Coordinator_deco()   // 코오디네이터 2
     }
 }
 
 class Coordinator_deco: NSObject, ObservableObject {
     var arView: ARView?
     var emptyAnchor:  AnchorEntity?
-    var cakeWholeEntity: ModelEntity?
+    var cakeParentEntity: ModelEntity?
     var camera: PerspectiveCamera?
     var cancellable: AnyCancellable?
     
-    // MARK: 데코 추가
     func addDecoEntity(imgName: String) {
-        guard !imgName.isEmpty, let arView = arView else { return }
+        guard let arView = arView else { return }
 
-        let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
-        let plane = ModelEntity(mesh: planeMesh)
-        plane.position.y += 0.79 * 0.45
-
-        if let texture = try? TextureResource.load(named: imgName) {
-            var material = UnlitMaterial()
-            material.color = .init(tint: .white, texture: .init(texture))
-            //material.opacityThreshold = 0.1
-            plane.model?.materials = [material]
-        }
+        let planeMesh = MeshResource.generatePlane(width: 0.5, depth: 0.5)
+        let material = SimpleMaterial(color: .blue, isMetallic: true)
+        let plane = ModelEntity(mesh: planeMesh, materials: [material])
+        plane.position.y += 0.79 * 0.43
 
         plane.generateCollisionShapes(recursive: true)
         arView.installGestures([.all], for: plane)
 
         emptyAnchor?.addChild(plane)
-        print("앵커의 수는 + \(arView.scene.anchors.count)")
+
         print("addDecoEntity")
+        print("빈앵커에 추가된 것은: \(emptyAnchor?.children.count ?? 0)")
     }
 
-    
+        
     // MARK: 모델 사이즈 Clamp
     func clampCakeSize() {
-        guard let model = cakeWholeEntity else { return }
+        guard let model = cakeParentEntity else { return }
         
         let currentScale = model.scale.x
         var newScale = currentScale
@@ -225,3 +236,5 @@ class Coordinator_deco: NSObject, ObservableObject {
     //Cake3DDecoView()
     CakeDecorationView(value: 4, path: .constant([4]))
 }
+
+// 높이 계산이 어떻게 되고 있는지 봐야 함..
