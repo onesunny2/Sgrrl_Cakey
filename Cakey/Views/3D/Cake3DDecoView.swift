@@ -21,7 +21,7 @@ struct Cake3DDecoView: View {
     var sideView: CameraMode = CameraMode.sideView
     
     // TODO: - 데이터에서 불러오기
-    var imgList: [String] = ["p1"]
+    var imgList: [String] = ["p1", "p2","p3","p4","p5"]
     
     var body: some View {
         ZStack{
@@ -120,21 +120,6 @@ struct ARViewContainer_deco: UIViewRepresentable {
         
         arView.installGestures([.rotation, .scale], for: cakeParentEntity)
         
-        // MARK: TODO: CakeSurface
-//        let cakeSurfaceModel = try! ModelEntity.loadModel(named: "cakeSurface")
-//        cakeSurfaceModel.scale = SIMD3(repeating: 0.43)
-//        let cakeWholeEntity = ModelEntity()
-        
-        // TEST이부분을 Coordinator의 함수로 바꾸고,
-        //  Cake3DDecoView의 버튼을 누르면 함수가 호출되도록 해줘!
-//        let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
-//        let planeMaterial = SimpleMaterial(color: .pickerBlue, isMetallic: true)
-//        let planeModel = ModelEntity(mesh: planeMesh, materials:[planeMaterial])
-//        planeModel.position.y += 0.79 * 0.43    // 높이
-//        cakeParentEntity.addChild(planeModel)
-        
-        //cakeWholeEntity.addChild(cakeParentEntity)
-        //cakeWholeEntity.addChild(cakeSurfaceModel)
         coordinator_deco.cakeParentEntity = cakeParentEntity
         
         // MARK: 데코 달아줄 entity
@@ -195,10 +180,19 @@ class Coordinator_deco: NSObject, ObservableObject {
     func addDecoEntity(imgName: String) {
         guard let arView = arView else { return }
 
-        let planeMesh = MeshResource.generatePlane(width: 0.5, depth: 0.5)
-        let material = SimpleMaterial(color: .blue, isMetallic: true)
-        let plane = ModelEntity(mesh: planeMesh, materials: [material])
-        plane.position.y += 0.79 * 0.43
+        let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
+        let plane = ModelEntity(mesh: planeMesh)
+        
+        //let material = SimpleMaterial(color: .blue, isMetallic: true)
+        if let texture = try? TextureResource.load(named: imgName) {
+            var material = UnlitMaterial()
+            material.color = .init(tint: .white, texture: .init(texture))
+            material.opacityThreshold = 0.1
+            plane.model?.materials = [material]
+        }
+        
+        plane.position.y += 0.79 * 0.43 + 0.03
+        plane.scale /= 3
 
         plane.generateCollisionShapes(recursive: true)
         arView.installGestures([.all], for: plane)
