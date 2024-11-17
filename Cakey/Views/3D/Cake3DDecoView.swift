@@ -10,12 +10,14 @@ import ARKit
 import RealityKit
 import Combine
 
-
 // MARK: - CakeDecoView에 들어갈 3D
 struct Cake3DDecoView: View {
+    @StateObject private var coordinator_deco = Coordinator_deco()
+    
     @State private var cameraHeight: Float = 0.8
     var topView: CameraMode = CameraMode.topView
     var sideView: CameraMode = CameraMode.sideView
+    var imgList: [String] = ["p1"]
     
     var body: some View {
         ZStack{
@@ -24,10 +26,58 @@ struct Cake3DDecoView: View {
             HStack{
                 Spacer()
                 VerticalSlider(value: $cameraHeight, range: sideView.cameraHeight...topView.cameraHeight)
-                    .frame(width: 15, height: 300)
+                    .frame(width: 30, height: 300)
                     .padding()
                     .background(.clear)
             }
+        }
+        
+        VStack {
+            HStack(spacing: 30) {
+                DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.trianglehead.2.clockwise.rotate.90", buttonAction: { })
+                DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "trash",buttonText: "선택 삭제", buttonAction: { })
+            } .padding(.bottom, 40)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(0..<5, id: \.self) { index in
+                        if index < imgList.count {
+                            let img = imgList[index]
+                            Button(action: {
+                                coordinator_deco.addDecoEntity(imgName: img)
+                                print("버튼 눌렀다!")
+                            }) {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(.clear)
+                                    .frame(width: 80, height: 80)
+                                    .overlay {
+                                        ZStack {
+                                            Image("\(img)")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 80)
+                                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                            
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .stroke(Color.cakeyOrange1, lineWidth: 2)
+                                                .padding(1)
+                                        }
+                                    }
+                            }
+                        } else {
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(.cakeyOrange2)
+                                .frame(width: 80, height: 80)
+                                .overlay {
+                                    Image(systemName: "photo")
+                                        .font(.symbolTitle2)
+                                        .foregroundStyle(.cakeyOrange3)
+                                }
+                        }
+                    }
+
+                }
+            } .padding(.leading, (UIScreen.main.bounds.width - 292) / 2)
         }
     }
 }
@@ -49,7 +99,6 @@ struct ARViewContainer_deco: UIViewRepresentable {
         cakeModel.scale = SIMD3(repeating: 0.43)
         let selectedMaterial = SimpleMaterial(color: UIColor(selectedColor), isMetallic: false)
         cakeModel.model?.materials = [selectedMaterial]
-        context.coordinator.cakeEntity = cakeModel
         
         let cakeTrayModel = try! ModelEntity.loadModel(named: "cakeTray")
         cakeTrayModel.scale = SIMD3(repeating: 0.43)
@@ -59,18 +108,33 @@ struct ARViewContainer_deco: UIViewRepresentable {
         cakeParentEntity.addChild(cakeTrayModel)
         
         cakeParentEntity.generateCollisionShapes(recursive: true)
-        context.coordinator.cakeParentEntity = cakeParentEntity
+        
         arView.installGestures([.rotation, .scale], for: cakeParentEntity)
         
-        // MARK: CakeSurface - TODO
+        // MARK: TODO: CakeSurface
         let cakeSurfaceModel = try! ModelEntity.loadModel(named: "cakeSurface")
         cakeSurfaceModel.scale = SIMD3(repeating: 0.43)
+        let cakeWholeEntity = ModelEntity()
         
+        // TEST
+        let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
+        let planeMaterial = SimpleMaterial(color: .pickerBlue, isMetallic: true)
+        let planeModel = ModelEntity(mesh: planeMesh, materials:[planeMaterial])
+        planeModel.position.y += 0.79 * 0.43    // 높이
+        cakeParentEntity.addChild(planeModel)
+        
+        cakeWholeEntity.addChild(cakeParentEntity)
+        cakeWholeEntity.addChild(cakeSurfaceModel)
+        context.coordinator.cakeWholeEntity = cakeWholeEntity
         
         let cakeAnchor = AnchorEntity(world: [0, 0, 0])
         cakeAnchor.addChild(cakeParentEntity)
         cakeAnchor.addChild(cakeSurfaceModel)
-        arView.scene.anchors.append(cakeAnchor)
+        //arView.scene.anchors.append(cakeAnchor)
+        arView.scene.addAnchor(cakeAnchor)
+        
+        //test
+        context.coordinator.emptyAnchor = cakeAnchor
         
         // MARK: Virtual Camera
         let camera = PerspectiveCamera()
@@ -96,7 +160,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
         // MARK: 슬라이더 연동 Camera 높이값 변동
         context.coordinator.camera?.position.y = cameraHeight
         context.coordinator.camera?.position.x = cameraHeight * 0.6
-        context.coordinator.cakeParentEntity?.scale *= cameraHeight * 1.2
+        //context.coordinator.cakeParentEntity?.scale *= cameraHeight * 1.2
     }
     
     func makeCoordinator() -> Coordinator_deco {
@@ -104,15 +168,40 @@ struct ARViewContainer_deco: UIViewRepresentable {
     }
 }
 
-class Coordinator_deco: NSObject {
-    var cakeEntity: ModelEntity?
-    var cakeParentEntity: ModelEntity?
+class Coordinator_deco: NSObject, ObservableObject {
+    var arView: ARView?
+    var emptyAnchor:  AnchorEntity?
+    var cakeWholeEntity: ModelEntity?
     var camera: PerspectiveCamera?
     var cancellable: AnyCancellable?
     
+    // MARK: 데코 추가
+    func addDecoEntity(imgName: String) {
+        guard !imgName.isEmpty, let arView = arView else { return }
+
+        let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
+        let plane = ModelEntity(mesh: planeMesh)
+        plane.position.y += 0.79 * 0.45
+
+        if let texture = try? TextureResource.load(named: imgName) {
+            var material = UnlitMaterial()
+            material.color = .init(tint: .white, texture: .init(texture))
+            //material.opacityThreshold = 0.1
+            plane.model?.materials = [material]
+        }
+
+        plane.generateCollisionShapes(recursive: true)
+        arView.installGestures([.all], for: plane)
+
+        emptyAnchor?.addChild(plane)
+        print("앵커의 수는 + \(arView.scene.anchors.count)")
+        print("addDecoEntity")
+    }
+
+    
     // MARK: 모델 사이즈 Clamp
     func clampCakeSize() {
-        guard let model = cakeParentEntity else { return }
+        guard let model = cakeWholeEntity else { return }
         
         let currentScale = model.scale.x
         var newScale = currentScale
@@ -127,53 +216,6 @@ class Coordinator_deco: NSObject {
         
         if newScale != currentScale {
             model.scale = SIMD3(repeating: newScale)
-        }
-    }
-}
-
-//enum CameraMode {
-//    case quarterView
-//    case topDownView
-//    
-//    var angle: Double {
-//        switch self {
-//        case .quarterView:
-//            return -45.0 * .pi / 180.0
-//        case .topDownView:
-//            return -90.0 * .pi / 180.0
-//        }
-//    }
-//    
-//    var position: SIMD3<Float> {
-//        switch self {
-//        case .quarterView:
-//            return [0, 0.5, 0.5]
-//        case .topDownView:
-//            return [0, 0.65, 0]
-//        }
-//    }
-//    
-//    var defaultGestureMode: GestureMode {
-//        switch self {
-//        case .quarterView:
-//            return .allGesture
-//        case .topDownView:
-//            return .onlyScaleGesture
-//        }
-//    }
-//}
-
-
-enum GestureMode {
-    case onlyScaleGesture
-    case allGesture
-    
-    var scale: [Double] {
-        switch self {
-        case .onlyScaleGesture:
-            return [1.0, 2.0]
-        case .allGesture:
-            return [0.5, 3.0]
         }
     }
 }

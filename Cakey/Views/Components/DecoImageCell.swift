@@ -8,9 +8,8 @@
 import SwiftUI
 
 struct DecoImageCell: View {
-    //@ObservedObject var coordinator: Coordinator2
-    
-    // 임시 데이터
+
+    // TODO: 데이터 연결
     var imgList: [String] = ["zzamong", "cakeBG"]
     var imgTouchAction: (String) -> Void = { _ in }
     

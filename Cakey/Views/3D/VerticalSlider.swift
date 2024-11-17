@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-//세로 슬라이더
+// MARK: - Camera Slider
 struct VerticalSlider: View {
     @Binding var value: Float
     var range: ClosedRange<Float>
@@ -19,11 +19,11 @@ struct VerticalSlider: View {
                 Rectangle()
                     .fill(.cakeyOrange1)
                     .frame(height: CGFloat((value - range.lowerBound) / (range.upperBound - range.lowerBound)) * geometry.size.height)
-                    .cornerRadius(5)
+                    .cornerRadius(25)
             }
             .frame(width: geometry.size.width)
             .background(Color.gray.opacity(0.3))
-            .cornerRadius(5)
+            .cornerRadius(20)
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { gesture in

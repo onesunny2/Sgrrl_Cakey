@@ -3,6 +3,16 @@
     "objectMetadataList" : [
       [
         "AF3D030A-6F01-40AF-AF17-7EC0F899DE85",
+        "Root",
+        "SkyDome"
+      ],
+      {
+        "disallowsFraming" : true,
+        "isExpanded" : false,
+        "isLocked" : false
+      },
+      [
+        "AF3D030A-6F01-40AF-AF17-7EC0F899DE85",
         "Root"
       ],
       {
