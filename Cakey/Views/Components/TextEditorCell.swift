@@ -53,7 +53,7 @@ struct TextEditorCell: View {
                 }
 
                 
-                Text("최대 3문단 입력 가능")
+                Text("최대 3줄 / 한 줄당 7자 제한")
                     .customStyledFont(font: .cakeyCaption1, color: .cakeyOrange3)
             }
         }
