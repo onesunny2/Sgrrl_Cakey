@@ -13,6 +13,7 @@ struct ArchieveDetailView: View {
     @Binding var path: [Int]
     @State var isOnLastPage: Bool = true
     @State var keywords: [String] = ["타이니는 개발을 해", "티나는 원피엠", "이브는 디자인피엠", "도라미는 케이크를 그려", "케이키", "무사출시기원일곱여덟일이삼사오"]
+    @State var showActionSheet: Bool = false
     
     var body: some View {
         ZStack {
@@ -149,7 +150,7 @@ struct ArchieveDetailView: View {
                 .padding(.bottom, 11)
             
             Button {
-                
+                self.showActionSheet = true
             } label: {
                 HStack(spacing: 3) {
                     Image(systemName: "square.and.arrow.down")
@@ -166,6 +167,11 @@ struct ArchieveDetailView: View {
                         .fill(.cakeyOrange1)
                 }
                 .padding(.horizontal, 24)
+                .confirmationDialog("", isPresented: $showActionSheet) {
+                    Button("취소", role: .cancel) {}
+                    Button("스크린샷 저장") {}
+                    Button("케이크만 저장") {}
+                }
             }
         }
     }
