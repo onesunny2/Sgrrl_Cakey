@@ -13,7 +13,7 @@ struct ArchieveCell: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 12)
             .fill(.pickerWhite)
-            .shadow(color: .black.opacity(0.15), radius: 18, x: 0, y: 8)
+            .shadow(color: .black.opacity(0.15), radius: 9, x: 0, y: 8)
             .frame(width: 166, height: 220)
             .overlay {
                 // TODO: 라미 3D 케이크 들어갈 자리(프레임 크기 알아서 변경 필요하면 해줘)
@@ -37,11 +37,11 @@ func archiveDateFormatter(from date: Date) -> String {
 }
 
 
-#Preview {
-    ZStack {
-        Color.cakeyYellow1
-            .ignoresSafeArea(.all)
-        
-        ArchieveCell()
-    }
-}
+//#Preview {
+//    ZStack {
+//        Color.cakeyYellow1
+//            .ignoresSafeArea(.all)
+//        
+//        ArchieveCell()
+//    }
+//}
