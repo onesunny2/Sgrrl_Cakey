@@ -164,7 +164,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
     @Binding var activeMode: EditMode
     
     // TODO: - 색상 데이터 불러오기
-    var selectedColor: Color = .white
+    var selectedColor: Color = .cakeyOrange2
     
     func makeUIView(context: Context) -> ARView {
         // MARK: ARView 초기화
@@ -186,10 +186,11 @@ struct ARViewContainer_deco: UIViewRepresentable {
         cakeParentEntity.addChild(cakeModel)
         cakeParentEntity.addChild(cakeTrayModel)
         cakeParentEntity.generateCollisionShapes(recursive: true)
-        cakeParentEntity.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: [1, 1, 1])])
-        arView.installGestures([.rotation, .scale], for: cakeParentEntity)
+        //cakeParentEntity.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: [1, 1, 1])])
+        //arView.installGestures([.rotation, .scale], for: cakeParentEntity)
         
         coordinator_deco.cakeParentEntity = cakeParentEntity
+        arView.installGestures([.rotation, .scale], for: cakeParentEntity)
         
         // MARK: 데코 달아줄 entity
         let emptyAnchor = AnchorEntity(world: [0,0,0])
@@ -268,6 +269,15 @@ class Coordinator_deco: NSObject, ObservableObject {
         
         switch activeMode {
         case .editMode:
+            // 여기가 이상한듯한데 어떻게 해야하지
+            if let cakeParentEntity = cakeParentEntity {
+                print("cakeParentEntity에 무언가 담김!")
+                cakeParentEntity.children.forEach{ cake in
+                    if let deco = cake as? ModelEntity{
+                        deco.collision?.filter = CollisionFilter(group: cakeGroup, mask: [])
+                    }
+                }
+            }
             print("현재 수정모드이고, ")
             emptyAnchor?.children.forEach { entity in
                 if let decoEntity = entity as? ModelEntity {
@@ -275,23 +285,22 @@ class Coordinator_deco: NSObject, ObservableObject {
                 }
             }
             
-            // 여기가 이상한듯한데 어떻게 해야하지
-            if let cakeParentEntity = cakeParentEntity {
-                print("cakeParentEntity에 무언가 담김!")
-                cakeParentEntity.collision?.filter = CollisionFilter(group: cakeGroup, mask: [])
-                arView.installGestures([.rotation, .scale], for: cakeParentEntity)
-            }
+            
             print("수정 모드 활성화: 데코만 제스처 작용")
             
         case .lookMode:
+            
+            if let cakeParentEntity = cakeParentEntity {
+                cakeParentEntity.children.forEach{ cake in
+                    if let deco = cake as? ModelEntity{
+                        deco.collision?.filter = CollisionFilter(group: cakeGroup, mask: .all)
+                    }
+                }
+            }
             emptyAnchor?.children.forEach { entity in
                 if let decoEntity = entity as? ModelEntity {
                     decoEntity.collision?.filter = CollisionFilter(group: decoGroup, mask: [])
                 }
-            }
-            if let cakeParentEntity = cakeParentEntity {
-                arView.installGestures([.rotation, .scale], for: cakeParentEntity)
-                cakeParentEntity.collision?.filter = CollisionFilter(group: cakeGroup, mask: .all)
             }
             print("살펴보기 모드 활성화: 케이크만 제스처 작용")
             
@@ -319,7 +328,7 @@ class Coordinator_deco: NSObject, ObservableObject {
 //        plane.position.y += 0.79 * 0.43 + 0.03
 //        plane.scale /= 3
         
-        plane.position.y += 0.79 * 0.43 + 0.05
+        plane.position.y += 0.79 * 0.43 + 0.04
         plane.scale /= 2
 
         plane.generateCollisionShapes(recursive: true)
