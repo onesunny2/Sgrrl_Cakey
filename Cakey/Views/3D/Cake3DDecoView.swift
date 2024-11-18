@@ -30,7 +30,7 @@ struct Cake3DDecoView: View {
             HStack{
                 Spacer()
                 VerticalSlider(value: $cameraHeight, range: sideView.cameraHeight...topView.cameraHeight)
-                    .frame(width: 30, height: 300)
+                    .frame(width: 20, height: 300)
                     .padding()
                     .background(.clear)
             }
@@ -185,6 +185,7 @@ class Coordinator_deco: NSObject, ObservableObject {
     @Published var selectedEntity: ModelEntity? {
         // MARK: 변경된 직후에 실행되는 관찰자
         didSet {
+            // LongPress된 되상에 blink
             if selectedEntity != oldValue {
                 blinkEntity(selectedEntity)
             }
@@ -214,43 +215,18 @@ class Coordinator_deco: NSObject, ObservableObject {
         emptyAnchor?.addChild(plane)
     }
     
-    // MARK: 전체 삭제
+    // MARK: 전체 삭제 - 버튼 할당
     func deleteAll(){
         guard let emptyAnchor = emptyAnchor else { return }
         emptyAnchor.children.removeAll()
     }
     
-    // MARK: 선택 삭제 - 다시 보기!
+    // MARK: 선택 삭제 - 버튼 할당
     func deleteOne(){
         guard let selectedEntity = selectedEntity else { return }
         emptyAnchor?.removeChild(selectedEntity)
         self.selectedEntity = nil
     }
-    
-    private func selectEntity(_ entity: ModelEntity) {
-        selectedEntity = entity
-    }
-
-    private func blinkEntity(_ entity: ModelEntity?) {
-        guard let entity = entity else { return }
-        let originalMaterial = entity.model?.materials.first
-        var isRed = false
-
-        Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { timer in
-            guard self.selectedEntity == entity else {
-                timer.invalidate()
-                entity.model?.materials = [originalMaterial!]
-                return
-            }
-            
-            isRed.toggle()
-            var selectedMaterial = UnlitMaterial(color: .orange)
-            selectedMaterial.opacityThreshold = 0.1
-            
-            entity.model?.materials = [isRed ? selectedMaterial : originalMaterial!]
-        }
-    }
-    
     
     // MARK: LongPress 제스처 추가 함수
     func setupLongPressGeture(){
@@ -258,15 +234,38 @@ class Coordinator_deco: NSObject, ObservableObject {
         arView?.addGestureRecognizer(longPressRecognizer)
     }
     
+    // MARK: LongPress한 물체 select
     @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
         guard gesture.state == .began, let arView = arView else { return }
         let location = gesture.location(in: arView)
 
         if let entity = arView.entity(at: location) as? ModelEntity {
-            selectEntity(entity)
+            selectedEntity = entity
         }
     }
     
+    // MARK: blink 함수
+    private func blinkEntity(_ entity: ModelEntity?) {
+        guard let entity = entity else { return }
+        
+        let originalMaterial = entity.model?.materials.first
+        var isRed = false
+        
+        // 0.3초 간격으로 blink
+        Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { timer in
+            guard self.selectedEntity == entity else {
+                timer.invalidate()
+                entity.model?.materials = [originalMaterial!]
+                return
+            }
+            isRed.toggle()
+            
+            var selectedMaterial = UnlitMaterial(color: .cakeyOrange1)
+            selectedMaterial.opacityThreshold = 0.1
+            
+            entity.model?.materials = [isRed ? selectedMaterial : originalMaterial!]
+        }
+    }
         
     // MARK: 모델 사이즈 Clamp
     func clampCakeSize() {
