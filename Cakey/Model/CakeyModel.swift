@@ -8,7 +8,7 @@
 import Foundation
 import RealmSwift
 
-struct CakeyModel {
+struct CakeyModel: Hashable {
     var id: String = UUID().uuidString
     var cakeColor: String?
     var letteringText: String?
@@ -18,7 +18,7 @@ struct CakeyModel {
     var isComplete: Bool = false
 }
 
-struct decoElements: Decodable, Encodable {
+struct decoElements: Decodable, Encodable, Hashable {
     var image: Data
     var description: String
 }

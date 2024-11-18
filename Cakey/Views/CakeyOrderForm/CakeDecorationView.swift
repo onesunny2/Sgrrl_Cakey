@@ -9,8 +9,8 @@ import SwiftUI
 
 struct CakeDecorationView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    let value: Int
-    @Binding var path: [Int]
+    @Binding var path: [Destination]
+    var viewModel: CakeyViewModel
     
     var body: some View {
         ZStack {
@@ -40,7 +40,7 @@ struct CakeDecorationView: View {
                     } .padding(.bottom, 40)
                     
                     ScrollView(.horizontal, showsIndicators: false) {
-                        DecoImageCell()
+                        DecoImageCell(imgList: viewModel.cakeyModel.cakeImages)
                     } .padding(.leading, (UIScreen.main.bounds.width - 292) / 2)
                 }
             }
@@ -61,7 +61,7 @@ struct CakeDecorationView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    path.append(5)
+                    path.append(.cakeLetteringView)
                     // TODO: 완료 기능 구현 필요
                 } label: {
                     Text("다음")
@@ -75,6 +75,6 @@ struct CakeDecorationView: View {
     }
 }
 
-#Preview {
-    CakeDecorationView(value: 4, path: .constant([4]))
-}
+//#Preview {
+//    CakeDecorationView(value: 4, path: .constant([4]))
+//}

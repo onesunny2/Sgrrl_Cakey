@@ -9,14 +9,14 @@ import SwiftUI
 
 struct CakeLetteringView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    let value: Int
-    @Binding var path: [Int]
+    @Binding var path: [Destination]
     @State private var selectedColor: Color = .pickerBlack
     @State private var pickerColor: Color = .white
     @State private var selectedColorIndex: Int = 0
     @State private var text: String = ""
     @State private var keyboardHeight: CGFloat = 0
     @State private var isKeyboardVisible: Bool = false
+    var viewModel: CakeyViewModel
     
     var body: some View {
         ZStack {
@@ -51,7 +51,12 @@ struct CakeLetteringView: View {
                 TextEditorCell(text: $text)
                     .padding(.bottom, isKeyboardVisible ? 155 : 30)
                 
-                NextButtonCell(nextValue: {path.append(6)})
+                NextButtonCell {
+                    path.append(.cakeOrderformView)
+                    viewModel.cakeyModel.letteringColor = selectedColor.toHex()
+                    viewModel.cakeyModel.letteringText = text
+                    viewModel.cakeyModel.saveDate = .now
+                }
             }
             .padding(.top, 86)
             .padding(.bottom, 10)
@@ -72,7 +77,9 @@ struct CakeLetteringView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    // TODO: 스킵 기능 구현 필요
+                    viewModel.cakeyModel.letteringColor = "#000000" // default 검정색
+                    viewModel.cakeyModel.letteringText = ""
+                    
                 } label: {
                     Text("SKIP")
                         .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)

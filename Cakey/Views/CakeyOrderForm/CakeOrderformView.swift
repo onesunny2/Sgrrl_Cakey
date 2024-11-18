@@ -10,11 +10,10 @@ import Photos
 
 struct CakeOrderformView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    let value: Int
-    @Binding var path: [Int]
+    @Binding var path: [Destination]
     @State var isOnLastPage: Bool = true
-    @State var keywords: [String] = ["타이니는 개발을 해", "티나는 원피엠", "이브는 디자인피엠", "도라미는 케이크를 그려", "케이키", "무사출시기원일곱여덟일이삼사오"]
     @State var showActionSheet: Bool = false
+    var viewModel: CakeyViewModel
     
     var body: some View {
         ZStack {
@@ -132,7 +131,7 @@ struct CakeOrderformView: View {
         
         // 키워드 리스트
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(keywords, id: \.self) { keyword in
+            ForEach(viewModel.cakeyModel.cakeImages.map { $0.description }, id: \.self) { keyword in
                 HStack(spacing: 12) {
                     Circle()
                         .fill(.cakeyOrange1)

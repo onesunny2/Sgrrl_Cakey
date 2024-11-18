@@ -9,26 +9,28 @@ import SwiftUI
 
 struct DecoImageCell: View {
     // 임시 데이터
-    var imgList: [String] = ["zzamong", "cakeBG"]
+    var imgList: [decoElements]
     var imgTouchAction: () -> Void = { }
     
     var body: some View {
         HStack(spacing: 8) {
-            ForEach(imgList, id: \.self) { img in
+            ForEach(imgList.map{ $0.image }, id: \.self) { img in
                 RoundedRectangle(cornerRadius: 10)
                     .fill(.clear)
                     .frame(width: 80, height: 80)
                     .overlay {
                         ZStack {
-                            Image("\(img)")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                            
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.cakeyOrange1, lineWidth: 2)
-                                .padding(1)
+                            if let img = UIImage(data: img) {
+                                Image(uiImage: img)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 80)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.cakeyOrange1, lineWidth: 2)
+                                    .padding(1)
+                            }
                         }
                     }
                     .onTapGesture {
@@ -51,11 +53,11 @@ struct DecoImageCell: View {
     }
 }
 
-#Preview {
-    ZStack {
-        Color.cakeyYellow1
-            .ignoresSafeArea(.all)
-        
-        DecoImageCell()
-    }
-}
+//#Preview {
+//    ZStack {
+//        Color.cakeyYellow1
+//            .ignoresSafeArea(.all)
+//        
+//        DecoImageCell()
+//    }
+//}

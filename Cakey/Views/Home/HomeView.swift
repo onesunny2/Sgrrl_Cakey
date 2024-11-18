@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
-    @State private var path: [Int] = []
+    @State private var path: [Destination] = []
+    @Bindable var viewModel = CakeyViewModel(cakeyModel: CakeyModel())
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -51,7 +52,7 @@ struct HomeView: View {
             // 버튼 2개
             HStack(spacing: 7) {
                 Button {
-                    path.append(1)
+                    path.append(.archieveView)
                 } label: {
                     Text("주문서 불러오기")
                         .customStyledFont(font: .cakeyBody, color: .cakeyYellow1)
@@ -63,30 +64,28 @@ struct HomeView: View {
                         }
                     
                 }
-                .navigationDestination(for: Int.self) { value in
-                    switch value {
-                    case 1:
-                        ArchieveView(value: value, path: $path)
-                    case 2:
-                        CakeColorView(value: value, path: $path)
-                    case 3:
-                        CakeImageView(value: value, path: $path)
-                    case 4:
-                        CakeDecorationView(value: value, path: $path)
-                    case 5:
-                        CakeLetteringView(value: value, path: $path)
-                    case 6:
-                        CakeOrderformView(value: value, path: $path)
-                    case 7:
-                        ArchieveDetailView(value: value, path: $path)
-                    default:
-                        EmptyView()
+                .navigationDestination(for: Destination.self) { destination in
+                    switch destination {
+                    case .archieveView:
+                        ArchieveView(path: $path)
+                    case .cakeColorView:
+                        CakeColorView(path: $path, viewModel: viewModel)
+                    case .cakeImageView:
+                        CakeImageView(path: $path, viewModel: viewModel)
+                    case .cakeDecorationView:
+                        CakeDecorationView(path: $path, viewModel: viewModel)
+                    case .cakeLetteringView:
+                        CakeLetteringView(path: $path, viewModel: viewModel)
+                    case .cakeOrderformView:
+                        CakeOrderformView(path: $path, viewModel: viewModel)
+                    case .archieveDetailView(let cakeyModel):
+                        ArchieveDetailView(path: $path, cakeyModel: cakeyModel)
                     }
                 }
                 
                 
                 Button {
-                    path.append(2)
+                    path.append(.cakeColorView)
                 } label: {
                     Text("주문서 작성하기")
                         .customStyledFont(font: .cakeyBody, color: .cakeyYellow1)

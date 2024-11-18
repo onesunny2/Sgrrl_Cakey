@@ -9,8 +9,9 @@ import SwiftUI
 
 struct ArchieveView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    let value: Int
-    @Binding var path: [Int]
+    @Binding var path: [Destination]
+    @Bindable var archieveViewModel = ArchieveViewModel()
+    @State var cakeyModelList: [CakeyModel] = []
     
     var archieveColums: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
     
@@ -28,8 +29,11 @@ struct ArchieveView: View {
                 
                 ScrollView {
                     LazyVGrid(columns: archieveColums, spacing: 16) {
-                        ForEach(0..<3) { _ in
-                            ArchieveCell()
+                        ForEach(cakeyModelList.indices, id: \.self) { index in
+                            ArchieveCell(archieveDate: cakeyModelList[index].saveDate)
+                                .onTapGesture {
+                                    path.append(.archieveDetailView(cakeyModelList[index]))
+                                }
                         }
                     }
                     .padding(.horizontal, 20)
@@ -49,6 +53,9 @@ struct ArchieveView: View {
                         .foregroundStyle(.cakeyOrange1)
                 }
             }
+        }
+        .onAppear {
+            cakeyModelList =  archieveViewModel.readSortedCakeys()
         }
     }
 }

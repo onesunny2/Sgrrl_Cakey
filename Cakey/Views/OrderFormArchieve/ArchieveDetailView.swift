@@ -10,11 +10,12 @@ import Photos
 
 struct ArchieveDetailView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    let value: Int
-    @Binding var path: [Int]
+    @Binding var path: [Destination]
     @State var isOnLastPage: Bool = true
-    @State var keywords: [String] = ["타이니는 개발을 해", "티나는 원피엠", "이브는 디자인피엠", "도라미는 케이크를 그려", "케이키", "무사출시기원일곱여덟일이삼사오"]
-    @State var showActionSheet: Bool = false
+    @State var isShowActionSheet: Bool = false
+    @State var isShowAlert: Bool = false
+    var cakeyModel: CakeyModel
+    var realmManager = RealmManager.shared
     
     var body: some View {
         ZStack {
@@ -53,11 +54,22 @@ struct ArchieveDetailView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 8) {
                     Button {
-                        // TODO: 삭제하기 기능 추가 필요
+                        isShowAlert = true
                     } label: {
                         Image(systemName: "trash")
                             .font(.cakeyCallout)
                             .foregroundStyle(.cakeyOrange1)
+                    }
+                    .alert("주문서를 삭제하시겠습니까?", isPresented: $isShowAlert) {
+                        Button("취소", role: .cancel) {
+                            isShowAlert = false
+                        }
+                        Button("삭제하기", role: .destructive) {
+                            realmManager.deleteCakey(cakeyModel.id)
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                    } message: {
+                        Text("작성한 모든 데이터가 삭제됩니다.")
                     }
 
                     
@@ -71,7 +83,7 @@ struct ArchieveDetailView: View {
                 }
             }
         }
-        .confirmationDialog("", isPresented: $showActionSheet) {
+        .confirmationDialog("", isPresented: $isShowActionSheet) {
             Button("취소", role: .cancel) {}
             Button("스크린샷 저장") {
                 let hostingController = UIHostingController(rootView: captureContent())
@@ -143,7 +155,7 @@ struct ArchieveDetailView: View {
         
         // 키워드 리스트
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(keywords, id: \.self) { keyword in
+            ForEach(cakeyModel.cakeImages.map { $0.description }, id: \.self) { keyword in
                 HStack(spacing: 12) {
                     Circle()
                         .fill(.cakeyOrange1)
@@ -192,7 +204,7 @@ struct ArchieveDetailView: View {
                 .padding(.bottom, 11)
             
             Button {
-                self.showActionSheet = true
+                self.isShowActionSheet = true
             } label: {
                 HStack(spacing: 3) {
                     Image(systemName: "square.and.arrow.down")
