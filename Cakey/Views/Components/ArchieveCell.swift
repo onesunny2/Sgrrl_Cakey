@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ArchieveCell: View {
-    var archieveDate: Date = Date()
+    var archieveDate: Date
     
     var body: some View {
         RoundedRectangle(cornerRadius: 12)

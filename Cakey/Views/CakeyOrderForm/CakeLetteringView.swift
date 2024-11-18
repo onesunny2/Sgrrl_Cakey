@@ -9,8 +9,7 @@ import SwiftUI
 
 struct CakeLetteringView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    let value: Int
-    @Binding var path: [Int]
+    @Binding var path: [Destination]
     @State private var selectedColor: Color = .pickerBlack
     @State private var pickerColor: Color = .white
     @State private var selectedColorIndex: Int = 0
@@ -53,7 +52,7 @@ struct CakeLetteringView: View {
                     .padding(.bottom, isKeyboardVisible ? 155 : 30)
                 
                 NextButtonCell {
-                    path.append(6)
+                    path.append(.cakeOrderformView)
                     viewModel.cakeyModel.letteringColor = selectedColor.toHex()
                     viewModel.cakeyModel.letteringText = text
                     viewModel.cakeyModel.saveDate = .now

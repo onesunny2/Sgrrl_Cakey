@@ -9,8 +9,7 @@ import SwiftUI
 
 struct CakeDecorationView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    let value: Int
-    @Binding var path: [Int]
+    @Binding var path: [Destination]
     var viewModel: CakeyViewModel
     
     var body: some View {
@@ -62,7 +61,7 @@ struct CakeDecorationView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    path.append(5)
+                    path.append(.cakeLetteringView)
                     // TODO: 완료 기능 구현 필요
                 } label: {
                     Text("다음")

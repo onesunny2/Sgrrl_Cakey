@@ -9,8 +9,7 @@ import SwiftUI
 
 struct CakeImageView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    let value: Int
-    @Binding var path: [Int]
+    @Binding var path: [Destination]
     @State private var keyboardHeight: CGFloat = 0
     var viewModel: CakeyViewModel
     
@@ -33,7 +32,7 @@ struct CakeImageView: View {
                 
                 Spacer()
                 
-                NextButtonCell(nextValue: {path.append(4)})
+                NextButtonCell(nextValue: {path.append(.cakeDecorationView)})
             }
             .padding(.top, 86)
             .padding(.bottom, 10)

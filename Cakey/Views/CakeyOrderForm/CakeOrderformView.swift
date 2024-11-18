@@ -10,8 +10,7 @@ import Photos
 
 struct CakeOrderformView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    let value: Int
-    @Binding var path: [Int]
+    @Binding var path: [Destination]
     @State var isOnLastPage: Bool = true
     @State var showActionSheet: Bool = false
     var viewModel: CakeyViewModel

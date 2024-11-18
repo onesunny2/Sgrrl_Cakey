@@ -9,8 +9,7 @@ import SwiftUI
 
 struct CakeColorView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    let value: Int
-    @Binding var path: [Int]
+    @Binding var path: [Destination]
     @State private var selectedColor: Color = .pickerWhite
     @State private var pickerColor: Color = .white
     @State private var selectedColorIndex: Int = 0
@@ -44,7 +43,7 @@ struct CakeColorView: View {
                     .padding(.bottom, 70)
                 
                 NextButtonCell {
-                    path.append(3)
+                    path.append(.cakeImageView)
                     viewModel.cakeyModel.cakeColor = selectedColor.toHex()
                 }
             }
