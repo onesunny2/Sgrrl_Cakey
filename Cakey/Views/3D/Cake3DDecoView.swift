@@ -12,10 +12,20 @@ import Combine
 
 // 수정 모드를 나누거나, cake와 plane같이 스케일 조정할 수 있게 해야함.
 
+// TODO:gesture 넣었다 뺐다
+
+// TODO: enum형으로 바꾸기
+enum EditMode{
+    case editMode
+    case lookMode
+}
+
 // MARK: - CakeDecoView에 들어갈 3D
 struct Cake3DDecoView: View {
     @StateObject private var coordinator_deco = Coordinator_deco()
     @State private var cameraHeight: Float = 0.8
+    
+    @State private var activeMode: EditMode = .editMode
     
     var topView: CameraMode = CameraMode.topView
     var sideView: CameraMode = CameraMode.sideView
@@ -24,8 +34,9 @@ struct Cake3DDecoView: View {
     var imgList: [String] = ["p1", "p2","p3","p4","p5"]
     
     var body: some View {
+        // MARK: - Cake3D
         ZStack{
-            ARViewContainer_deco(coordinator_deco: coordinator_deco, cameraHeight: $cameraHeight).ignoresSafeArea()
+            ARViewContainer_deco(coordinator_deco: coordinator_deco, cameraHeight: $cameraHeight, activeMode: $activeMode).ignoresSafeArea()
         
             HStack{
                 Spacer()
@@ -36,67 +47,121 @@ struct Cake3DDecoView: View {
             }
         }
         
-        VStack {
-            // MARK: 전체, 개별 삭제
-            HStack(spacing: 30) {
-                DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.trianglehead.2.clockwise.rotate.90", buttonAction: {
-                    coordinator_deco.deleteAll()
-                })
-                DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "trash",buttonText: "선택 삭제", buttonAction: {
-                    coordinator_deco.deleteOne()
-                })
-            } .padding(.bottom, 40)
-            
-            // MARK: 이미지 Cell
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(0..<5, id: \.self) { index in
-                        if index < imgList.count {
-                            let img = imgList[index]
-                            Button(action: {
-                                coordinator_deco.addDecoEntity(imgName: img)
-                                print("버튼 눌렀다!")
-                            }) {
+        // MARK: - DecoMode
+        if activeMode == .editMode {
+            VStack {
+                // MARK: 전체, 개별 삭제
+                HStack(spacing: 30) {
+                    DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.trianglehead.2.clockwise.rotate.90", buttonAction: {
+                        coordinator_deco.deleteAll()
+                    })
+                    DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "trash",buttonText: "선택 삭제", buttonAction: {
+                        coordinator_deco.deleteOne()
+                    })
+                } .padding(.bottom, 40)
+                
+                // MARK: 이미지 Cell
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(0..<5, id: \.self) { index in
+                            if index < imgList.count {
+                                let img = imgList[index]
+                                Button(action: {
+                                    coordinator_deco.addDecoEntity(imgName: img)
+                                    print("버튼 눌렀다!")
+                                }) {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(.clear)
+                                        .frame(width: 80, height: 80)
+                                        .overlay {
+                                            ZStack {
+                                                Image("\(img)")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 80)
+                                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                                
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .stroke(Color.cakeyOrange1, lineWidth: 2)
+                                                    .padding(1)
+                                            }
+                                        }
+                                }
+                            } else {
                                 RoundedRectangle(cornerRadius: 10)
-                                    .fill(.clear)
+                                    .fill(.cakeyOrange2)
                                     .frame(width: 80, height: 80)
                                     .overlay {
-                                        ZStack {
-                                            Image("\(img)")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 80)
-                                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                                            
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .stroke(Color.cakeyOrange1, lineWidth: 2)
-                                                .padding(1)
-                                        }
+                                        Image(systemName: "photo")
+                                            .font(.symbolTitle2)
+                                            .foregroundStyle(.cakeyOrange3)
                                     }
                             }
-                        } else {
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(.cakeyOrange2)
-                                .frame(width: 80, height: 80)
-                                .overlay {
-                                    Image(systemName: "photo")
-                                        .font(.symbolTitle2)
-                                        .foregroundStyle(.cakeyOrange3)
-                                }
                         }
+                        
                     }
-
+                }
+                .padding(.leading, (UIScreen.main.bounds.width - 292) / 2)
+            }
+        }
+        
+        // MARK: - Mode Select
+        VStack {
+            HStack(spacing: 30) {
+                if activeMode == .editMode {
+                    Image(systemName: "arrowtriangle.down.fill")
+                        .offset(x: -45)
+                        .transition(.opacity)
+                } else if activeMode == .lookMode {
+                    Image(systemName: "arrowtriangle.down.fill")
+                        .offset(x: +45)
+                        .transition(.opacity)
                 }
             }
-                .padding(.leading, (UIScreen.main.bounds.width - 292) / 2)
-        }
+            
+            HStack(spacing: 30) {
+                Button(action: {
+                    withAnimation {
+                        coordinator_deco.activeMode = .editMode
+                        activeMode = .editMode
+                    }
+                }) {
+                    VStack {
+                        Image(systemName: "pencil")
+                            .foregroundColor(activeMode == .editMode ? .blue : .gray)
+                        Text("수정하기")
+                            .foregroundColor(activeMode == .editMode ? .blue : .gray)
+                    }
+                }
+                
+                Button(action: {
+                    withAnimation {
+                        activeMode = .lookMode
+                    }
+                    coordinator_deco.activeMode = .lookMode
+                }) {
+                    VStack {
+                        Image(systemName: "eye.fill")
+                            .foregroundColor(activeMode == .lookMode ? .blue : .gray)
+                        Text("살펴보기")
+                            .foregroundColor(activeMode == .lookMode ? .blue : .gray)
+                    }
+                }
+            }
+        }.padding(.top, 30)
     }
 }
+
+//TODO: 분리
+let decoGroup = CollisionGroup(rawValue: 1 << 0)
+let cakeGroup = CollisionGroup(rawValue: 1 << 1)
+
 
 // MARK: - ARViewContainer
 struct ARViewContainer_deco: UIViewRepresentable {
     @ObservedObject var coordinator_deco: Coordinator_deco  // 코오디네이터 1
     @Binding var cameraHeight: Float
+    @Binding var activeMode: EditMode
     
     // TODO: - 색상 데이터 불러오기
     var selectedColor: Color = .white
@@ -121,13 +186,14 @@ struct ARViewContainer_deco: UIViewRepresentable {
         cakeParentEntity.addChild(cakeModel)
         cakeParentEntity.addChild(cakeTrayModel)
         cakeParentEntity.generateCollisionShapes(recursive: true)
-        
+        cakeParentEntity.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: [1, 1, 1])])
         arView.installGestures([.rotation, .scale], for: cakeParentEntity)
         
         coordinator_deco.cakeParentEntity = cakeParentEntity
         
         // MARK: 데코 달아줄 entity
         let emptyAnchor = AnchorEntity(world: [0,0,0])
+        
         coordinator_deco.emptyAnchor = emptyAnchor
         arView.scene.addAnchor(emptyAnchor)
         
@@ -135,7 +201,6 @@ struct ARViewContainer_deco: UIViewRepresentable {
         let cakeAnchor = AnchorEntity(world: [0, 0, 0])
         cakeAnchor.addChild(cakeParentEntity)
         cakeAnchor.addChild(emptyAnchor)
-        
         arView.scene.addAnchor(cakeAnchor)
         
     
@@ -159,6 +224,10 @@ struct ARViewContainer_deco: UIViewRepresentable {
         
         coordinator_deco.arView = arView
         coordinator_deco.setupLongPressGeture()
+        coordinator_deco.updateMode()
+        
+        // TODO:
+        //coordinator_deco.activeMode = activeMode
 
         return arView
     }
@@ -168,6 +237,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
         context.coordinator.camera?.position.y = cameraHeight
         context.coordinator.camera?.position.x = cameraHeight * 0.6
         //context.coordinator.cakeParentEntity?.scale *= cameraHeight * 1.2
+        coordinator_deco.updateMode()
     }
     
     func makeCoordinator() -> Coordinator_deco {
@@ -181,6 +251,7 @@ class Coordinator_deco: NSObject, ObservableObject {
     var cakeParentEntity: ModelEntity?
     var camera: PerspectiveCamera?
     var cancellable: AnyCancellable?
+    var activeMode: EditMode = .editMode
     
     @Published var selectedEntity: ModelEntity? {
         // MARK: 변경된 직후에 실행되는 관찰자
@@ -191,6 +262,45 @@ class Coordinator_deco: NSObject, ObservableObject {
             }
         }
     }
+    
+    func updateMode() {
+        guard let arView = arView else { return }
+        
+        switch activeMode {
+        case .editMode:
+            print("현재 수정모드이고, ")
+            emptyAnchor?.children.forEach { entity in
+                if let decoEntity = entity as? ModelEntity {
+                    decoEntity.collision?.filter = CollisionFilter(group: decoGroup, mask: .all)
+                }
+            }
+            
+            // 여기가 이상한듯한데 어떻게 해야하지
+            if let cakeParentEntity = cakeParentEntity {
+                print("cakeParentEntity에 무언가 담김!")
+                cakeParentEntity.collision?.filter = CollisionFilter(group: cakeGroup, mask: [])
+                arView.installGestures([.rotation, .scale], for: cakeParentEntity)
+            }
+            print("수정 모드 활성화: 데코만 제스처 작용")
+            
+        case .lookMode:
+            emptyAnchor?.children.forEach { entity in
+                if let decoEntity = entity as? ModelEntity {
+                    decoEntity.collision?.filter = CollisionFilter(group: decoGroup, mask: [])
+                }
+            }
+            if let cakeParentEntity = cakeParentEntity {
+                arView.installGestures([.rotation, .scale], for: cakeParentEntity)
+                cakeParentEntity.collision?.filter = CollisionFilter(group: cakeGroup, mask: .all)
+            }
+            print("살펴보기 모드 활성화: 케이크만 제스처 작용")
+            
+      
+        }
+    }
+
+
+    
 
     // MARK: 데코 추가 함수
     func addDecoEntity(imgName: String) {
@@ -206,13 +316,20 @@ class Coordinator_deco: NSObject, ObservableObject {
             plane.model?.materials = [material]
         }
         
-        plane.position.y += 0.79 * 0.43 + 0.03
-        plane.scale /= 3
+//        plane.position.y += 0.79 * 0.43 + 0.03
+//        plane.scale /= 3
+        
+        plane.position.y += 0.79 * 0.43 + 0.05
+        plane.scale /= 2
 
         plane.generateCollisionShapes(recursive: true)
+        //plane.collision = CollisionComponent(shapes:[ShapeResource.generateBox(size: [0.3,0.3,0.3])])
+        //plane.collision?.filter = cakeFilter
         arView.installGestures([.all], for: plane)
 
         emptyAnchor?.addChild(plane)
+        
+        
     }
     
     // MARK: 전체 삭제 - 버튼 할당
