@@ -262,18 +262,10 @@ class Coordinator_deco: NSObject, ObservableObject {
     
     func updateMode() {
         guard let cakeParentEntity = cakeParentEntity else { return }
-
+        
+        // CakeParentEntity안에서 cake tag로 제스처 구분!
         switch activeMode {
         case .editMode:
-//            // 케이크 제스처 OFF
-//            cakeParentEntity.collision?.filter = CollisionFilter(group: cakeGroup, mask: [])
-//            
-//            // 데코 제스처 ON
-//            decoAnchor?.children.forEach { entity in
-//                if let decoEntity = entity as? ModelEntity {
-//                    decoEntity.collision?.filter = CollisionFilter(group: decoGroup, mask: .all)
-//                }
-//            }
             cakeParentEntity.children.forEach { entity in
                 if let entity = entity as? ModelEntity{
                     if entity.name == "cake"{
@@ -284,7 +276,6 @@ class Coordinator_deco: NSObject, ObservableObject {
                 }
             }
         case .lookMode:
-            // 케이크 제스처 ON
             cakeParentEntity.children.forEach { entity in
                 if let entity = entity as? ModelEntity{
                     if entity.name == "cake"{
@@ -292,7 +283,6 @@ class Coordinator_deco: NSObject, ObservableObject {
                     }else{
                         entity.collision?.filter = CollisionFilter(group: decoGroup, mask: [])
                     }
-                    
                 }
             }
         }
@@ -313,7 +303,7 @@ class Coordinator_deco: NSObject, ObservableObject {
             plane.model?.materials = [material]
         }
 
-        plane.position.y += 0.79 * 0.43 + 0.04
+        plane.position.y += 0.79 * 0.43 + 0.008
         plane.scale /= 2
 
         plane.generateCollisionShapes(recursive: true)
@@ -325,15 +315,22 @@ class Coordinator_deco: NSObject, ObservableObject {
 
     
     // MARK: 전체 삭제 - 버튼 할당
-    func deleteAll(){
-        guard let emptyAnchor = decoAnchor else { return }
-        emptyAnchor.children.removeAll()
+    func deleteAll() {
+        guard let cakeParentEntity = cakeParentEntity else { return }
+        
+        // "cake" 이름이 아닌 모든 자식을 순회하며 제거
+        for entity in cakeParentEntity.children.filter({ $0.name != "cake" }) {
+            cakeParentEntity.removeChild(entity)
+        }
+        
+        print("모든 데코가 삭제되었습니다.")
     }
+
     
     // MARK: 선택 삭제 - 버튼 할당
     func deleteOne(){
         guard let selectedEntity = selectedEntity else { return }
-        decoAnchor?.removeChild(selectedEntity)
+        cakeParentEntity?.removeChild(selectedEntity)
         self.selectedEntity = nil
     }
     
