@@ -10,11 +10,7 @@ import ARKit
 import RealityKit
 import Combine
 
-// 수정 모드를 나누거나, cake와 plane같이 스케일 조정할 수 있게 해야함.
-
-// TODO:gesture 넣었다 뺐다
-
-// TODO: enum형으로 바꾸기
+// MARK: 수정모드, 살펴보기모드
 enum EditMode{
     case editMode
     case lookMode
@@ -186,22 +182,20 @@ struct ARViewContainer_deco: UIViewRepresentable {
         cakeParentEntity.addChild(cakeModel)
         cakeParentEntity.addChild(cakeTrayModel)
         cakeParentEntity.generateCollisionShapes(recursive: true)
-        //cakeParentEntity.collision = CollisionComponent(shapes: [ShapeResource.generateBox(size: [1, 1, 1])])
-        //arView.installGestures([.rotation, .scale], for: cakeParentEntity)
         
         coordinator_deco.cakeParentEntity = cakeParentEntity
         arView.installGestures([.rotation, .scale], for: cakeParentEntity)
         
-        // MARK: 데코 달아줄 entity
-        let emptyAnchor = AnchorEntity(world: [0,0,0])
+        // MARK: DecoAnchor
+        let decoAnchor = AnchorEntity(world: [0,0,0])
         
-        coordinator_deco.emptyAnchor = emptyAnchor
-        arView.scene.addAnchor(emptyAnchor)
+        coordinator_deco.decoAnchor = decoAnchor
+        arView.scene.addAnchor(decoAnchor)
         
         // MARK: CakeAnchor
         let cakeAnchor = AnchorEntity(world: [0, 0, 0])
         cakeAnchor.addChild(cakeParentEntity)
-        cakeAnchor.addChild(emptyAnchor)
+        cakeAnchor.addChild(decoAnchor)
         arView.scene.addAnchor(cakeAnchor)
         
     
@@ -226,10 +220,6 @@ struct ARViewContainer_deco: UIViewRepresentable {
         coordinator_deco.arView = arView
         coordinator_deco.setupLongPressGeture()
         coordinator_deco.updateMode()
-        
-        // TODO:
-        //coordinator_deco.activeMode = activeMode
-
         return arView
     }
     
@@ -248,7 +238,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
 
 class Coordinator_deco: NSObject, ObservableObject {
     var arView: ARView?
-    var emptyAnchor:  AnchorEntity?
+    var decoAnchor:  AnchorEntity?
     var cakeParentEntity: ModelEntity?
     var camera: PerspectiveCamera?
     var cancellable: AnyCancellable?
@@ -257,7 +247,7 @@ class Coordinator_deco: NSObject, ObservableObject {
     @Published var selectedEntity: ModelEntity? {
         // MARK: 변경된 직후에 실행되는 관찰자
         didSet {
-            // LongPress된 되상에 blink
+            // LongPress된 대상에 blink
             if selectedEntity != oldValue {
                 blinkEntity(selectedEntity)
             }
@@ -265,31 +255,26 @@ class Coordinator_deco: NSObject, ObservableObject {
     }
     
     func updateMode() {
-        guard let arView = arView else { return }
-        
         switch activeMode {
+        //MARK: 수정모드
         case .editMode:
-            // 여기가 이상한듯한데 어떻게 해야하지
+            // MARK: 케이크 제스처 OFF
             if let cakeParentEntity = cakeParentEntity {
-                print("cakeParentEntity에 무언가 담김!")
                 cakeParentEntity.children.forEach{ cake in
                     if let deco = cake as? ModelEntity{
                         deco.collision?.filter = CollisionFilter(group: cakeGroup, mask: [])
                     }
                 }
             }
-            print("현재 수정모드이고, ")
-            emptyAnchor?.children.forEach { entity in
+            // MARK: 데코 제스처 ON
+            decoAnchor?.children.forEach { entity in
                 if let decoEntity = entity as? ModelEntity {
                     decoEntity.collision?.filter = CollisionFilter(group: decoGroup, mask: .all)
                 }
             }
-            
-            
-            print("수정 모드 활성화: 데코만 제스처 작용")
-            
+        //MARK: 살펴보기 모드
         case .lookMode:
-            
+            // MARK: 케이크 제스처 ON
             if let cakeParentEntity = cakeParentEntity {
                 cakeParentEntity.children.forEach{ cake in
                     if let deco = cake as? ModelEntity{
@@ -297,19 +282,14 @@ class Coordinator_deco: NSObject, ObservableObject {
                     }
                 }
             }
-            emptyAnchor?.children.forEach { entity in
+            // MARK: 데코 제스처 OFF
+            decoAnchor?.children.forEach { entity in
                 if let decoEntity = entity as? ModelEntity {
                     decoEntity.collision?.filter = CollisionFilter(group: decoGroup, mask: [])
                 }
             }
-            print("살펴보기 모드 활성화: 케이크만 제스처 작용")
-            
-      
         }
     }
-
-
-    
 
     // MARK: 데코 추가 함수
     func addDecoEntity(imgName: String) {
@@ -324,33 +304,30 @@ class Coordinator_deco: NSObject, ObservableObject {
             material.opacityThreshold = 0.1
             plane.model?.materials = [material]
         }
-        
-//        plane.position.y += 0.79 * 0.43 + 0.03
-//        plane.scale /= 3
+
+        //MARK: size작은 버전 높이
+        //plane.position.y += 0.79 * 0.43 + 0.03
+        //plane.scale /= 3
         
         plane.position.y += 0.79 * 0.43 + 0.04
         plane.scale /= 2
 
         plane.generateCollisionShapes(recursive: true)
-        //plane.collision = CollisionComponent(shapes:[ShapeResource.generateBox(size: [0.3,0.3,0.3])])
-        //plane.collision?.filter = cakeFilter
         arView.installGestures([.all], for: plane)
 
-        emptyAnchor?.addChild(plane)
-        
-        
+        decoAnchor?.addChild(plane)
     }
     
     // MARK: 전체 삭제 - 버튼 할당
     func deleteAll(){
-        guard let emptyAnchor = emptyAnchor else { return }
+        guard let emptyAnchor = decoAnchor else { return }
         emptyAnchor.children.removeAll()
     }
     
     // MARK: 선택 삭제 - 버튼 할당
     func deleteOne(){
         guard let selectedEntity = selectedEntity else { return }
-        emptyAnchor?.removeChild(selectedEntity)
+        decoAnchor?.removeChild(selectedEntity)
         self.selectedEntity = nil
     }
     
@@ -416,8 +393,6 @@ class Coordinator_deco: NSObject, ObservableObject {
 
 
 #Preview {
-    //Cake3DDecoView()
     CakeDecorationView(value: 4, path: .constant([4]))
 }
 
-// 높이 계산이 어떻게 되고 있는지 봐야 함..
