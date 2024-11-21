@@ -20,9 +20,9 @@ struct DecoActionCell: View {
             VStack{
                 RoundedRectangle(cornerRadius: 12)
                     .fill(buttonColor)
-                    .frame(width: 88, height: 64)
+                    .frame(width: 168, height: 44)
                     .overlay {
-                        VStack{
+                        HStack{
                             Image(systemName: symbolName)
                                 .font(.symbolTitle1)
                                 .foregroundStyle(.cakeyYellow1)

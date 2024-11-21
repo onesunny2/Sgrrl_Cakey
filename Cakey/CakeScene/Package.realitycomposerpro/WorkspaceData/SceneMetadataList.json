@@ -24,36 +24,9 @@
     "objectMetadataList" : [
       [
         "AF3D030A-6F01-40AF-AF17-7EC0F899DE85",
-        "Root"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "AF3D030A-6F01-40AF-AF17-7EC0F899DE85",
-        "Root",
-        "holecut3"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "AF3D030A-6F01-40AF-AF17-7EC0F899DE85",
         "Root",
         "holecut3",
         "_materials"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "AF3D030A-6F01-40AF-AF17-7EC0F899DE85",
-        "Root",
-        "holecut3",
-        "Cube"
       ],
       {
         "isExpanded" : true,
@@ -67,6 +40,24 @@
       {
         "disallowsFraming" : true,
         "isExpanded" : false,
+        "isLocked" : false
+      },
+      [
+        "AF3D030A-6F01-40AF-AF17-7EC0F899DE85",
+        "Root"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "AF3D030A-6F01-40AF-AF17-7EC0F899DE85",
+        "Root",
+        "holecut3",
+        "Cube"
+      ],
+      {
+        "isExpanded" : true,
         "isLocked" : false
       }
     ]

@@ -12,6 +12,7 @@ def Xform "Root"
 {
     reorder nameChildren = ["cakeTray", "cakeModel", "cakeSurface"]
     def "cakeTray" (
+        active = false
         references = @cakeTray.usdz@
     )
     {
@@ -20,6 +21,7 @@ def Xform "Root"
     }
 
     def "cakeModel" (
+        active = false
         references = @cakeModel.usdz@
     )
     {
@@ -28,7 +30,7 @@ def Xform "Root"
     }
 
     def Cylinder "cakeSurface" (
-        active = true
+        active = false
         prepend apiSchemas = ["MaterialBindingAPI"]
     )
     {
@@ -53,30 +55,29 @@ def Xform "Root"
         }
     }
 
-    def "holecut3" (
+    def "ring" (
         active = true
-        prepend references = @holecut3.usdz@
+        customData = {
+            float3 rotationEulerHint = (1.5707964, 0, 0)
+        }
+        prepend references = @ring.usdz@
     )
     {
-        float3 xformOp:scale = (1, 1, 1)
+        quatf xformOp:orient = (0.70710677, 0.70710677, 0, 0)
+        float3 xformOp:scale = (0.4, 0.4, 0.4)
+        float3 xformOp:translate = (0, 1, 0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
 
-        over "Cylinder" (
-            active = false
-        )
+        over "Circle"
         {
-        }
-
-        over "Cube" (
-            customData = {
-                float3 rotationEulerHint = (1.5707964, 0, 0)
+            over "Mesh" (
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                rel material:binding = </Root/cakeTray/cakeTray/Materials/material_4> (
+                    bindMaterialAs = "weakerThanDescendants"
+                )
             }
-        )
-        {
-            quatf xformOp:orient = (0.70710677, 0.70710677, 0, 0)
-            float3 xformOp:scale = (3, 3, 0.1530289)
-            double3 xformOp:translate = (0, 1, 0)
-            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
         }
     }
 }

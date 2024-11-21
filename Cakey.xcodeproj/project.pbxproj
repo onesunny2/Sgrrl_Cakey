@@ -6,13 +6,8 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		865CC0AE2CEC395C005F59D9 /* Cake3DDecoViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865CC0AD2CEC395C005F59D9 /* Cake3DDecoViewTest.swift */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
 		431436762CD79EED00413602 /* Cakey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cakey.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		865CC0AD2CEC395C005F59D9 /* Cake3DDecoViewTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cake3DDecoViewTest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -50,7 +45,6 @@
 		4314366D2CD79EED00413602 = {
 			isa = PBXGroup;
 			children = (
-				865CC0AD2CEC395C005F59D9 /* Cake3DDecoViewTest.swift */,
 				431436782CD79EED00413602 /* Cakey */,
 				431436772CD79EED00413602 /* Products */,
 			);
@@ -138,7 +132,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				865CC0AE2CEC395C005F59D9 /* Cake3DDecoViewTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
