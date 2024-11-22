@@ -14,12 +14,13 @@ struct CakeyModel: Hashable {
     var letteringText: String?
     var letteringColor: String?
     var cakeImages: [decoElements] = []
+    var cakeArImage: Data?
     var saveDate: Date = .now
     var isComplete: Bool = false
 }
 
 struct decoElements: Decodable, Encodable, Hashable {
-    var image: Data
+    var image: Data?
     var description: String
 }
 
@@ -34,6 +35,7 @@ extension CakeyModel: Persistable {
         self.letteringText = persistedObject.letteringText
         self.letteringColor = persistedObject.letteringColor
         self.cakeImages = try! decoder.decode([decoElements].self, from: persistedObject.cakeImages!)
+        self.cakeArImage = persistedObject.cakeArImage
         self.saveDate = persistedObject.saveDate
         self.isComplete = persistedObject.isCompleted
     }
@@ -47,6 +49,7 @@ extension CakeyModel: Persistable {
         cakey.letteringText = self.letteringText
         cakey.letteringColor = self.letteringColor
         cakey.cakeImages = try! encoder.encode(self.cakeImages)
+        cakey.cakeArImage = self.cakeArImage
         cakey.saveDate = self.saveDate
         cakey.isCompleted = self.isComplete
         
@@ -61,6 +64,7 @@ class CakeyEntity: Object {
     @Persisted var letteringText: String?
     @Persisted var letteringColor: String?
     @Persisted var cakeImages: Data?
+    @Persisted var cakeArImage: Data?
     @Persisted var saveDate: Date
     @Persisted var isCompleted: Bool
 }

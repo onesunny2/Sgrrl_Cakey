@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
-import PhotosUI
 
 struct DecoCarouselCell: View {
     @State private var currentIndex: Int = 0
+    @State private var isAlbumPresented: Bool = false
+    @State var decoImages: [decoElements] = Array(repeating: decoElements(image: nil, description: ""), count: 6)
     
     var body: some View {
         VStack(spacing: 40) {
@@ -22,21 +23,43 @@ struct DecoCarouselCell: View {
                             .fill(.cakeyOrange2)
                             .frame(width: 230, height: 230)
                             .overlay {
-                                VStack(spacing: 20) {
-                                    Image(systemName: "plus.circle.fill")
-                                        .font(.symbolLargeTitle)
-                                    
-                                    HStack(spacing: 5) {
-                                        Image(systemName: "photo")
-                                        Text("이미지 추가")
+                                if let image = decoImages[index].image {
+                                    ZStack {
+                                        Image(uiImage: UIImage(data: image)!)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 230, height: 230)
+                                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        
+                                        // TODO: - 테두리 이상한거 물어보기
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(.clear)
+                                            .frame(width: 230, height: 230)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .stroke(.cakeyOrange1, lineWidth: 4)
+                                            )
                                     }
-                                    .font(.cakeySubhead)
+                                } else {
+                                    VStack(spacing: 20) {
+                                        Image(systemName: "plus.circle.fill")
+                                            .font(.symbolLargeTitle)
+                                        
+                                        HStack(spacing: 5) {
+                                            Image(systemName: "photo")
+                                            Text("이미지 추가")
+                                        }
+                                        .font(.cakeySubhead)
+                                    }
+                                    .foregroundStyle(.cakeyOrange3)
                                 }
-                                .foregroundStyle(.cakeyOrange3)
                             }
                             .scrollTransition(.interactive, axis: .horizontal) { effect, phase in
                                 effect
                                     .scaleEffect(phase.isIdentity ? 1 : 0.9)
+                            }
+                            .onTapGesture {
+                                isAlbumPresented = true
                             }
                             .onAppear {
                                 updateCurrentIndex(for: geo, index: index)
@@ -60,6 +83,13 @@ struct DecoCarouselCell: View {
                     Circle()
                         .fill(currentIndex == index ? .cakeyOrange1 : .cakeyOrange2)
                         .frame(width: 8)
+                }
+            }
+        }
+        .sheet(isPresented: $isAlbumPresented) {
+            ImagePicker(sourceType: .photoLibrary) { selectedImage in
+                if let selectedImage = selectedImage {
+                    decoImages[currentIndex].image = selectedImage.pngData()
                 }
             }
         }

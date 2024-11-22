@@ -20,8 +20,8 @@ struct DecoImageCell: View {
                     .frame(width: 80, height: 80)
                     .overlay {
                         ZStack {
-                            if let img = UIImage(data: img) {
-                                Image(uiImage: img)
+                            if let img = img, let uiImage = UIImage(data: img) {
+                                Image(uiImage: uiImage)
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 80)
