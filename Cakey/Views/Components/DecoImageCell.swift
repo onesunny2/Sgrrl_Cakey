@@ -23,29 +23,28 @@ struct DecoImageCell: View {
                             if let img = img, let uiImage = UIImage(data: img) {
                                 Image(uiImage: uiImage)
                                     .resizable()
-                                    .scaledToFit()
+                                    .scaledToFill()
                                     .frame(width: 80)
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
                                 
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(Color.cakeyOrange1, lineWidth: 2)
                                     .padding(1)
+                            } else {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(.cakeyOrange2)
+                                    .frame(width: 80, height: 80)
+                                    .overlay {
+                                        Image(systemName: "photo")
+                                            .font(.symbolTitle2)
+                                            .foregroundStyle(.cakeyOrange3)
+                                    }
                             }
+                            
                         }
                     }
                     .onTapGesture {
                         imgTouchAction()
-                    }
-            }
-            
-            ForEach(0..<(6 - imgList.count), id: \.self) { _ in
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(.cakeyOrange2)
-                    .frame(width: 80, height: 80)
-                    .overlay {
-                        Image(systemName: "photo")
-                            .font(.symbolTitle2)
-                            .foregroundStyle(.cakeyOrange3)
                     }
             }
         }
