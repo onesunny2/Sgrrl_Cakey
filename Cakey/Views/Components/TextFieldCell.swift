@@ -9,6 +9,8 @@ import SwiftUI
 
 struct TextFieldCell: View {
     @State private var text: String = ""
+    @Binding var decoElemets: [decoElements]
+    @Binding var currentIndex: Int
     
     var body: some View {
         VStack(alignment: .trailing, spacing: 6) {
@@ -19,15 +21,17 @@ struct TextFieldCell: View {
                 .background(Color.white)
                 .frame(width: 292)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
+                .disabled(decoElemets[currentIndex].image == nil)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(.cakeyOrange1, lineWidth: 3)
+                        .stroke(decoElemets[currentIndex].image == nil ? .textFieldGray : .cakeyOrange1, lineWidth: 3)
                 )
                 .onChange(of: text, initial: true) { oldValue, newValue in
                     if newValue.count > 15 {
                         text = String(newValue.prefix(15))
                     }
                 }
+                
             
             // MARK: 글자 제한 수 카운트
             Text("\(text.count)/15")
@@ -36,11 +40,11 @@ struct TextFieldCell: View {
     }
 }
 
-#Preview {
-    ZStack {
-        Color.cakeyYellow1
-            .ignoresSafeArea(.all)
-        
-        TextFieldCell()
-    }
-}
+//#Preview {
+//    ZStack {
+//        Color.cakeyYellow1
+//            .ignoresSafeArea(.all)
+//        
+//        TextFieldCell()
+//    }
+//}

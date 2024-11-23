@@ -9,6 +9,8 @@ import SwiftUI
 
 struct CakeImageView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @State private var currentIndex: Int = 0
+    @State var decoImages: [decoElements] = Array(repeating: decoElements(image: nil, description: ""), count: 6)
     @Binding var path: [Destination]
     @State private var keyboardHeight: CGFloat = 0
     var viewModel: CakeyViewModel
@@ -24,10 +26,10 @@ struct CakeImageView: View {
                 NoticeCelll(notice1: "원하는 데코가 있나요?", notice2: "최대  6개까지 추가할 수 있어요")
                     .padding(.bottom, 54)
                 
-                DecoCarouselCell()
+                DecoCarouselCell(currentIndex: $currentIndex, decoImages: $decoImages)
                     .padding(.bottom, 60)
                 
-                TextFieldCell()
+                TextFieldCell(decoElemets: $decoImages, currentIndex: $currentIndex)
                     .padding(.bottom, keyboardHeight - 200)
                 
                 Spacer()

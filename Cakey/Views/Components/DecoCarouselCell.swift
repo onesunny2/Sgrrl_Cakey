@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct DecoCarouselCell: View {
-    @State private var currentIndex: Int = 0
+    @Binding var currentIndex: Int
     @State private var isAlbumPresented: Bool = false
-    @State var decoImages: [decoElements] = Array(repeating: decoElements(image: nil, description: ""), count: 6)
+    @Binding var decoImages: [decoElements]
     
     var body: some View {
         VStack(spacing: 40) {
@@ -28,13 +28,13 @@ struct DecoCarouselCell: View {
                                         Image(uiImage: UIImage(data: image)!)
                                             .resizable()
                                             .scaledToFill()
-                                            .frame(width: 230, height: 230)
+                                            .frame(width: 226, height: 226)
                                             .clipShape(RoundedRectangle(cornerRadius: 12))
                                         
                                         // TODO: - 테두리 이상한거 물어보기
                                         RoundedRectangle(cornerRadius: 12)
                                             .fill(.clear)
-                                            .frame(width: 230, height: 230)
+                                            .frame(width: 226, height: 226)
                                             .overlay(
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .stroke(.cakeyOrange1, lineWidth: 4)
@@ -89,7 +89,7 @@ struct DecoCarouselCell: View {
         .sheet(isPresented: $isAlbumPresented) {
             ImagePicker(sourceType: .photoLibrary) { selectedImage in
                 if let selectedImage = selectedImage {
-                    decoImages[currentIndex].image = selectedImage.pngData()
+                        decoImages[currentIndex].image = selectedImage.pngData()
                 }
             }
         }
@@ -107,11 +107,11 @@ struct DecoCarouselCell: View {
     }
 }
 
-#Preview {
-    ZStack {
-        Color.cakeyYellow1
-            .ignoresSafeArea(.all)
-        
-        DecoCarouselCell()
-    }
-}
+//#Preview {
+//    ZStack {
+//        Color.cakeyYellow1
+//            .ignoresSafeArea(.all)
+//        
+//        DecoCarouselCell()
+//    }
+//}
