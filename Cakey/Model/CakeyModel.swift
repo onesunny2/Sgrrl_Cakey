@@ -20,7 +20,7 @@ struct CakeyModel: Hashable {
 }
 
 struct decoElements: Decodable, Encodable, Hashable {
-    var image: Data
+    var image: Data?
     var description: String
 }
 

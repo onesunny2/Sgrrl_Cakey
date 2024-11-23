@@ -42,10 +42,8 @@ struct CakeColorView: View {
                 CakeColorPickerCell(selectedColor: $selectedColor, pickerColor: $pickerColor, selectedColorIndex: $selectedColorIndex)
                     .padding(.bottom, 70)
                 
-                NextButtonCell {
-                    path.append(.cakeImageView)
-                    viewModel.cakeyModel.cakeColor = selectedColor.toHex()
-                }
+                NextButtonCell(nextValue: {path.append(.cakeImageView)
+                    viewModel.cakeyModel.cakeColor = selectedColor.toHex()}, isButtonActive: false)
             }
             .padding(.top, 86)
             .padding(.bottom, 10)

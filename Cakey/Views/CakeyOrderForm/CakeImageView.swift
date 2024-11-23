@@ -9,6 +9,8 @@ import SwiftUI
 
 struct CakeImageView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @State private var currentIndex: Int = 0
+    @State var decoImages: [decoElements] = Array(repeating: decoElements(image: nil, description: ""), count: 6)
     @Binding var path: [Destination]
     @State private var keyboardHeight: CGFloat = 0
     var viewModel: CakeyViewModel
@@ -24,15 +26,18 @@ struct CakeImageView: View {
                 NoticeCelll(notice1: "원하는 데코가 있나요?", notice2: "최대  6개까지 추가할 수 있어요")
                     .padding(.bottom, 54)
                 
-                DecoCarouselCell()
+                DecoCarouselCell(currentIndex: $currentIndex, decoImages: $decoImages)
                     .padding(.bottom, 60)
                 
-                TextFieldCell()
+                TextFieldCell(decoElemets: $decoImages, currentIndex: $currentIndex)
                     .padding(.bottom, keyboardHeight - 200)
                 
                 Spacer()
                 
-                NextButtonCell(nextValue: {path.append(.cakeDecorationView)})
+                NextButtonCell(nextValue: {
+                    path.append(.cakeDecorationView)
+                    viewModel.cakeyModel.cakeImages = decoImages
+                }, isButtonActive: decoImages[0].image == nil || decoImages[0].description == "")
             }
             .padding(.top, 86)
             .padding(.bottom, 10)
@@ -52,7 +57,8 @@ struct CakeImageView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    // TODO: 스킵 기능 구현 필요
+                    viewModel.cakeyModel.cakeImages = []
+                    path.append(.cakeDecorationView)
                 } label: {
                     Text("SKIP")
                         .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
