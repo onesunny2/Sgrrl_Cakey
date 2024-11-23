@@ -54,7 +54,8 @@ struct CakeImageView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    // TODO: 스킵 기능 구현 필요
+                    viewModel.cakeyModel.cakeImages = []
+                    path.append(.cakeDecorationView)
                 } label: {
                     Text("SKIP")
                         .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
