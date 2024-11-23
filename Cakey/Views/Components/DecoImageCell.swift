@@ -24,7 +24,7 @@ struct DecoImageCell: View {
                                 Image(uiImage: uiImage)
                                     .resizable()
                                     .scaledToFill()
-                                    .frame(width: 80)
+                                    .frame(width: 80, height: 80)
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
                                 
                                 RoundedRectangle(cornerRadius: 10)
