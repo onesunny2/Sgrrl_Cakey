@@ -34,7 +34,10 @@ struct CakeImageView: View {
                 
                 Spacer()
                 
-                NextButtonCell(nextValue: {path.append(.cakeDecorationView)}, isButtonActive: decoImages[0].image == nil)
+                NextButtonCell(nextValue: {
+                    path.append(.cakeDecorationView)
+                    viewModel.cakeyModel.cakeImages = decoImages
+                }, isButtonActive: decoImages[0].image == nil)
             }
             .padding(.top, 86)
             .padding(.bottom, 10)
