@@ -30,6 +30,15 @@ struct TextFieldCell: View {
                     if newValue.count > 15 {
                         text = String(newValue.prefix(15))
                     }
+                    if decoElemets[currentIndex].description == "" {
+                        text = ""
+                    } else {
+                       text = decoElemets[currentIndex].description
+                    }
+                }
+                .onChange(of: currentIndex, initial: false) { oldIndex, newIndex in
+                    decoElemets[oldIndex].description = text
+                    text = ""
                 }
                 
             
