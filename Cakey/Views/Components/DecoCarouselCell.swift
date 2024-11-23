@@ -59,7 +59,11 @@ struct DecoCarouselCell: View {
                                     .scaleEffect(phase.isIdentity ? 1 : 0.9)
                             }
                             .onTapGesture {
-                                isAlbumPresented = true
+                                if currentIndex > 0 && decoImages[currentIndex-1].image == nil {
+                                    isAlbumPresented = false
+                                } else {
+                                    isAlbumPresented = true
+                                } 
                             }
                             .onAppear {
                                 updateCurrentIndex(for: geo, index: index)
