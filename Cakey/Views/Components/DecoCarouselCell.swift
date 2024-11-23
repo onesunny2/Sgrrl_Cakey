@@ -93,7 +93,10 @@ struct DecoCarouselCell: View {
         .sheet(isPresented: $isAlbumPresented) {
             ImagePicker(sourceType: .photoLibrary) { selectedImage in
                 if let selectedImage = selectedImage {
-                    decoImages[currentIndex].image = selectedImage.pngData()
+                    let targetSize = CGSize(width: 230, height: 230)
+                    if let imageData = selectedImage.pngData(), let downsampledImage = ImageDownsample.downsample(data: imageData, to: targetSize) {
+                        decoImages[currentIndex].image = downsampledImage.pngData()
+                    }
                 }
             }
         }
