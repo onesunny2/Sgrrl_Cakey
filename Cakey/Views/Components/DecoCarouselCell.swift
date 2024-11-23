@@ -89,7 +89,7 @@ struct DecoCarouselCell: View {
         .sheet(isPresented: $isAlbumPresented) {
             ImagePicker(sourceType: .photoLibrary) { selectedImage in
                 if let selectedImage = selectedImage {
-                        decoImages[currentIndex].image = selectedImage.pngData()
+                    decoImages[currentIndex].image = selectedImage.pngData()
                 }
             }
         }
