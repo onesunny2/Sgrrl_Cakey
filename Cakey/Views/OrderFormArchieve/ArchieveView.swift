@@ -56,6 +56,7 @@ struct ArchieveView: View {
         }
         .onAppear {
             cakeyModelList =  archieveViewModel.readSortedCakeys()
+            print("\(archieveViewModel.readSortedCakeys())")
         }
     }
 }

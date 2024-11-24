@@ -57,6 +57,7 @@ struct CakeLetteringView: View {
                     viewModel.cakeyModel.letteringColor = selectedColor.toHex()
                     viewModel.cakeyModel.letteringText = text
                     viewModel.cakeyModel.saveDate = .now
+                    viewModel.cakeyModel.isComplete = true
                 }, isButtonActive: false)
             }
             .padding(.top, 86)
