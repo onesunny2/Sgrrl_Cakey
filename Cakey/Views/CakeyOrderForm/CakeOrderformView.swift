@@ -34,6 +34,7 @@ struct CakeOrderformView: View {
         .onAppear {
             UIPageControl.appearance().currentPageIndicatorTintColor = UIColor.cakeyOrange1 // 현재 페이지 색상
             UIPageControl.appearance().pageIndicatorTintColor = UIColor.cakeyOrange3 // 나머지 페이지 색상
+            viewModel.updateCakey()
         }
         .navigationBarBackButtonHidden(true)
         .toolbarBackground(.cakeyYellow1, for: .navigationBar)
