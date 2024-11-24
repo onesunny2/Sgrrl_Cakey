@@ -14,7 +14,6 @@ class ArchieveViewModel {
     // Read
     func readSortedCakeys() -> [CakeyModel] {
         self.realm.readCakey()
-            .filter { $0.isComplete == true }
             .sorted(by: {$0.saveDate > $1.saveDate} )
     }
     
