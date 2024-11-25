@@ -73,7 +73,7 @@ struct HomeView: View {
                     case .cakeImageView:
                         CakeImageView(path: $path, viewModel: viewModel)
                     case .cakeDecorationView:
-                        CakeDecorationView(path: $path, viewModel: viewModel)
+                        CakeDecorationView(viewModel: viewModel, path: $path)
                     case .cakeLetteringView:
                         CakeLetteringView(path: $path, viewModel: viewModel)
                     case .cakeOrderformView:

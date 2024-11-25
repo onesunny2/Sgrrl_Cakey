@@ -18,8 +18,7 @@ struct Cake3DDecoView: View {
     var topView: CameraMode = CameraMode.topView
     var sideView: CameraMode = CameraMode.sideView
     
-    // TODO: - 데이터에서 불러오기
-    var imgList: [String] = ["p6", "p2","p3","p4","p5"]
+    var viewModel: CakeyViewModel
     
     var body: some View {
         // MARK: - Cake3D
@@ -49,7 +48,7 @@ struct Cake3DDecoView: View {
                 } .padding(.bottom, 10)
                 
                 // MARK: ImageSelect
-                ImageScrollView(imgList: imgList) { img in
+                ImageScrollView(imgList: viewModel.cakeyModel.cakeImages) { img in
                     coordinator_deco.addDecoEntity(imgName: img)
                     print("버튼 눌렀다! \(img)")
                 }
@@ -342,7 +341,7 @@ class Coordinator_deco: NSObject, ObservableObject {
 
 
 
-#Preview {
-    CakeDecorationView(value: 4, path: .constant([4]))
-}
+//#Preview {
+//    CakeDecorationView(value: 4, path: .constant([4]))
+//}
 
