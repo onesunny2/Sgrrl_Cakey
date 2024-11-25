@@ -28,7 +28,7 @@ struct Cake3DDecoView: View {
     var sideView: CameraMode = CameraMode.sideView
     
     // TODO: - 데이터에서 불러오기
-    var imgList: [String] = ["p1", "p2","p3","p4","p5"]
+    var imgList: [String] = ["p6", "p2","p3","p4","p5"]
     
     var body: some View {
         // MARK: - Cake3D
@@ -188,6 +188,17 @@ struct ARViewContainer_deco: UIViewRepresentable {
         cakeModel.name = "cake"
         //cakeModel.physicsBody = PhysicsBodyComponent(massProperties: .default, material: .default, mode: .static)
         
+        // MARK: CakeModel - CakeSurface
+        let cakeSurfaceModel = try! ModelEntity.loadModel(named: "cakeSurface")
+        var cakeMat = PhysicallyBasedMaterial()
+        cakeMat.baseColor = .init(tint: .white.withAlphaComponent(0))
+        cakeMat.opacityThreshold = 0
+        
+        cakeSurfaceModel.model?.materials = [cakeMat]
+        cakeSurfaceModel.scale = SIMD3(repeating: 0.43)
+        //cakeSurfaceModel.position.y -= 0.05
+        cakeSurfaceModel.physicsBody = PhysicsBodyComponent(massProperties: .default, material: .default, mode: .static)
+        
         
         // MARK: CakeModel - CakeTray
         let cakeTrayModel = try! ModelEntity.loadModel(named: "cakeTray")
@@ -198,6 +209,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
         let cakeParentEntity = ModelEntity()
         cakeParentEntity.addChild(cakeModel)
         cakeParentEntity.addChild(cakeTrayModel)
+        cakeParentEntity.addChild(cakeSurfaceModel)
         cakeParentEntity.generateCollisionShapes(recursive: true)
         
         
@@ -218,24 +230,11 @@ struct ARViewContainer_deco: UIViewRepresentable {
         
         
         // MARK: CakeRing
-        let cakeRingModel = try! ModelEntity.loadModel(named: "cakeRing")
-        cakeRingModel.scale = SIMD3(repeating: 0.43)
-        var cakeRingMaterial = PhysicallyBasedMaterial()
-        //cakeRingMaterial.opacityThreshold = 1
-        cakeRingModel.model?.materials = [cakeRingMaterial]
-        cakeRingModel.generateCollisionShapes(recursive: true)
-        cakeRingModel.name = "cakeRing"
-        
-        cakeRingModel.physicsBody = PhysicsBodyComponent(
-            massProperties: .default,
-            material: .default,
-            mode: .static
-        )
-        
         let ringAnchor = AnchorEntity(world: [0,0,0])
-        ringAnchor.addChild(cakeRingModel)
+        coordinator_deco.ringAnchor = ringAnchor
+        //coordinator_deco.makeRing()
+        
         arView.scene.addAnchor(ringAnchor)
-        coordinator_deco.cakeRingEntity = cakeRingModel
         
         // MARK: Virtual Camera
         let camera = PerspectiveCamera()
@@ -253,6 +252,8 @@ struct ARViewContainer_deco: UIViewRepresentable {
             camera.look(at: cakeParentEntity.position, from: camera.position, relativeTo: nil)
             // MARK: 모델 사이즈 Clamp
             context.coordinator.clampCakeSize()
+            
+            coordinator_deco.clampDecoPosition()
         } as? AnyCancellable
         
         
@@ -268,7 +269,9 @@ struct ARViewContainer_deco: UIViewRepresentable {
         context.coordinator.camera?.position.y = cameraHeight
         context.coordinator.camera?.position.x = cameraHeight * 0.6
         //context.coordinator.cakeParentEntity?.scale *= cameraHeight * 1.2
+        
         coordinator_deco.updateMode()
+        
     }
     
     func makeCoordinator() -> Coordinator_deco {
@@ -280,10 +283,12 @@ class Coordinator_deco: NSObject, ObservableObject {
     var arView: ARView?
     var decoAnchor:  AnchorEntity?
     var cakeParentEntity: ModelEntity?
-    var cakeRingEntity: ModelEntity?
+    var ringAnchor: AnchorEntity?
     var camera: PerspectiveCamera?
     var cancellable: AnyCancellable?
     var activeMode: EditMode = .editMode
+    
+    var cancellables = Set<AnyCancellable>()
     
     
     @Published var selectedEntity: ModelEntity? {
@@ -311,9 +316,6 @@ class Coordinator_deco: NSObject, ObservableObject {
                     }
                 }
             }
-            
-            // ring과 decogroup만 부딪혔으면 좋겠어! 즉 ring에는 터치도 먹히면 안되는거야..!
-            cakeRingEntity?.collision?.filter = CollisionFilter(group: ringGroup, mask: [decoGroup])
             
         case .lookMode:
             cakeParentEntity.children.forEach { entity in
@@ -343,14 +345,14 @@ class Coordinator_deco: NSObject, ObservableObject {
             plane.model?.materials = [material]
         }
         
-        plane.position.y += 0.79 * 0.43 + 0.008
+        plane.position.y += 0.79 * 0.43 + 0.02
         plane.scale /= 2
         
         plane.generateCollisionShapes(recursive: true)
         arView.installGestures([.all], for: plane)
         plane.name = "deco"
         
-        plane.collision = CollisionComponent(shapes: [.generateBox(size: simd_float3(repeating: 0.5))], mode: .trigger, filter: .sensor)
+        plane.collision = CollisionComponent(shapes:[ShapeResource.generateBox(width: 0.5, height: 0.1, depth: 0.5)], mode: .trigger, filter: .sensor)
         plane.physicsBody = PhysicsBodyComponent(
             massProperties: .default,
             material: .default,
@@ -359,6 +361,25 @@ class Coordinator_deco: NSObject, ObservableObject {
         
         // decoAnchor 대신 cakeParentEntity에 추가
         cakeParentEntity.addChild(plane)
+        
+        // ringGroup과 충돌하면! 속도 고정, y값 고정 하고 싶은거야!
+            arView.scene.subscribe(to: SceneEvents.Update.self) { [weak plane] _ in
+                guard let plane = plane else { return }
+                
+                plane.physicsMotion?.angularVelocity = SIMD3(repeating: 0)
+                plane.physicsMotion?.linearVelocity = SIMD3(repeating: 0)
+                plane.position.y = 0.79 * 0.43 + 0.02 // 고정된 y-position 값
+            }.store(in: &cancellables)
+        
+        arView.scene.subscribe(to: CollisionEvents.Began.self) { [weak self, weak plane] event in
+                guard let plane = plane else { return }
+                
+                if event.entityA == plane || event.entityB == plane {
+                    // 속도를 0으로 설정
+                    plane.physicsMotion?.linearVelocity = .zero
+                    plane.physicsMotion?.angularVelocity = .zero
+                }
+            }.store(in: &cancellables)
     }
     
     
@@ -440,6 +461,68 @@ class Coordinator_deco: NSObject, ObservableObject {
             model.scale = SIMD3(repeating: newScale)
         }
     }
+    
+    func makeRing() {
+        let radius: Float = 0.5
+        let cubeSize: Float = 0.1
+
+        // 큐브의 개수 (원을 구성할 큐브의 수)
+        let cubeCount = 60
+
+        for i in 0..<cubeCount {
+            let angle = Float(i) * (2 * .pi / Float(cubeCount))
+            
+            let x = radius * cos(angle)
+            let z = radius * sin(angle)
+            
+            var cakeMat = PhysicallyBasedMaterial()
+            cakeMat.baseColor = .init(tint: .white.withAlphaComponent(0))
+            cakeMat.opacityThreshold = 0
+            
+            let cube = ModelEntity(mesh: MeshResource.generateBox(size: cubeSize), materials: [cakeMat])
+            cube.generateCollisionShapes(recursive: true)
+            cube.physicsBody = PhysicsBodyComponent(massProperties: .default, material: .default, mode: .static)
+
+            cube.position = simd_make_float3(x, 0.79 * 0.43 + 0.01, z) // y는 큐브가 바닥에 닿도록 설정
+            
+            cube.collision = CollisionComponent(
+                shapes: [ShapeResource.generateBox(size: SIMD3(repeating: cubeSize))],
+                mode: .trigger,
+                filter: CollisionFilter(group: ringGroup, mask: decoGroup)
+            )
+            
+            ringAnchor?.addChild(cube)
+        }
+    }
+    
+    func clampDecoPosition() {
+        
+        guard let cakeParentEntity = cakeParentEntity else { return }
+
+        let radius: Float = 0.4 // 원의 반지름
+
+        // CakeParentEntity의 자식 엔터티 중 "deco" 이름을 가진 엔터티만 순회
+        for entity in cakeParentEntity.children.filter({ $0.name == "deco" }) {
+            var position = entity.position(relativeTo: nil)
+            print("deco의 위치는\(position)")
+            
+            let distanceSquared = position.x * position.x + position.z * position.z
+            
+            // 원 밖으로 나갔을 경우
+            if distanceSquared > radius * radius {
+                print("clampDecoPosition")
+                let distance = sqrt(distanceSquared)
+                let clampedX = position.x * (radius / distance)
+                let clampedZ = position.z * (radius / distance)
+                
+                position.x = clampedX
+                position.z = clampedZ
+                entity.position = position
+            }
+        }
+    }
+
+
 }
 
 
