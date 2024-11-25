@@ -9,11 +9,12 @@ import SwiftUI
 
 struct CakeColorView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    let value: Int
-    @Binding var path: [Int]
+    @Binding var path: [Destination]
     @State private var selectedColor: Color = .pickerWhite
     @State private var pickerColor: Color = .white
     @State private var selectedColorIndex: Int = 0
+    var viewModel: CakeyViewModel
+    
     
     var body: some View {
         ZStack {
@@ -33,13 +34,14 @@ struct CakeColorView: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 50)
                 
-                ColorPickerCell(selectedColor: $selectedColor, pickerColor: $pickerColor, selectedColorIndex: $selectedColorIndex)
+                CakeColorPickerCell(selectedColor: $selectedColor, pickerColor: $pickerColor, selectedColorIndex: $selectedColorIndex)
                     .padding(.bottom, 70)
                 
-                NextButtonCell(nextValue: { path.append(3)} )
+                NextButtonCell(nextValue: {path.append(.cakeImageView)
+                    viewModel.cakeyModel.cakeColor = selectedColor.toHex()}, isButtonActive: false)
             }
             .padding(.top, 86)
-            .padding(.bottom, 20)
+            .padding(.bottom, 10)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -55,7 +57,7 @@ struct CakeColorView: View {
         }
     }
 }
-
-#Preview {
-    CakeColorView(value: 1, path: .constant([1]))
-}
+//
+//#Preview {
+//    CakeColorView(value: 1, path: .constant([1]))
+//}

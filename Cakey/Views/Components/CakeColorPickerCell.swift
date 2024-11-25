@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ColorPickerCell: View {
+struct CakeColorPickerCell: View {
     let colorList: [Color] = [.pickerWhite, .pickerPink, .pickerYellow, .pickerBlue, .pickerPurple]
     @Binding var selectedColor: Color
     @Binding var pickerColor: Color
@@ -66,6 +66,6 @@ struct ColorPickerCell: View {
         Color.cakeyYellow1
             .ignoresSafeArea(.all)
         
-        ColorPickerCell(selectedColor: .constant(.pickerWhite), pickerColor: .constant(.white), selectedColorIndex: .constant(0))
+        CakeColorPickerCell(selectedColor: .constant(.pickerWhite), pickerColor: .constant(.white), selectedColorIndex: .constant(0))
     }
 }
