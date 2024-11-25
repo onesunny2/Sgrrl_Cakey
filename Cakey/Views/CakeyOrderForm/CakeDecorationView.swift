@@ -24,21 +24,8 @@ struct CakeDecorationView: View {
                 NoticeCelll(notice1: "케이크 도안을 만들어 보세요!", notice2: "이미지를 케이크에 자유롭게 배치할 수 있어요")
                     .padding(.bottom, 40)
                 
-                // TODO: 3D
+                // 3D DecoView
                 Cake3DDecoView()
-                
-                // MARK: 데코레이션 버튼 3개
-                // TODO: 각 버튼별 액션 도라미가 해줘야함
-//                VStack {
-//                    HStack(spacing: 30) {
-//                        DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.trianglehead.2.clockwise.rotate.90", buttonAction: { })
-//                        DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "trash",buttonText: "선택 삭제", buttonAction: { })
-//                    } .padding(.bottom, 40)
-//                    
-//                    ScrollView(.horizontal, showsIndicators: false) {
-//                        DecoImageCell()
-//                    } .padding(.leading, (UIScreen.main.bounds.width - 292) / 2)
-//                }
             }
             .padding(.top, 86)
             .padding(.bottom, 20)

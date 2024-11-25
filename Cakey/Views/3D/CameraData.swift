@@ -7,6 +7,7 @@
 
 import Foundation
 
+// MARK: CameraMode
 enum CameraMode {
     case quarterView
     case topView
@@ -22,4 +23,10 @@ enum CameraMode {
             return 0.5
         }
     }
+}
+
+// MARK: 수정모드, 살펴보기모드
+enum EditMode{
+    case editMode
+    case lookMode
 }
