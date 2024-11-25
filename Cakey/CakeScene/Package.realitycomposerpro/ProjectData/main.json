@@ -1,5 +1,6 @@
 {
   "pathsToIds" : {
-    "CakeScene\/Sources\/CakeScene\/CakeScene.rkassets\/Scene.usda" : "AF3D030A-6F01-40AF-AF17-7EC0F899DE85"
+    "CakeScene\/Sources\/CakeScene\/CakeScene.rkassets\/Scene.usda" : "AF3D030A-6F01-40AF-AF17-7EC0F899DE85",
+    "CakeScene\/Sources\/CakeScene\/CakeScene.rkassets\/holecut.usdc" : "9C8AE960-3790-4B8F-A1AC-FDE4550C8E0E"
   }
 }

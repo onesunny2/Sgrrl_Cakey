@@ -28,13 +28,8 @@ struct CakeColorView: View {
                 NoticeCelll(notice1: "어떤 색상을 원하세요?", notice2: "원하는 케이크 색상을 선택해 주세요")
                     .padding(.bottom, 30)
                 
-                // TODO: 람지의 3D케이크 자리
-//                Rectangle()
-//                    .fill(selectedColor)
-//                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-//                    .padding(.horizontal, 20)
-//                    .padding(.bottom, 50)
-                Cake3DView()
+                // MARK: 람지의 3D케이크 자리
+                Cake3DColorView(selectedColor: $selectedColor)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(.horizontal, 20)
                     .padding(.bottom, 50)
