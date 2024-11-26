@@ -48,7 +48,8 @@ struct ARViewContainer_color: UIViewRepresentable {
 
         cakeParentEntity.generateCollisionShapes(recursive: true)
         context.coordinator.cakeParentEntity = cakeParentEntity
-        arView.installGestures([.rotation, .scale], for: cakeParentEntity)
+        // FIXME: ColorView에서 제스처 필요없어 보임
+        //arView.installGestures([.rotation, .scale], for: cakeParentEntity)
         
         let cakeAnchor = AnchorEntity(world: [0, 0, 0])
         cakeAnchor.addChild(cakeParentEntity)

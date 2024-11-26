@@ -48,9 +48,13 @@ struct Cake3DDecoView: View {
                 } .padding(.bottom, 10)
                 
                 // MARK: ImageSelect
-                ImageScrollView(imgList: viewModel.cakeyModel.cakeImages) { img in
-                    coordinator_deco.addDecoEntity(imgName: img)
-                    print("버튼 눌렀다! \(img)")
+//                ImageScrollView(imgList: viewModel.cakeyModel.cakeImages) { img in
+//                    coordinator_deco.addDecoEntity(imgName: img)
+//                    print("버튼 눌렀다! \(img)")
+//                }
+                ImageScrollView(imgList: viewModel.cakeyModel.cakeImages) { imgData in
+                    coordinator_deco.addDecoEntity(imgName: imgData)
+                    print("버튼 눌렀다! \(imgData)")
                 }
                 .padding(.leading, 30)
             }
@@ -205,18 +209,56 @@ class Coordinator_deco: NSObject, ObservableObject {
     }
     
     
+//    // MARK: 데코 추가 함수
+//    func addDecoEntity(imgName: String) {
+//        guard let arView = arView, let cakeParentEntity = cakeParentEntity else { return }
+//        
+//        let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
+//        let plane = ModelEntity(mesh: planeMesh)
+//        
+//        if let texture = try? TextureResource.load(named: imgName) {
+//            var material = UnlitMaterial()
+//            material.color = .init(tint: .white, texture: .init(texture))
+//            material.opacityThreshold = 0.1
+//            plane.model?.materials = [material]
+//        }
+//        
+//        var ciImage = CIImage(image: (UIImage(data: imgName))!)
+//        
+//        
+//        TextureResource(image: CGImage(), options: <#T##TextureResource.CreateOptions#>)
+//        
+//        plane.position.y += 0.79 * 0.43 + 0.02
+//        plane.scale /= 2
+//        
+//        plane.generateCollisionShapes(recursive: true)
+//        arView.installGestures([.all], for: plane)
+//        plane.name = "deco"
+//        
+//        // decoAnchor 대신 cakeParentEntity에 추가
+//        cakeParentEntity.addChild(plane)
+//    }
+    
     // MARK: 데코 추가 함수
-    func addDecoEntity(imgName: String) {
+    func addDecoEntity(imgName: Data) {
         guard let arView = arView, let cakeParentEntity = cakeParentEntity else { return }
         
         let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
         let plane = ModelEntity(mesh: planeMesh)
         
-        if let texture = try? TextureResource.load(named: imgName) {
-            var material = UnlitMaterial()
-            material.color = .init(tint: .white, texture: .init(texture))
-            material.opacityThreshold = 0.1
-            plane.model?.materials = [material]
+        if let uiImage = UIImage(data: imgName),
+           let cgImage = uiImage.cgImage {
+            
+            do {
+                // TextureResource 생성
+                let texture = try TextureResource.generate(from: cgImage, options: .init(semantic: .color))
+                var material = UnlitMaterial()
+                material.color = .init(tint: .white, texture: .init(texture))
+                material.opacityThreshold = 0.1
+                plane.model?.materials = [material]
+            } catch {
+                print("Error creating texture: \(error.localizedDescription)")
+            }
         }
         
         plane.position.y += 0.79 * 0.43 + 0.02
@@ -226,9 +268,10 @@ class Coordinator_deco: NSObject, ObservableObject {
         arView.installGestures([.all], for: plane)
         plane.name = "deco"
         
-        // decoAnchor 대신 cakeParentEntity에 추가
+        // cakeParentEntity에 추가
         cakeParentEntity.addChild(plane)
     }
+
     
     
     // MARK: 전체 삭제 - 버튼 할당
@@ -239,8 +282,6 @@ class Coordinator_deco: NSObject, ObservableObject {
         for entity in cakeParentEntity.children.filter({ $0.name != "cake" }) {
             cakeParentEntity.removeChild(entity)
         }
-        
-        print("모든 데코가 삭제되었습니다.")
     }
     
     
@@ -320,8 +361,6 @@ class Coordinator_deco: NSObject, ObservableObject {
         // CakeParentEntity의 자식 엔터티 중 "deco" 이름을 가진 엔터티만 순회
         for entity in cakeParentEntity.children.filter({ $0.name == "deco" }) {
             var position = entity.position(relativeTo: cakeParentEntity)
-            print("deco의 위치는\(position)")
-            
             let distanceSquared = position.x * position.x + position.z * position.z
             
             // 원 밖으로 나갔을 경우
@@ -337,11 +376,6 @@ class Coordinator_deco: NSObject, ObservableObject {
             }
         }
     }
+    
 }
-
-
-
-//#Preview {
-//    CakeDecorationView(value: 4, path: .constant([4]))
-//}
 

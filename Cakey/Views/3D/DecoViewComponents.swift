@@ -8,43 +8,87 @@
 import SwiftUI
 
 // MARK: - ImageScrollView
+//@ViewBuilder
+//func ImageScrollView(imgList: [decoElements], action: @escaping (String) -> Void) -> some View {
+//    ScrollView(.horizontal, showsIndicators: false) {
+//        HStack(spacing: 8) {
+//            ForEach(imgList.map{ $0.image }, id: \.self) { img in
+//                RoundedRectangle(cornerRadius: 10)
+//                    .fill(.clear)
+//                    .frame(width: 80, height: 80)
+//                    .overlay {
+//                        ZStack {
+//                            if let img = img, let uiImage = UIImage(data: img) {
+//                                Image(uiImage: uiImage)
+//                                    .resizable()
+//                                    .scaledToFill()
+//                                    .frame(width: 80, height: 80)
+//                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+//                                
+//                                RoundedRectangle(cornerRadius: 10)
+//                                    .stroke(Color.cakeyOrange1, lineWidth: 2)
+//                                    .padding(1)
+//                            } else {
+//                                RoundedRectangle(cornerRadius: 10)
+//                                    .fill(.cakeyOrange2)
+//                                    .frame(width: 80, height: 80)
+//                                    .overlay {
+//                                        Image(systemName: "photo")
+//                                            .font(.symbolTitle2)
+//                                            .foregroundStyle(.cakeyOrange3)
+//                                    }
+//                            }
+//                        }
+//                    }
+//                    
+//            }
+//        }
+//    }
+//}
+
 @ViewBuilder
-func ImageScrollView(imgList: [decoElements], action: @escaping (String) -> Void) -> some View {
+func ImageScrollView(imgList: [decoElements], action: @escaping (Data) -> Void) -> some View {
     ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 8) {
-            ForEach(imgList.map{ $0.image }, id: \.self) { img in
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(.clear)
-                    .frame(width: 80, height: 80)
-                    .overlay {
-                        ZStack {
-                            if let img = img, let uiImage = UIImage(data: img) {
-                                Image(uiImage: uiImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 80, height: 80)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                                
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.cakeyOrange1, lineWidth: 2)
-                                    .padding(1)
-                            } else {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(.cakeyOrange2)
-                                    .frame(width: 80, height: 80)
-                                    .overlay {
-                                        Image(systemName: "photo")
-                                            .font(.symbolTitle2)
-                                            .foregroundStyle(.cakeyOrange3)
-                                    }
+            ForEach(Array(imgList.enumerated()), id: \.offset) { index, element in
+                if let imgData = element.image {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(.clear)
+                        .frame(width: 80, height: 80)
+                        .overlay {
+                            ZStack {
+                                if let uiImage = UIImage(data: imgData) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 80, height: 80)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.cakeyOrange1, lineWidth: 2)
+                                        .padding(1)
+                                } else {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(.cakeyOrange2)
+                                        .frame(width: 80, height: 80)
+                                        .overlay {
+                                            Image(systemName: "photo")
+                                                .font(.symbolTitle2)
+                                                .foregroundStyle(.cakeyOrange3)
+                                        }
+                                }
                             }
-                            
                         }
-                    }
+                        .onTapGesture {
+                            action(imgData) // 이미지 데이터 전달
+                        }
+                }
             }
         }
     }
 }
+
+
 
 // MARK: - ModeSelectView
 @ViewBuilder

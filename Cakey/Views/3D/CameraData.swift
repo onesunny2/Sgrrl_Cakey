@@ -25,7 +25,7 @@ enum CameraMode {
     }
 }
 
-// MARK: 수정모드, 살펴보기모드
+// MARK: EditMode - 수정모드, 살펴보기모드
 enum EditMode{
     case editMode
     case lookMode
