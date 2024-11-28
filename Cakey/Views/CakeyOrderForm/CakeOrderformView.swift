@@ -104,13 +104,12 @@ struct CakeOrderformView: View {
         }
     }
     
+    @ViewBuilder
     func cakeImage() -> some View {
-            Rectangle()
-                .fill(.pickerPink)
-                .frame(width: 300, height: 250)
-                .overlay {
-                    Text("1")
-                }
+        Image(.zzamong)
+            .resizable()
+            .scaledToFit()
+            .frame(width: 300, height: 250)
     }
     
     @ViewBuilder
@@ -154,9 +153,10 @@ struct CakeOrderformView: View {
                 Spacer()
             }
             .padding(.leading, 17)
-            .padding(.bottom, -20)
+            .padding(.bottom, 28)
             
             cakeImage()
+                .padding(.bottom, 16)
             
             designKeywordLists()
         }
