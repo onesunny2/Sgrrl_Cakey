@@ -104,24 +104,13 @@ struct CakeOrderformView: View {
         }
     }
     
-    func imageTabview() -> some View {
-        TabView {
+    func cakeImage() -> some View {
             Rectangle()
                 .fill(.pickerPink)
                 .frame(width: 300, height: 250)
                 .overlay {
                     Text("1")
                 }
-            
-            Rectangle()
-                .fill(.pickerPink)
-                .frame(width: 300, height: 250)
-                .overlay {
-                    Text("2")
-                }
-        }
-        .tabViewStyle(PageTabViewStyle())
-        .frame(height: 350)
     }
     
     @ViewBuilder
@@ -167,7 +156,7 @@ struct CakeOrderformView: View {
             .padding(.leading, 17)
             .padding(.bottom, -20)
             
-            imageTabview()
+            cakeImage()
             
             designKeywordLists()
         }
