@@ -35,7 +35,6 @@ struct CakeOrderformView: View {
             UIPageControl.appearance().currentPageIndicatorTintColor = UIColor.cakeyOrange1 // 현재 페이지 색상
             UIPageControl.appearance().pageIndicatorTintColor = UIColor.cakeyOrange3 // 나머지 페이지 색상
             viewModel.updateCakey()
-            print(viewModel.cakeyModel.cakeImages)
         }
         .navigationBarBackButtonHidden(true)
         .toolbarBackground(.cakeyYellow1, for: .navigationBar)
@@ -120,8 +119,8 @@ struct CakeOrderformView: View {
             .padding(.bottom, 28)
         
         // 키워드 리스트
-        if viewModel.cakeyModel.cakeImages.first?.description == "" {
-            EmptyView()
+        if viewModel.cakeyModel.cakeImages.isEmpty {
+            
         } else {
             VStack(alignment: .leading, spacing: 8) {
                     ForEach(viewModel.cakeyModel.cakeImages.map { $0.description }, id: \.self) { keyword in
