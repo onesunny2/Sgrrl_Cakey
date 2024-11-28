@@ -120,15 +120,19 @@ struct CakeOrderformView: View {
         
         // 키워드 리스트
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(viewModel.cakeyModel.cakeImages.map { $0.description }, id: \.self) { keyword in
-                HStack(spacing: 12) {
-                    Circle()
-                        .fill(.cakeyOrange1)
-                        .frame(width: 8, height: 8)
-                    
-                    Text("\(keyword)")
-                        .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
-                        .frame(width: 235, alignment: .leading)
+            if viewModel.cakeyModel.cakeImages.first?.description == "" {
+                EmptyView()
+            } else {
+                ForEach(viewModel.cakeyModel.cakeImages.map { $0.description }, id: \.self) { keyword in
+                    HStack(spacing: 12) {
+                        Circle()
+                            .fill(.cakeyOrange1)
+                            .frame(width: 8, height: 8)
+                        
+                        Text("\(keyword)")
+                            .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
+                            .frame(width: 235, alignment: .leading)
+                    }
                 }
             }
         }
