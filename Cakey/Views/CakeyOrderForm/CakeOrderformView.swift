@@ -115,7 +115,7 @@ struct CakeOrderformView: View {
     func designKeywordLists() -> some View {
         Text("이런 디자인이 들어갔으면 좋겠어요!")
             .customStyledFont(font: .cakeyBody, color: .cakeyOrange1)
-            .padding(.bottom, 8)
+            .padding(.bottom, 12)
         
         // 키워드 리스트
         if viewModel.cakeyModel.cakeImages.isEmpty {
