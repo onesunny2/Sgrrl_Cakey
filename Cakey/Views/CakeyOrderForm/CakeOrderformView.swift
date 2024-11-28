@@ -19,7 +19,7 @@ struct CakeOrderformView: View {
         ZStack {
             Color.cakeyYellow1
                 .ignoresSafeArea(.all)
-            ScrollView(.vertical, showsIndicators: false) {
+
                 VStack(spacing: 0) {
                     captureContent()  // 캡처 대상 뷰
                     
@@ -29,7 +29,6 @@ struct CakeOrderformView: View {
                 }
                 .padding(.top, 20)
                 .padding(.bottom, 10)
-            }
         }
         .onAppear {
             UIPageControl.appearance().currentPageIndicatorTintColor = UIColor.cakeyOrange1 // 현재 페이지 색상
