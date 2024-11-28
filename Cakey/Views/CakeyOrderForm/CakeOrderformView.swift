@@ -23,7 +23,7 @@ struct CakeOrderformView: View {
                 VStack(spacing: 0) {
                     captureContent()  // 캡처 대상 뷰
                     
-                    Spacer(minLength: 16)
+                    Spacer(minLength: 20)
                     
                     saveButton()  // 캡처에서 제외
                 }
@@ -115,7 +115,7 @@ struct CakeOrderformView: View {
     func designKeywordLists() -> some View {
         Text("이런 디자인이 들어갔으면 좋겠어요!")
             .customStyledFont(font: .cakeyBody, color: .cakeyOrange1)
-            .padding(.bottom, 28)
+            .padding(.bottom, 8)
         
         // 키워드 리스트
         if viewModel.cakeyModel.cakeImages.isEmpty {
@@ -170,10 +170,6 @@ struct CakeOrderformView: View {
     
     func saveButton() -> some View {
         VStack {
-//            Text("주문서를 저장하고, 사장님과 공유해보세요!")
-//                .customStyledFont(font: .cakeyCaption1, color: .cakeyOrange1)
-//                .padding(.bottom, 11)
-            
             Button {
                 self.showActionSheet = true
             } label: {
