@@ -170,9 +170,9 @@ struct CakeOrderformView: View {
     
     func saveButton() -> some View {
         VStack {
-            Text("주문서를 저장하고, 사장님과 공유해보세요!")
-                .customStyledFont(font: .cakeyCaption1, color: .cakeyOrange1)
-                .padding(.bottom, 11)
+//            Text("주문서를 저장하고, 사장님과 공유해보세요!")
+//                .customStyledFont(font: .cakeyCaption1, color: .cakeyOrange1)
+//                .padding(.bottom, 11)
             
             Button {
                 self.showActionSheet = true
