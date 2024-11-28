@@ -32,15 +32,18 @@ struct CakeLetteringView: View {
                 
                 // TODO: 라미 케이크 자리(크기는 알아서 조정해줘)
                 ZStack {
-                    Rectangle()
-                        .fill(.pink)
+//                    Rectangle()
+//                        .fill(.pink)
+//                        .frame(width: 230, height: 230)
+                    Cake3DTopView()
                         .frame(width: 230, height: 230)
-                    
-                    Text("\(text)")
-                        .customStyledFont(font: .cakeyTitle2, color: selectedColor)
-                        .multilineTextAlignment(.center)
-                        .kerning(5)
-                        .lineSpacing(15)
+                    VStack{
+                        Text("\(text)")
+                            .customStyledFont(font: .cakeyTitle2, color: selectedColor)
+                            .multilineTextAlignment(.center)
+                            .kerning(5)
+                            .lineSpacing(15)
+                    }
                 }
                     .padding(.bottom, 30)
                 

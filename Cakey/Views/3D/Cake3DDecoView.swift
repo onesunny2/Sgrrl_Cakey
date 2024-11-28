@@ -23,7 +23,7 @@ struct Cake3DDecoView: View {
     var body: some View {
         // MARK: - Cake3D
         ZStack{
-            ARViewContainer_deco(coordinator_deco: coordinator_deco, cameraHeight: $cameraHeight, activeMode: $activeMode).ignoresSafeArea()
+            ARViewContainer_deco(coordinator_deco: coordinator_deco, cameraHeight: $cameraHeight, activeMode: $activeMode, viewModel: viewModel).ignoresSafeArea()
             
             HStack{
                 Spacer()
@@ -76,8 +76,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
     @Binding var cameraHeight: Float
     @Binding var activeMode: EditMode
     
-    // TODO: - 색상 데이터 불러오기
-    var selectedColor: Color = .cakeyOrange2
+    var viewModel: CakeyViewModel
     
     func makeUIView(context: Context) -> ARView {
         // MARK: ARView 초기화
@@ -87,6 +86,8 @@ struct ARViewContainer_deco: UIViewRepresentable {
         // MARK: CakeModel - Cake
         let cakeModel = try! ModelEntity.loadModel(named: "cakeModel")
         cakeModel.scale = SIMD3(repeating: 0.43)
+        
+        var selectedColor = Color(hex:viewModel.cakeyModel.cakeColor!)  // 선택 컬러 적용
         let selectedMaterial = SimpleMaterial(color: UIColor(selectedColor), isMetallic: false)
         cakeModel.model?.materials = [selectedMaterial]
         cakeModel.name = "cake"
