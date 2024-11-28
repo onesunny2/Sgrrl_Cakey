@@ -119,29 +119,35 @@ struct CakeOrderformView: View {
             .padding(.bottom, 28)
         
         // 키워드 리스트
-        VStack(alignment: .leading, spacing: 8) {
-            ForEach(viewModel.cakeyModel.cakeImages.map { $0.description }, id: \.self) { keyword in
-                HStack(spacing: 12) {
-                    Circle()
-                        .fill(.cakeyOrange1)
-                        .frame(width: 8, height: 8)
-                    
-                    Text("\(keyword)")
-                        .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
-                        .frame(width: 235, alignment: .leading)
-                }
+        if viewModel.cakeyModel.cakeImages.isEmpty {
+            
+        } else {
+            VStack(alignment: .leading, spacing: 8) {
+                    ForEach(viewModel.cakeyModel.cakeImages.map { $0.description }, id: \.self) { keyword in
+                        if keyword != "" {
+                            HStack(spacing: 12) {
+                                Circle()
+                                    .fill(.cakeyOrange1)
+                                    .frame(width: 8, height: 8)
+                                
+                                Text("\(keyword)")
+                                    .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
+                                    .frame(width: 235, alignment: .leading)
+                            }
+                        }
+                    }
             }
-        }
-        .padding(.horizontal, 17)
-        .padding(.vertical, 18)
-        .background {
-            RoundedRectangle(cornerRadius: 40)
-                .strokeBorder(Color.cakeyOrange1, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round, dash: [0.5, 7]))
-        }
-        .padding(8)
-        .background {
-            RoundedRectangle(cornerRadius: 45)
-                .stroke(Color.cakeyOrange1, lineWidth: 2)
+            .padding(.horizontal, 17)
+            .padding(.vertical, 18)
+            .background {
+                RoundedRectangle(cornerRadius: 40)
+                    .strokeBorder(Color.cakeyOrange1, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round, dash: [0.5, 7]))
+            }
+            .padding(8)
+            .background {
+                RoundedRectangle(cornerRadius: 45)
+                    .stroke(Color.cakeyOrange1, lineWidth: 2)
+            }
         }
     }
     
