@@ -19,6 +19,7 @@ struct CakeLetteringView: View {
     var viewModel: CakeyViewModel
     
     var body: some View {
+        
         ZStack {
             Color.cakeyYellow1
                 .ignoresSafeArea(.all)
@@ -35,7 +36,7 @@ struct CakeLetteringView: View {
 //                    Rectangle()
 //                        .fill(.pink)
 //                        .frame(width: 230, height: 230)
-                    Cake3DTopView()
+                    Cake3DTopView(viewModel: viewModel)
                         .frame(width: 230, height: 230)
                     VStack{
                         Text("\(text)")

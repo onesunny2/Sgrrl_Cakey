@@ -12,13 +12,13 @@ import Combine
 
 // MARK: - CakeLetteringView에 들어갈 3D
 struct Cake3DTopView: View {
-    //var viewModel: CakeyViewModel
+    var viewModel: CakeyViewModel
     
     var body: some View {
         ZStack {
             //ARViewContainer_top(selectedColor: Color(hex: viewModel.cakeyModel.cakeColor!))
                 //.ignoresSafeArea()
-            ARViewContainer_top(selectedColor: Color(hex: "000000"))
+            ARViewContainer_top(viewModel: viewModel)
                 .ignoresSafeArea()
         }
     }
@@ -26,8 +26,8 @@ struct Cake3DTopView: View {
 
 // MARK: - ARViewContainer
 struct ARViewContainer_top: UIViewRepresentable {
-    var selectedColor: Color
     var topView: CameraMode = CameraMode.topView
+    var viewModel: CakeyViewModel
     
     func makeUIView(context: Context) -> ARView {
         // MARK: ARView 초기화
@@ -37,8 +37,12 @@ struct ARViewContainer_top: UIViewRepresentable {
         // MARK: CakeModel
         let cakeModel = try! ModelEntity.loadModel(named: "cakeModel")
         cakeModel.scale = SIMD3(repeating: 0.7)
+        
+        let selectedColor = Color(hex:viewModel.cakeyModel.cakeColor!)  // 선택 컬러 적용
+        let selectedMaterial = SimpleMaterial(color: UIColor(selectedColor), isMetallic: false)
+        
         let defaultMaterial = SimpleMaterial(color: .white, isMetallic: false)
-        cakeModel.model?.materials = [defaultMaterial]
+        cakeModel.model?.materials = [selectedMaterial]
         context.coordinator.cakeEntity = cakeModel
         
         let cakeTrayModel = try! ModelEntity.loadModel(named: "cakeTray")
@@ -71,9 +75,6 @@ struct ARViewContainer_top: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: ARView, context: Context) {
-        // MARK: - selectedColor 변경 시 호출
-        let selectedMaterial = SimpleMaterial(color: UIColor(selectedColor), isMetallic: false)
-        context.coordinator.cakeEntity?.model?.materials = [selectedMaterial]
     }
     
     func makeCoordinator() -> Coordinator_top {
@@ -88,6 +89,6 @@ class Coordinator_top: NSObject {
     var camera: PerspectiveCamera?
 }
 
-#Preview {
-    Cake3DTopView()
-}
+//#Preview {
+//    Cake3DTopView()
+//}

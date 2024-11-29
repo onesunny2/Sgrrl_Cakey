@@ -42,7 +42,7 @@ struct Cake3DDecoView: View {
                     DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.trianglehead.2.clockwise.rotate.90", buttonAction: {
                         coordinator_deco.deleteAll()
                     })
-                    DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "trash",buttonText: "선택 삭제", buttonAction: {
+                    DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "multiply",buttonText: "선택 삭제", buttonAction: {
                         coordinator_deco.deleteOne()
                     })
                 } .padding(.bottom, 10)
@@ -87,7 +87,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
         let cakeModel = try! ModelEntity.loadModel(named: "cakeModel")
         cakeModel.scale = SIMD3(repeating: 0.43)
         
-        var selectedColor = Color(hex:viewModel.cakeyModel.cakeColor!)  // 선택 컬러 적용
+        let selectedColor = Color(hex:viewModel.cakeyModel.cakeColor!)  // 선택 컬러 적용
         let selectedMaterial = SimpleMaterial(color: UIColor(selectedColor), isMetallic: false)
         cakeModel.model?.materials = [selectedMaterial]
         cakeModel.name = "cake"
@@ -338,6 +338,7 @@ class Coordinator_deco: NSObject, ObservableObject {
             }
         }
     }
-    
 }
+
+
 
