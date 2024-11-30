@@ -31,7 +31,7 @@ struct DecoCarouselCell: View {
                                     ZStack {
                                         Image(uiImage: UIImage(data: image)!)
                                             .resizable()
-                                            .scaledToFill()
+                                            .scaledToFit()
                                             .frame(width: 226, height: 226)
                                             .clipShape(RoundedRectangle(cornerRadius: 12))
                                         
@@ -97,17 +97,16 @@ struct DecoCarouselCell: View {
         .sheet(isPresented: $isAlbumPresented) {
             ImagePicker(sourceType: .photoLibrary) { selectedImage in
                 if let selectedImage = selectedImage {
-                    let targetSize = CGSize(width: 230, height: 230)
-                    
-                    // Downsample 이미지를 생성
-                    if let imageData = selectedImage.pngData(),
-                       let downsampledImage = ImageDownsample.downsample(data: imageData, to: targetSize),
-                       let uiImage = UIImage(data: downsampledImage.pngData()!) {
-                        
-                        // Downsample된 이미지를 스티커로 생성
-                        createSticker(for: uiImage) { stickerImage in
-                            if let stickerImage = stickerImage {
-                                decoImages[currentIndex].image = stickerImage.pngData()
+                    // 스티커 생성
+                    createSticker(for: selectedImage) { stickerImage in
+                        if let stickerImage = stickerImage {
+                            let targetSize = CGSize(width: 230, height: 230)
+                            
+                            // 스티커 이미지를 다운샘플링
+                            if let imageData = stickerImage.pngData(),
+                               let downsampledImage = ImageDownsample.downsample(data: imageData, to: targetSize) {
+                                // 다운샘플링된 이미지를 decoImages에 저장
+                                decoImages[currentIndex].image = downsampledImage.pngData()
                             }
                         }
                     }
