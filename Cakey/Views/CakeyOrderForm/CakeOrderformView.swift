@@ -123,11 +123,13 @@ struct CakeOrderformView: View {
             Button("케이크만 저장") {
                 // Cake3DDecoView를 UIHostingController로 감싸기
                 let hostingController = UIHostingController(rootView: arCakeView())
-                let targetSize = CGSize(width: 300, height: 300) // 캡처할 크기 지정
-                hostingController.view.frame = CGRect(origin: .zero, size: targetSize)
                 hostingController.view.backgroundColor = .clear // 배경 투명 설정
 
-                // 현재 UIWindow 가져오기
+                // 캡처할 뷰의 크기 설정
+                let fixedSize = CGSize(width: 300, height: 250) // arCakeView의 정해진 크기
+                hostingController.view.frame = CGRect(origin: .zero, size: fixedSize)
+
+                // UIWindow 가져오기
                 guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                       let window = windowScene.windows.first else {
                     print("UIWindow를 가져오지 못했습니다.")
@@ -149,8 +151,6 @@ struct CakeOrderformView: View {
                     // 뷰를 화면에서 제거
                     hostingController.view.removeFromSuperview()
                 }
-                
-                print(viewModel.cakeyModel.cakeArImage ?? Data())
             }
         }
     }
@@ -168,8 +168,9 @@ struct CakeOrderformView: View {
     func arCakeView() -> some View {
         Image(.zzamong)
             .resizable()
-            .scaledToFit()
+            .scaledToFill()
             .frame(width: 300, height: 250)
+            .background(.clear)
     }
     
     @ViewBuilder

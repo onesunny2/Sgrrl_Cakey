@@ -44,12 +44,3 @@ func archiveDateFormatter(from date: Date) -> String {
     return formatter.string(from: date)
 }
 
-
-//#Preview {
-//    ZStack {
-//        Color.cakeyYellow1
-//            .ignoresSafeArea(.all)
-//        
-//        ArchieveCell()
-//    }
-//}
