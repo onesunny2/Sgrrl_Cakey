@@ -35,7 +35,6 @@ struct DecoCarouselCell: View {
                                             .frame(width: 226, height: 226)
                                             .clipShape(RoundedRectangle(cornerRadius: 12))
                                         
-                                        // TODO: - 테두리 이상한거 물어보기
                                         RoundedRectangle(cornerRadius: 12)
                                             .fill(.clear)
                                             .frame(width: 226, height: 226)
