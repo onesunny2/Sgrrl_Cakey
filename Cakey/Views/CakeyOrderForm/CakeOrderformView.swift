@@ -33,6 +33,37 @@ struct CakeOrderformView: View {
         .onAppear {
             UIPageControl.appearance().currentPageIndicatorTintColor = UIColor.cakeyOrange1 // 현재 페이지 색상
             UIPageControl.appearance().pageIndicatorTintColor = UIColor.cakeyOrange3 // 나머지 페이지 색상
+            
+            // MARK: 뷰 캡쳐해서 모델에 저장하기
+            // Cake3DDecoView를 UIHostingController로 감싸기
+             let hostingController = UIHostingController(rootView: Cake3DDecoView(viewModel: viewModel))
+             let targetSize = CGSize(width: 300, height: 300) // 캡처 크기 설정
+             hostingController.view.frame = CGRect(origin: .zero, size: targetSize)
+             hostingController.view.backgroundColor = .clear // 배경 설정
+             
+             // UIWindow 가져오기
+             guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                   let window = windowScene.windows.first else {
+                 print("UIWindow를 가져오지 못했습니다.")
+                 return
+             }
+             window.addSubview(hostingController.view) // 캡처를 위해 화면에 추가
+
+             DispatchQueue.main.async {
+                 hostingController.view.layoutIfNeeded()
+                 
+                 // 캡처 수행
+                 if let imageData = hostingController.view.captureAsImageData() {
+                     viewModel.cakeyModel.cakeArImage = imageData // Data로 저장
+                     print("Cake3DDecoView 캡처 완료.")
+                 } else {
+                     print("이미지 데이터 캡처에 실패했습니다.")
+                 }
+                 
+                 // 뷰를 화면에서 제거
+                 hostingController.view.removeFromSuperview()
+             }
+            
             viewModel.updateCakey()
         }
         .navigationBarBackButtonHidden(true)
@@ -90,7 +121,36 @@ struct CakeOrderformView: View {
                  }
             }
             // TODO: 3D 케이크 자리
-            Button("케이크만 저장") { }
+            Button("케이크만 저장") {
+                // Cake3DDecoView를 UIHostingController로 감싸기
+                let hostingController = UIHostingController(rootView: Cake3DDecoView(viewModel: viewModel))
+                let targetSize = CGSize(width: 300, height: 300) // 캡처할 크기 지정
+                hostingController.view.frame = CGRect(origin: .zero, size: targetSize)
+                hostingController.view.backgroundColor = .clear // 배경 투명 설정
+
+                // 현재 UIWindow 가져오기
+                guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                      let window = windowScene.windows.first else {
+                    print("UIWindow를 가져오지 못했습니다.")
+                    return
+                }
+                window.addSubview(hostingController.view) // 화면에 추가 (캡처를 위해)
+
+                DispatchQueue.main.async {
+                    hostingController.view.layoutIfNeeded()
+                    
+                    // 캡처 수행
+                    if let capturedImage = hostingController.view.captureAsImage() {
+                        saveScreenShotToAlbum(capturedImage) // 캡처 이미지 앨범 저장
+                        print("Cake3DDecoView가 성공적으로 저장되었습니다.")
+                    } else {
+                        print("이미지 캡처에 실패했습니다.")
+                    }
+
+                    // 뷰를 화면에서 제거
+                    hostingController.view.removeFromSuperview()
+                }
+            }
         }
     }
     
@@ -104,7 +164,7 @@ struct CakeOrderformView: View {
     }
     
     @ViewBuilder
-    func cakeImage() -> some View {
+    func arCakeView() -> some View {
         Image(.zzamong)
             .resizable()
             .scaledToFit()
@@ -160,7 +220,7 @@ struct CakeOrderformView: View {
             .padding(.leading, 17)
             .padding(.bottom, 28)
             
-            cakeImage()
+            arCakeView()
                 .padding(.bottom, 16)
             
             designKeywordLists()
