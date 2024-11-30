@@ -12,37 +12,51 @@ import SwiftUI
 func ImageScrollView(imgList: [decoElements], action: @escaping (String) -> Void) -> some View {
     ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 8) {
-            ForEach(imgList.map{ $0.image }, id: \.self) { img in
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(.clear)
-                    .frame(width: 80, height: 80)
-                    .overlay {
-                        ZStack {
-                            if let img = img, let uiImage = UIImage(data: img) {
-                                Image(uiImage: uiImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 80, height: 80)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                                
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.cakeyOrange1, lineWidth: 2)
-                                    .padding(1)
-                            } else {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(.cakeyOrange2)
-                                    .frame(width: 80, height: 80)
-                                    .overlay {
-                                        Image(systemName: "photo")
-                                            .font(.symbolTitle2)
-                                            .foregroundStyle(.cakeyOrange3)
-                                    }
-                            }
-                            
+            if imgList.first?.image == nil {
+                ForEach(0..<6) { _ in
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(.cakeyOrange2)
+                        .frame(width: 80, height: 80)
+                        .overlay {
+                            Image(systemName: "photo")
+                                .font(.symbolTitle2)
+                                .foregroundStyle(.cakeyOrange3)
                         }
-                    }
+                }
+            } else {
+                ForEach(imgList.map{ $0.image }, id: \.self) { img in
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(.clear)
+                        .frame(width: 80, height: 80)
+                        .overlay {
+                            ZStack {
+                                if let img = img, let uiImage = UIImage(data: img) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 80, height: 80)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.cakeyOrange1, lineWidth: 2)
+                                        .padding(1)
+                                } else {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(.cakeyOrange2)
+                                        .frame(width: 80, height: 80)
+                                        .overlay {
+                                            Image(systemName: "photo")
+                                                .font(.symbolTitle2)
+                                                .foregroundStyle(.cakeyOrange3)
+                                        }
+                                }
+                                
+                            }
+                        }
+                }
             }
         }
+        .padding(.trailing, 23)
     }
 }
 
