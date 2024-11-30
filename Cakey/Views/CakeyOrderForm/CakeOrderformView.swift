@@ -36,7 +36,7 @@ struct CakeOrderformView: View {
             
             // MARK: 뷰 캡쳐해서 모델에 저장하기
             // Cake3DDecoView를 UIHostingController로 감싸기
-             let hostingController = UIHostingController(rootView: Cake3DDecoView(viewModel: viewModel))
+            let hostingController = UIHostingController(rootView: arCakeView())
              let targetSize = CGSize(width: 300, height: 300) // 캡처 크기 설정
              hostingController.view.frame = CGRect(origin: .zero, size: targetSize)
              hostingController.view.backgroundColor = .clear // 배경 설정
@@ -55,7 +55,7 @@ struct CakeOrderformView: View {
                  // 캡처 수행
                  if let imageData = hostingController.view.captureAsImageData() {
                      viewModel.cakeyModel.cakeArImage = imageData // Data로 저장
-                     print("Cake3DDecoView 캡처 완료.")
+                     print("캡처 완료.")
                  } else {
                      print("이미지 데이터 캡처에 실패했습니다.")
                  }
@@ -63,8 +63,6 @@ struct CakeOrderformView: View {
                  // 뷰를 화면에서 제거
                  hostingController.view.removeFromSuperview()
              }
-            
-            viewModel.updateCakey()
         }
         .navigationBarBackButtonHidden(true)
         .toolbarBackground(.cakeyYellow1, for: .navigationBar)
@@ -82,6 +80,7 @@ struct CakeOrderformView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                     Button {
+                        viewModel.updateCakey()
                         path.removeAll() // 홈으로 돌아가기
                     } label: {
                         Image(systemName: "house")
@@ -123,7 +122,7 @@ struct CakeOrderformView: View {
             // TODO: 3D 케이크 자리
             Button("케이크만 저장") {
                 // Cake3DDecoView를 UIHostingController로 감싸기
-                let hostingController = UIHostingController(rootView: Cake3DDecoView(viewModel: viewModel))
+                let hostingController = UIHostingController(rootView: arCakeView())
                 let targetSize = CGSize(width: 300, height: 300) // 캡처할 크기 지정
                 hostingController.view.frame = CGRect(origin: .zero, size: targetSize)
                 hostingController.view.backgroundColor = .clear // 배경 투명 설정
@@ -142,7 +141,7 @@ struct CakeOrderformView: View {
                     // 캡처 수행
                     if let capturedImage = hostingController.view.captureAsImage() {
                         saveScreenShotToAlbum(capturedImage) // 캡처 이미지 앨범 저장
-                        print("Cake3DDecoView가 성공적으로 저장되었습니다.")
+                        print("성공적으로 저장되었습니다.")
                     } else {
                         print("이미지 캡처에 실패했습니다.")
                     }
@@ -150,6 +149,8 @@ struct CakeOrderformView: View {
                     // 뷰를 화면에서 제거
                     hostingController.view.removeFromSuperview()
                 }
+                
+                print(viewModel.cakeyModel.cakeArImage ?? Data())
             }
         }
     }
