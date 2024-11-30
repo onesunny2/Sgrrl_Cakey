@@ -29,11 +29,22 @@ struct DecoCarouselCell: View {
                             .overlay {
                                 if let image = decoImages[index].image {
                                     ZStack {
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(.cakeyYellow1)
+                                            .frame(width: 226, height: 226)
+                                        
                                         Image(uiImage: UIImage(data: image)!)
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 226, height: 226)
                                             .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        
+//                                        Image(uiImage: UIImage(data: image)!)
+//                                            .resizable()
+//                                            .scaledToFit()
+//                                            .frame(maxWidth: 226, maxHeight: 226)
+//                                            .padding(10)
+//                                            .clipShape(RoundedRectangle(cornerRadius: 12))
                                         
                                         RoundedRectangle(cornerRadius: 12)
                                             .fill(.clear)
@@ -186,11 +197,3 @@ struct DecoCarouselCell: View {
     }
 }
 
-//#Preview {
-//    ZStack {
-//        Color.cakeyYellow1
-//            .ignoresSafeArea(.all)
-//        
-//        DecoCarouselCell()
-//    }
-//}
