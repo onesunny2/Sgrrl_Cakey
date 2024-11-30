@@ -30,7 +30,7 @@ struct ArchieveView: View {
                 ScrollView {
                     LazyVGrid(columns: archieveColums, spacing: 16) {
                         ForEach(cakeyModelList.indices, id: \.self) { index in
-                            ArchieveCell(archieveDate: cakeyModelList[index].saveDate)
+                            ArchieveCell(archieveDate: cakeyModelList[index].saveDate, cakeImage: cakeyModelList[index].cakeArImage ?? Data())
                                 .onTapGesture {
                                     path.append(.archieveDetailView(cakeyModelList[index]))
                                 }
