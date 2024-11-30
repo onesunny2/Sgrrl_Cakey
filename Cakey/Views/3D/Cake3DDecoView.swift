@@ -52,7 +52,7 @@ struct Cake3DDecoView: View {
                     coordinator_deco.addDecoEntity(imgName: img)
                     print("버튼 눌렀다! \(img)")
                 }
-                .padding(.leading, 30)
+                .padding(.leading, 23)
             }
         }
         
