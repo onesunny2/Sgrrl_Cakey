@@ -81,6 +81,8 @@ struct CakeLetteringView: View {
                 Button {
                     viewModel.cakeyModel.letteringColor = "#000000" // default 검정색
                     viewModel.cakeyModel.letteringText = ""
+                    viewModel.cakeyModel.saveDate = .now
+                    viewModel.cakeyModel.isComplete = true
                     path.append(.cakeOrderformView)
                 } label: {
                     Text("SKIP")
