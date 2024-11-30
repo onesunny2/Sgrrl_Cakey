@@ -36,7 +36,7 @@ struct DecoCarouselCell: View {
                                         Image(uiImage: UIImage(data: image)!)
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: 200, height: 200)
+                                            .frame(width: 230, height: 230)
                                             .clipShape(RoundedRectangle(cornerRadius: 12))
                                         
                                         RoundedRectangle(cornerRadius: 12)
@@ -147,7 +147,7 @@ struct DecoCarouselCell: View {
             let stickerImage = render(ciImage: outputImage)
             
             // 고정 크기로 리사이즈
-            let targetSize = CGSize(width: 200, height: 200)
+            let targetSize = CGSize(width: 230, height: 230)
             let resizedSticker = stickerImage.resize(to: targetSize)
             
             DispatchQueue.main.async {
