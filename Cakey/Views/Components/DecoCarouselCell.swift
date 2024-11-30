@@ -6,11 +6,15 @@
 //
 
 import SwiftUI
+import Vision
+import CoreImage.CIFilterBuiltins
 
 struct DecoCarouselCell: View {
     @Binding var currentIndex: Int
     @State private var isAlbumPresented: Bool = false
     @Binding var decoImages: [decoElements]
+    
+    private let processingQueue = DispatchQueue(label: "ProcessingQueue")
     
     var body: some View {
         VStack(spacing: 40) {
@@ -94,8 +98,18 @@ struct DecoCarouselCell: View {
             ImagePicker(sourceType: .photoLibrary) { selectedImage in
                 if let selectedImage = selectedImage {
                     let targetSize = CGSize(width: 230, height: 230)
-                    if let imageData = selectedImage.pngData(), let downsampledImage = ImageDownsample.downsample(data: imageData, to: targetSize) {
-                        decoImages[currentIndex].image = downsampledImage.pngData()
+                    
+                    // Downsample 이미지를 생성
+                    if let imageData = selectedImage.pngData(),
+                       let downsampledImage = ImageDownsample.downsample(data: imageData, to: targetSize),
+                       let uiImage = UIImage(data: downsampledImage.pngData()!) {
+                        
+                        // Downsample된 이미지를 스티커로 생성
+                        createSticker(for: uiImage) { stickerImage in
+                            if let stickerImage = stickerImage {
+                                decoImages[currentIndex].image = stickerImage.pngData()
+                            }
+                        }
                     }
                 }
             }
@@ -111,6 +125,66 @@ struct DecoCarouselCell: View {
         if abs(position - screenWidth / 2) < 115 {
             currentIndex = index
         }
+    }
+    
+    // 스티커 생성 함수
+    private func createSticker(for image: UIImage, completion: @escaping (UIImage?) -> Void) {
+        guard let inputImage = CIImage(image: image) else {
+            print("Failed to create CIImage")
+            completion(nil)
+            return
+        }
+        
+        processingQueue.async {
+            guard let maskImage = subjectMaskImage(from: inputImage) else {
+                print("Failed to create mask image")
+                completion(nil)
+                return
+            }
+            let outputImage = apply(maskImage: maskImage, to: inputImage)
+            let stickerImage = render(ciImage: outputImage)
+            DispatchQueue.main.async {
+                completion(stickerImage)
+            }
+        }
+    }
+    
+    // 마스킹 생성
+    private func subjectMaskImage(from inputImage: CIImage) -> CIImage? {
+        let handler = VNImageRequestHandler(ciImage: inputImage)
+        let request = VNGenerateForegroundInstanceMaskRequest()
+        do {
+            try handler.perform([request])
+        } catch {
+            print(error)
+            return nil
+        }
+        guard let result = request.results?.first else {
+            print("No observations found")
+            return nil
+        }
+        do {
+            let maskPixelBuffer = try result.generateScaledMaskForImage(forInstances: result.allInstances, from: handler)
+            return CIImage(cvPixelBuffer: maskPixelBuffer)
+        } catch {
+            print(error)
+            return nil
+        }
+    }
+
+    private func apply(maskImage: CIImage, to inputImage: CIImage) -> CIImage {
+        let filter = CIFilter.blendWithMask()
+        filter.inputImage = inputImage
+        filter.maskImage = maskImage
+        filter.backgroundImage = CIImage.empty()
+        return filter.outputImage!
+    }
+
+    private func render(ciImage: CIImage) -> UIImage {
+        guard let cgImage = CIContext(options: nil).createCGImage(ciImage, from: ciImage.extent) else {
+            fatalError("Failed to render CGImage")
+        }
+        return UIImage(cgImage: cgImage)
     }
 }
 
