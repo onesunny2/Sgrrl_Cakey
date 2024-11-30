@@ -36,15 +36,8 @@ struct DecoCarouselCell: View {
                                         Image(uiImage: UIImage(data: image)!)
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: 226, height: 226)
+                                            .frame(width: 200, height: 200)
                                             .clipShape(RoundedRectangle(cornerRadius: 12))
-                                        
-//                                        Image(uiImage: UIImage(data: image)!)
-//                                            .resizable()
-//                                            .scaledToFit()
-//                                            .frame(maxWidth: 226, maxHeight: 226)
-//                                            .padding(10)
-//                                            .clipShape(RoundedRectangle(cornerRadius: 12))
                                         
                                         RoundedRectangle(cornerRadius: 12)
                                             .fill(.clear)
@@ -152,8 +145,13 @@ struct DecoCarouselCell: View {
             }
             let outputImage = apply(maskImage: maskImage, to: inputImage)
             let stickerImage = render(ciImage: outputImage)
+            
+            // 고정 크기로 리사이즈
+            let targetSize = CGSize(width: 200, height: 200)
+            let resizedSticker = stickerImage.resize(to: targetSize)
+            
             DispatchQueue.main.async {
-                completion(stickerImage)
+                completion(resizedSticker)
             }
         }
     }
@@ -197,3 +195,13 @@ struct DecoCarouselCell: View {
     }
 }
 
+
+// UIImage 크기 변경을 위한 유틸리티 함수
+private extension UIImage {
+    func resize(to targetSize: CGSize) -> UIImage? {
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+        return renderer.image { _ in
+            self.draw(in: CGRect(origin: .zero, size: targetSize))
+        }
+    }
+}
