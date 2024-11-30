@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ArchieveCell: View {
     var archieveDate: Date
+    var cakeImage: Data
     
     var body: some View {
         RoundedRectangle(cornerRadius: 12)
@@ -18,9 +19,16 @@ struct ArchieveCell: View {
             .overlay {
                 // TODO: 라미 3D 케이크 들어갈 자리(프레임 크기 알아서 변경 필요하면 해줘)
                 VStack(spacing: 20) {
-                    Rectangle()
-                        .fill(.pickerPink)
-                        .frame(width: 132, height: 110)
+                    if let image = UIImage(data: cakeImage) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 132, height: 110)
+                    } else {
+                        Rectangle()
+                            .fill(.cakeyOrange3)
+                            .frame(width: 132, height: 110)
+                    }
                     
                     Text("\(archiveDateFormatter(from: archieveDate))")
                         .customStyledFont(font: .cakeySubhead, color: .cakeyOrange1)
@@ -36,12 +44,3 @@ func archiveDateFormatter(from date: Date) -> String {
     return formatter.string(from: date)
 }
 
-
-//#Preview {
-//    ZStack {
-//        Color.cakeyYellow1
-//            .ignoresSafeArea(.all)
-//        
-//        ArchieveCell()
-//    }
-//}
