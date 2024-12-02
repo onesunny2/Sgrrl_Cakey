@@ -9,6 +9,9 @@ import SwiftUI
 
 struct ArchieveView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @Binding var path: [Destination]
+    @Bindable var archieveViewModel = ArchieveViewModel()
+    @State var cakeyModelList: [CakeyModel] = []
     
     var archieveColums: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
     
@@ -17,7 +20,7 @@ struct ArchieveView: View {
             Color.cakeyYellow1
                 .ignoresSafeArea(.all)
             
-            VStack(spacing: 32) {
+            VStack(spacing: 13) {
                 HStack {
                     Text("나의 케이크 도안")
                         .customStyledFont(font: .cakeyTitle1, color: .cakeyOrange1)
@@ -26,12 +29,16 @@ struct ArchieveView: View {
                 
                 ScrollView {
                     LazyVGrid(columns: archieveColums, spacing: 16) {
-                        ForEach(0..<3) { _ in
-                            ArchieveCell()
+                        ForEach(cakeyModelList.indices, id: \.self) { index in
+                            ArchieveCell(archieveDate: cakeyModelList[index].saveDate, cakeImage: cakeyModelList[index].cakeArImage ?? Data())
+                                .onTapGesture {
+                                    path.append(.archieveDetailView(cakeyModelList[index]))
+                                }
                         }
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 10)
                 }
-                .padding(.horizontal, 20)
             }
             .padding(.top, 28)
         }
@@ -47,9 +54,13 @@ struct ArchieveView: View {
                 }
             }
         }
+        .onAppear {
+            cakeyModelList =  archieveViewModel.readSortedCakeys()
+            print("\(archieveViewModel.readSortedCakeys())")
+        }
     }
 }
 
-#Preview {
-    ArchieveView()
-}
+//#Preview {
+//    ArchieveView()
+//}

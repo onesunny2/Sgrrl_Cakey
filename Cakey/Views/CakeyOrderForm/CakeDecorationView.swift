@@ -9,8 +9,8 @@ import SwiftUI
 
 struct CakeDecorationView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    let value: Int
-    @Binding var path: [Int]
+    var viewModel: CakeyViewModel
+    @Binding var path: [Destination]
     
     
     var body: some View {
@@ -25,7 +25,7 @@ struct CakeDecorationView: View {
                     .padding(.bottom, 40)
                 
                 // 3D DecoView
-                Cake3DDecoView()
+                Cake3DDecoView(viewModel: viewModel)
             }
             .padding(.top, 86)
             .padding(.bottom, 20)
@@ -44,17 +44,20 @@ struct CakeDecorationView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    path.append(5)
-                    // TODO: 완료 기능 구현 필요
+                    path.append(.cakeLetteringView)
+                    // TODO: 완료 기능 구현 필요(arImage 모델 데이터)
                 } label: {
                     Text("완료")
                         .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
                 }
             }
         }
+        .onTapGesture {
+            hideKeyboard()
+        }
     }
 }
 
-#Preview {
-    CakeDecorationView(value: 4, path: .constant([4]))
-}
+//#Preview {
+//    CakeDecorationView(value: 4, path: .constant([4]))
+//}

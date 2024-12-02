@@ -11,10 +11,9 @@ import SwiftUI
 struct CakeyApp: App {
     var body: some Scene {
         WindowGroup {
+
             HomeView()
-            //Cake3DView(cameraMode: .quarterView)
-            //TestView()
-            //TestCake3DView()
+
         }
     }
 }

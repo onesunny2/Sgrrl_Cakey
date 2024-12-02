@@ -85,7 +85,7 @@ class Coordinator_color: NSObject {
     var camera: PerspectiveCamera?
 }
 
-#Preview {
-    CakeColorView(value: 1, path: .constant([1]))
-}
+//#Preview {
+//    CakeColorView(value: 1, path: .constant([1]))
+//}
 
