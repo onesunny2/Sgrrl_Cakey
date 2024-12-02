@@ -51,7 +51,7 @@ struct Cake3DDecoView: View {
                 ImageScrollView(imgList: viewModel.cakeyModel.cakeImages) { imgData in
                     coordinator_deco.addDecoEntity(imgData: imgData)
                 }
-                .padding(.leading, 30)
+                .padding(.leading, 23)
             }
         }
         

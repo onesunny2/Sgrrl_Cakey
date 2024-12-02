@@ -35,7 +35,9 @@ struct ImagePicker: UIViewControllerRepresentable {
 
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             if let image = info[.originalImage] as? UIImage {
-                parent.onImagePicked(image)
+                // 이미지 방향을 수정
+                let fixedImage = fixImageOrientation(image)
+                parent.onImagePicked(fixedImage)
             } else {
                 parent.onImagePicked(nil)
             }
@@ -45,6 +47,18 @@ struct ImagePicker: UIViewControllerRepresentable {
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
             parent.onImagePicked(nil)
             picker.dismiss(animated: true)
+        }
+
+        /// 이미지의 방향을 표준화
+        private func fixImageOrientation(_ image: UIImage) -> UIImage {
+            guard image.imageOrientation != .up else { return image }
+
+            UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale)
+            image.draw(in: CGRect(origin: .zero, size: image.size))
+            let normalizedImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            
+            return normalizedImage ?? image
         }
     }
 }
