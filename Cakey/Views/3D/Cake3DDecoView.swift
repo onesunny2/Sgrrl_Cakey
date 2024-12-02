@@ -13,6 +13,7 @@ import Combine
 struct Cake3DDecoView: View {
     @StateObject private var coordinator_deco = Coordinator_deco()
     @State private var cameraHeight: Float = 0.8
+    @State private var fieldOfView: Float = 60.0
     @State private var activeMode: EditMode = .editMode
     
     var topView: CameraMode = CameraMode.topView
@@ -24,7 +25,7 @@ struct Cake3DDecoView: View {
     var body: some View {
         // MARK: - Cake3D
         ZStack{
-            ARViewContainer_deco(coordinator_deco: coordinator_deco, cameraHeight: $cameraHeight, activeMode: $activeMode).ignoresSafeArea()
+            ARViewContainer_deco(coordinator_deco: coordinator_deco, cameraHeight: $cameraHeight, fieldOfView: $fieldOfView, activeMode: $activeMode).ignoresSafeArea()
             
             HStack{
                 Spacer()
@@ -76,6 +77,7 @@ let cakeGroup = CollisionGroup(rawValue: 1 << 1)
 struct ARViewContainer_deco: UIViewRepresentable {
     @ObservedObject var coordinator_deco: Coordinator_deco  // 코오디네이터 1
     @Binding var cameraHeight: Float
+    @Binding var fieldOfView: Float
     @Binding var activeMode: EditMode
     
     // TODO: - 색상 데이터 불러오기
@@ -148,6 +150,14 @@ struct ARViewContainer_deco: UIViewRepresentable {
         // MARK: 슬라이더 연동 Camera 높이값 변동
         context.coordinator.camera?.position.y = cameraHeight
         context.coordinator.camera?.position.x = cameraHeight * 0.6
+        
+        let newFOV = max(30, min(90, 60 / cameraHeight)) // FOV를 30도에서 90도로 제한
+        if var perspectiveCamera = context.coordinator.camera!.components[PerspectiveCameraComponent.self] {
+                    perspectiveCamera.fieldOfViewInDegrees = newFOV
+            context.coordinator.camera!.components.set(perspectiveCamera)
+                }
+        
+//        context.coordinator.camera = PerspectiveCameraComponent
         //context.coordinator.cakeParentEntity?.scale *= cameraHeight * 1.2
         
         coordinator_deco.updateMode()
