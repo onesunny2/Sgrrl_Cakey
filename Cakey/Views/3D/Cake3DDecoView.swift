@@ -338,6 +338,22 @@ class Coordinator_deco: NSObject, ObservableObject {
             }
         }
     }
+    
+    // MARK: cake 저장
+    func saveCakeEntity(){
+        guard let arView = arView else{
+            arView?.session.getCurrentWorldMap{cakeEntity, error in
+                if let error = error {
+                    print(error)
+                    return
+                }
+                
+                if let cakeEntity = cakeEntity {
+                    guard let data =
+                }
+            }
+        }
+    }
 }
 
 

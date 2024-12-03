@@ -60,3 +60,41 @@ class RealmManager {
 }
 
 
+//MARK: Cake3D CRUD
+extension RealmManager {
+    // MARK: Create
+    func addCakeEntity(_ cakeEntityModel: CakeEntityModel) {
+        let cakeEntity = cakeEntityModel.persistedObject()
+        
+        try! realm.write {
+            realm.add(cakeEntity)
+        }
+    }
+    
+    // MARK: Update
+    func updateCakeEntity(_ cakeEntityModel: CakeEntityModel) {
+        let cakeEntity = cakeEntityModel.persistedObject()
+        
+        try! realm.write {
+            realm.add(cakeEntity, update: .modified)
+        }
+    }
+    
+    // MARK: Read
+    func readCakeEntity(id: String) -> CakeEntityModel? {
+        guard let cakeEntity = realm.object(ofType: CakeEntity.self, forPrimaryKey: id) else { return nil }
+        return CakeEntityModel(persistedObject: cakeEntity)
+    }
+    
+    // MARK: Delete
+    func deleteCakeEntity(id: String) {
+        guard let cakeEntity = realm.object(ofType: CakeEntity.self, forPrimaryKey: id) else { return }
+        
+        try! realm.write {
+            realm.delete(cakeEntity)
+        }
+    }
+}
+
+
+

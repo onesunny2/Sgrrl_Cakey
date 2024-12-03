@@ -30,7 +30,6 @@ struct CakeLetteringView: View {
                 NoticeCelll(notice1: "원하는 문구가 있나요?", notice2: "문구를 적고, 케이크 위에 배치해 보세요")
                     .padding(.bottom, 38)
                 
-                
                 // TODO: 라미 케이크 자리(크기는 알아서 조정해줘)
                 ZStack {
 //                    Rectangle()
