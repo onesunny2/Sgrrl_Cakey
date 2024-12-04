@@ -54,7 +54,7 @@ struct HomeView: View {
                 Button {
                     path.append(.archieveView)
                 } label: {
-                    Text("주문서 불러오기")
+                    Text("도안 불러오기")
                         .customStyledFont(font: .cakeyBody, color: .cakeyYellow1)
                         .padding(.vertical, 13)
                         .frame(maxWidth: .infinity)
@@ -87,7 +87,7 @@ struct HomeView: View {
                 Button {
                     path.append(.cakeColorView)
                 } label: {
-                    Text("주문서 작성하기")
+                    Text("도안 만들기")
                         .customStyledFont(font: .cakeyBody, color: .cakeyYellow1)
                         .padding(.vertical, 13)
                         .frame(maxWidth: .infinity)
