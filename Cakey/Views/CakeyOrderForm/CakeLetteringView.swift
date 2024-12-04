@@ -51,14 +51,13 @@ struct CakeLetteringView: View {
                 TextEditorCell(text: $text)
                     .padding(.bottom, isKeyboardVisible ? 155 : 30)
                 
-
                 NextButtonCell(nextValue: {
                     path.append(.cakeOrderformView)
                     viewModel.cakeyModel.letteringColor = selectedColor.toHex()
                     viewModel.cakeyModel.letteringText = text
                     viewModel.cakeyModel.saveDate = .now
                     viewModel.cakeyModel.isComplete = true
-                }, isButtonActive: false)
+                }, buttonLabel: "완성", isButtonActive: false)
             }
             .padding(.top, 86)
             .padding(.bottom, 10)
