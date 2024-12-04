@@ -10,46 +10,45 @@ import RealmSwift
 import SwiftUI
 import RealityKit
 
-struct CakeEntityModel: Hashable {
+struct DecoEntityModel: Hashable {
     var id: String = UUID().uuidString
-    var cakeColor: String?
     var decoEntities: [decoEntity] = []
+    var saveDate: Date = .now
 }
 
 struct decoEntity: Decodable, Encodable, Hashable {
     var image: Data?
-    var position: SIMD3<Float>
-    var rotation: SIMD3<Float>
-    var scale: SIMD3<Float>
+    var position: SIMD3<Float>?
+    var transform: Transform?
 }
 
-extension CakeEntityModel: Persistable {
-    typealias PersistedObject = CakeEntity
+extension DecoEntityModel: Persistable {
+    typealias PersistedObject = DecoEntity
     
-    init(persistedObject: CakeEntity){
+    init(persistedObject: DecoEntity){
         let decoder = JSONDecoder()
         
         self.id = persistedObject.id
-        self.cakeColor = persistedObject.cakeColor
         self.decoEntities = try! decoder.decode([decoEntity].self, from: persistedObject.decoEntities!)
+        self.saveDate = persistedObject.saveDate
     }
     
-    func persistedObject() -> CakeEntity {
+    func persistedObject() -> DecoEntity {
         let encoder = JSONEncoder()
-        let cake = CakeEntity()
+        let cake = DecoEntity()
         
         cake.id = self.id
-        cake.cakeColor = self.cakeColor
         cake.decoEntities = try! encoder.encode(self.decoEntities)
+        cake.saveDate = self.saveDate
         
         return cake
     }
 }
 
-class CakeEntity: Object {
+class DecoEntity: Object {
     @Persisted(primaryKey: true) var id: String
-    @Persisted var cakeColor: String?
     @Persisted var decoEntities: Data?
+    @Persisted var saveDate: Date
 }
 
 

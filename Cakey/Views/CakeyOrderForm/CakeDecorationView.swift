@@ -50,6 +50,7 @@ struct CakeDecorationView: View {
                     Button {
                         path.append(.cakeLetteringView)
                         // TODO: 완료 기능 구현 필요(arImage 모델 데이터)
+                       
                     } label: {
                         Text("완료")
                             .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var path: [Destination] = []
-    @Bindable var viewModel = CakeyViewModel(cakeyModel: CakeyModel())
+    @Bindable var viewModel = CakeyViewModel(cakeyModel: CakeyModel(), decoModel: DecoEntityModel())
     
     var body: some View {
         NavigationStack(path: $path) {
