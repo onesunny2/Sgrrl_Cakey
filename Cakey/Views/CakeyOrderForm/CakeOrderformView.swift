@@ -83,7 +83,6 @@ struct CakeOrderformView: View {
             ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         viewModel.updateCakey()
-                        viewModel.updateDeco()
                         path.removeAll() // 홈으로 돌아가기
                     } label: {
                         Image(systemName: "house")

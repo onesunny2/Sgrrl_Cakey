@@ -14,9 +14,7 @@ import Combine
 
 // MARK: - CakeDecoView에 들어갈 3D
 struct Cake3DDecoView: View {
-    //@StateObject private var coordinator_deco = Coordinator_deco()
-    @StateObject private var coordinator_deco: Coordinator_deco
-    //@ObservedObject var coordinator_deco: Coordinator_deco
+    @StateObject private var coordinator_deco = Coordinator_deco()
     @State private var cameraHeight: Float = 0.8
     @State private var activeMode: EditMode = .editMode
     
@@ -25,19 +23,10 @@ struct Cake3DDecoView: View {
     
     var viewModel: CakeyViewModel
     
-    // MARK: 초기화
-       init(viewModel: CakeyViewModel) {
-           self.viewModel = viewModel
-           _coordinator_deco = StateObject(wrappedValue: Coordinator_deco(viewModel: viewModel))
-       }
-    
     var body: some View {
         // MARK: - Cake3D
         ZStack{
             ARViewContainer_deco(coordinator_deco: coordinator_deco, cameraHeight: $cameraHeight, activeMode: $activeMode, viewModel: viewModel).ignoresSafeArea()
-//                .onDisappear{
-//                    coordinator_deco.saveDecoEntity()
-//                }
             HStack{
                 Spacer()
                 VerticalSlider(value: $cameraHeight, range: sideView.cameraHeight...topView.cameraHeight)
@@ -90,7 +79,6 @@ struct ARViewContainer_deco: UIViewRepresentable {
     @Binding var activeMode: EditMode
     
     var viewModel: CakeyViewModel
-    
     
     func makeUIView(context: Context) -> ARView {
         // MARK: ARView 초기화
@@ -169,7 +157,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
     }
     
     func makeCoordinator() -> Coordinator_deco {
-        return Coordinator_deco(viewModel: viewModel)   // 코오디네이터 2
+        return Coordinator_deco()  // 코오디네이터 2
     }
 }
 
@@ -180,13 +168,8 @@ class Coordinator_deco: NSObject, ObservableObject {
     var camera: PerspectiveCamera?
     var cancellable: AnyCancellable?
     var activeMode: EditMode = .editMode
-    var viewModel: CakeyViewModel // 초기화 시 반드시 설정
+    var decoEntities = DecoEntities.shared
        
-    
-       // MARK: 초기화
-       init(viewModel: CakeyViewModel) {
-           self.viewModel = viewModel
-       }
     
     @Published var selectedEntity: ModelEntity? {
         // MARK: 변경된 직후에 실행되는 관찰자
@@ -229,6 +212,8 @@ class Coordinator_deco: NSObject, ObservableObject {
     
     // MARK: 데코 추가 함수
     func addDecoEntity(imgData: Data) {
+        
+        print("deco뷰에서의 imgData: \(imgData)")
         guard let arView = arView, let cakeParentEntity = cakeParentEntity else { return }
         
         let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
@@ -256,9 +241,8 @@ class Coordinator_deco: NSObject, ObservableObject {
         
         // cakeParentEntity에 추가
         cakeParentEntity.addChild(plane)
+        decoEntities.decoEntities.append(DecoEntity(image: imgData, position: plane.position, transform: plane.transform))
     }
-    
-    
     
     // MARK: 전체 삭제 - 버튼 할당
     func deleteAll() {
@@ -359,43 +343,6 @@ class Coordinator_deco: NSObject, ObservableObject {
                 entity.position = position
             }
         }
-    }
-    
-    // MARK: cake 저장
-    func saveDecoEntity() {
-        print("saveDecoEntity실행!")
-        guard let decoAnchor = decoAnchor else { return }
-        
-        var decoEntities: [decoEntity] = []
-        
-        for entity in decoAnchor.children {
-            if let modelEntity = entity as? ModelEntity,
-               entity.name.starts(with: "deco+") {
-                
-                // `deco+` 뒤의 문자열 추출
-                let trimmedImageData = entity.name.replacingOccurrences(of: "deco+", with: "")
-                
-                // DecoEntity 생성
-                let deco = decoEntity(
-                    image: trimmedImageData.data(using: .utf8),
-                    position: modelEntity.position(relativeTo: nil),
-                    transform: modelEntity.transform
-                )
-                decoEntities.append(deco)
-            }
-        }
-        
-        // `DecoEntityModel` 생성
-        let decoEntityModel = DecoEntityModel(
-            id: UUID().uuidString,
-            decoEntities: decoEntities
-        )
-        
-        viewModel.decoModel = decoEntityModel
-        
-        // Realm에 저장
-        // 할 때 튕김
-        //viewModel.updateDeco()
     }
 
     // 저장된 엔티티 불러오기
