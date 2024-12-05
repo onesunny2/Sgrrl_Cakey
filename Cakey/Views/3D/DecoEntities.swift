@@ -17,5 +17,7 @@ class DecoEntities: ObservableObject {
 struct DecoEntity{
     var image: Data
     var position: SIMD3<Float>
+    var scale: SIMD3<Float>
+    var orientation: simd_quatf
     var transform: Transform
 }

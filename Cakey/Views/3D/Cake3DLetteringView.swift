@@ -24,7 +24,8 @@ struct Cake3DLetteringView: View {
 
 // MARK: - ARViewContainer
 struct ARViewContainer_top: UIViewRepresentable {
-    var topView: CameraMode = CameraMode.topView
+    //var topView: CameraMode = CameraMode.topView
+    var topView: CameraMode = CameraMode.quarterView
     var viewModel: CakeyViewModel
     
     func makeUIView(context: Context) -> ARView {
@@ -49,7 +50,7 @@ struct ARViewContainer_top: UIViewRepresentable {
         
         let decoAnchor = AnchorEntity()
         context.coordinator.decoAnchor = decoAnchor
-        context.coordinator.loadDecoEntity()
+        
         
         // MARK: 추가함
         //        let textMesh = MeshResource.generateText(viewModel.cakeyModel.letteringText ?? "생일축하해", extrusionDepth: 0.01, font: UIFont(name: "Hakgyoansim Dunggeunmiso OTF B", size: 0.15) ?? UIFont.systemFont(ofSize: 0.15), containerFrame: .zero, alignment: .left, lineBreakMode: .byTruncatingHead)
@@ -71,7 +72,7 @@ struct ARViewContainer_top: UIViewRepresentable {
         context.coordinator.cakeParentEntity = cakeParentEntity
         // FIXME: ColorView에서 제스처 필요없어 보임
         //arView.installGestures([.rotation, .scale], for: cakeParentEntity)
-        
+        context.coordinator.arView = arView
         
         let cakeAnchor = AnchorEntity(world: [0, 0, 0])
         cakeAnchor.addChild(cakeParentEntity)
@@ -87,11 +88,12 @@ struct ARViewContainer_top: UIViewRepresentable {
         cameraAnchor.addChild(camera)
         arView.scene.addAnchor(cameraAnchor)
         
-        context.coordinator.arView = arView
+        context.coordinator.loadDecoEntity()
         return arView
     }
     
     func updateUIView(_ uiView: ARView, context: Context) {
+        
     }
     
     func makeCoordinator() -> Coordinator_top {
@@ -109,26 +111,31 @@ class Coordinator_top: NSObject {
 
     var decoEntities = DecoEntities.shared
     
-
-    
     func loadDecoEntity() {
         print("Lettering - loadDeco 실행!")
         print("저장된 데코엔티티 개수: \(decoEntities.decoEntities.count)")
+        
         // DecoEntity 데이터 순회
         for deco in decoEntities.decoEntities {
             let imgData = deco.image
             let pos = deco.position
-            let transform = deco.transform
+            let scale = deco.scale
+            let orientation = deco.orientation
             
-            addDecoEntity(imgData: imgData, position: pos, transform: transform)
+            addDecoEntity(imgData: imgData, position: pos, scale: scale, orientation: orientation)
         }
     }
     
-    func addDecoEntity(imgData: Data, position: SIMD3<Float>, transform: Transform) {
+    func addDecoEntity(imgData: Data, position: SIMD3<Float>, scale: SIMD3<Float>, orientation: simd_quatf) {
+        
         print("Lettering - addDeco 실행!")
         print("레터링뷰에서의 imgData: \(imgData)")
         print("레터링뷰에서의 position: \(position)")
-        print("레터링뷰에서의 transform: \(transform)")
+        print("레터링뷰에서의 scale: \(scale)")
+        print("레터링뷰에서의 orientation: \(orientation)")
+        
+        guard let cakeParentEntity = cakeParentEntity else { return }
+        
         let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
         let plane = ModelEntity(mesh: planeMesh)
         
@@ -147,10 +154,12 @@ class Coordinator_top: NSObject {
         
         // 위치 조정
         plane.position = position
-        plane.transform = transform
+        plane.scale = scale
+        plane.orientation = orientation
         
         // 부모 엔티티에 추가
-        cakeParentEntity?.addChild(plane)
+        cakeParentEntity.addChild(plane)
+        print("cakedeco 개수는\(cakeParentEntity.children.count)")
     }
     
 }

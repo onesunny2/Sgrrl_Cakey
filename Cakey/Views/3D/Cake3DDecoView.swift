@@ -241,7 +241,7 @@ class Coordinator_deco: NSObject, ObservableObject {
         
         // cakeParentEntity에 추가
         cakeParentEntity.addChild(plane)
-        decoEntities.decoEntities.append(DecoEntity(image: imgData, position: plane.position, transform: plane.transform))
+        decoEntities.decoEntities.append(DecoEntity(image: imgData, position: plane.position(relativeTo: nil),scale: plane.scale, orientation: plane.orientation/*(relativeTo: nil)*/, transform: plane.transform))
     }
     
     // MARK: 전체 삭제 - 버튼 할당
