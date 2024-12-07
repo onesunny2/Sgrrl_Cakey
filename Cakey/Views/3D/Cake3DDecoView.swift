@@ -14,7 +14,8 @@ import Combine
 
 // MARK: - CakeDecoView에 들어갈 3D
 struct Cake3DDecoView: View {
-    @StateObject private var coordinator_deco = Coordinator_deco()
+    //@StateObject private var coordinator_deco = Coordinator_deco()
+    var coordinator_deco : Coordinator_deco
     @State private var cameraHeight: Float = 0.8
     @State private var activeMode: EditMode = .editMode
     
@@ -249,7 +250,7 @@ class Coordinator_deco: NSObject, ObservableObject {
         // cakeParentEntity에 추가
         cakeParentEntity.addChild(plane)
         
-        decoEntities.decoEntities.append(DecoEntity(id: plane.id, image: imgData, position: plane.position(relativeTo: nil),scale: plane.scale, orientation: plane.orientation/*(relativeTo: nil)*/, transform: plane.transform))
+        decoEntities.decoEntities.append(DecoEntity(id: plane.id, image: imgData, position: plane.position(relativeTo: nil),scale: plane.scale(relativeTo: nil), orientation: plane.orientation(relativeTo: nil), transform: plane.transform))
     }
     
     // MARK: 전체 삭제 - 버튼 할당
@@ -272,11 +273,10 @@ class Coordinator_deco: NSObject, ObservableObject {
         highlightAnchor?.children.removeAll()
         self.selectedEntity = nil
         
-        // MARK: 여기 확인!
-            if let index = decoEntities.decoEntities.firstIndex(where: { $0.image.hashValue == selectedEntity.name.hashValue }) {
-  
-                // 배열에서 삭제
+        // MARK: id 비교 후 삭제 - 성공!
+            if let index = decoEntities.decoEntities.firstIndex(where: { $0.id == selectedEntity.id }) {
                 decoEntities.decoEntities.remove(at: index)
+                print("삭제완료!")
             } else {
                 print("선택된 엔티티가 decoEntities에 없음")
             }
@@ -301,7 +301,7 @@ class Coordinator_deco: NSObject, ObservableObject {
     private func highlightEntity(_ entity: ModelEntity?) {
         guard let entity = entity else { return }
         
-        let planeMesh = MeshResource.generatePlane(width: 0.8, depth: 0.8)
+        let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
         let plane = ModelEntity(mesh: planeMesh)
         
         if let texture = try? TextureResource.load(named: "selectHighlight") {
@@ -363,7 +363,7 @@ class Coordinator_deco: NSObject, ObservableObject {
         }
     }
     
-    // position은 했고, scale도 clamp해야함!
+    // TODO: 동적 사이즈 변경 필요.. position은 했고, scale도 clamp해야함!
     func clampDecoPosition() {
         
         guard let cakeParentEntity = cakeParentEntity else { return }
@@ -389,6 +389,20 @@ class Coordinator_deco: NSObject, ObservableObject {
         }
     }
     
+    func saveDecoEntity(){
+        print("saveDecoEntity 실행!")
+        guard let cakeParentEntity = cakeParentEntity else { return }
+        
+        for entity in cakeParentEntity.children.filter({ $0.name.starts(with: "deco")}){
+            if let index = decoEntities.decoEntities.firstIndex(where: { $0.id == entity.id }) {
+                decoEntities.decoEntities[index].position = entity.position(relativeTo: nil)
+                decoEntities.decoEntities[index].scale = entity.scale(relativeTo: nil)
+                decoEntities.decoEntities[index].orientation = entity.orientation(relativeTo: nil)
+            } else {
+                print("해당 id를 가진 decoEntity를 찾지 못함!")
+            }
+        }
+    }
 }
 
 

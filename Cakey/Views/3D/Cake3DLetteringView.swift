@@ -13,10 +13,11 @@ import Combine
 // MARK: - CakeLetteringView에 들어갈 3D
 struct Cake3DLetteringView: View {
     var viewModel: CakeyViewModel
+    @Binding var text: String
     
     var body: some View {
         ZStack {
-            ARViewContainer_top(viewModel: viewModel)
+            ARViewContainer_top(viewModel: viewModel, text: $text)
                 .ignoresSafeArea()
         }
     }
@@ -27,6 +28,7 @@ struct ARViewContainer_top: UIViewRepresentable {
     //var topView: CameraMode = CameraMode.topView
     var topView: CameraMode = CameraMode.quarterView
     var viewModel: CakeyViewModel
+    @Binding var text: String
     
     func makeUIView(context: Context) -> ARView {
         // MARK: ARView 초기화
@@ -53,15 +55,15 @@ struct ARViewContainer_top: UIViewRepresentable {
         
         
         // MARK: 추가함
-        //        let textMesh = MeshResource.generateText(viewModel.cakeyModel.letteringText ?? "생일축하해", extrusionDepth: 0.01, font: UIFont(name: "Hakgyoansim Dunggeunmiso OTF B", size: 0.15) ?? UIFont.systemFont(ofSize: 0.15), containerFrame: .zero, alignment: .left, lineBreakMode: .byTruncatingHead)
-        //                let textMaterial = SimpleMaterial(color: .black, isMetallic: true)
-        //
-        //        let textEntity = ModelEntity(mesh: textMesh, materials: [textMaterial])
-        //        let rotationAngle = Float.pi * 1.5 // 180도 (라디안)
-        //        textEntity.transform.rotation = simd_quatf(angle: rotationAngle, axis: [1, 0, 0])
-        //        textEntity.position.y += (0.79 * 0.43 + 0.02 )/0.43 * 0.7
-        //
-        //
+//                let textMesh = MeshResource.generateText(viewModel.cakeyModel.letteringText ?? "생일축하해", extrusionDepth: 0.01, font: UIFont(name: "Hakgyoansim Dunggeunmiso OTF B", size: 0.15) ?? UIFont.systemFont(ofSize: 0.15), containerFrame: .zero, alignment: .left, lineBreakMode: .byTruncatingHead)
+//                        let textMaterial = SimpleMaterial(color: .black, isMetallic: true)
+//        
+//                let textEntity = ModelEntity(mesh: textMesh, materials: [textMaterial])
+//                let rotationAngle = Float.pi * 1.5 // 180도 (라디안)
+//                textEntity.transform.rotation = simd_quatf(angle: rotationAngle, axis: [1, 0, 0])
+//                textEntity.position.y += (0.79 * 0.43 + 0.02 )/0.43 * 0.7
+//        
+        
         
         let cakeParentEntity = ModelEntity()
         cakeParentEntity.addChild(cakeModel)
@@ -89,11 +91,12 @@ struct ARViewContainer_top: UIViewRepresentable {
         arView.scene.addAnchor(cameraAnchor)
         
         context.coordinator.loadDecoEntity()
+        context.coordinator.updateTextEntity(text)
         return arView
     }
     
     func updateUIView(_ uiView: ARView, context: Context) {
-        
+        context.coordinator.updateTextEntity(text)
     }
     
     func makeCoordinator() -> Coordinator_top {
@@ -108,8 +111,40 @@ class Coordinator_top: NSObject {
     var cakeParentEntity: ModelEntity?
     var decoAnchor: AnchorEntity?
     var camera: PerspectiveCamera?
+    var textEntity: ModelEntity?
 
     var decoEntities = DecoEntities.shared
+    
+    func updateTextEntity(_ newText: String) {
+            guard let cakeParentEntity = cakeParentEntity else { return }
+            
+            // 기존 텍스트 엔티티 삭제
+            if let existingTextEntity = textEntity {
+                cakeParentEntity.removeChild(existingTextEntity)
+            }
+            
+            // 새로운 텍스트 엔티티 생성
+            let textMesh = MeshResource.generateText(
+                newText,
+                extrusionDepth: 0.01,
+                font: UIFont(name: "Hakgyoansim Dunggeunmiso OTF B", size: 0.15) ?? UIFont.systemFont(ofSize: 0.15),
+                containerFrame: .zero,
+                alignment: .center,
+                lineBreakMode: .byTruncatingTail
+            )
+            
+            let textMaterial = SimpleMaterial(color: .black, isMetallic: true)
+            let newTextEntity = ModelEntity(mesh: textMesh, materials: [textMaterial])
+            newTextEntity.transform.rotation = simd_quatf(angle: Float.pi * 1.5, axis: [1, 0, 0])
+        newTextEntity.scale = newTextEntity.scale/2.5
+            newTextEntity.position.y += (0.79 * 0.43 + 0.02) / 0.43 * 0.7
+            newTextEntity.position.x -= 0.15
+            
+            // 부모 엔티티에 추가
+            cakeParentEntity.addChild(newTextEntity)
+            textEntity = newTextEntity
+        }
+
     
     func loadDecoEntity() {
         print("Lettering - loadDeco 실행!")

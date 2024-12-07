@@ -13,6 +13,8 @@ struct CakeDecorationView: View {
     var viewModel: CakeyViewModel
     @Binding var path: [Destination]
     
+    @StateObject var coordinator_deco = Coordinator_deco()
+    
     //@AppStorage("isOnboarding") var isOnboarding: Bool = false
     @State private var isOnboardingVisible: Bool = true
     
@@ -29,7 +31,7 @@ struct CakeDecorationView: View {
                         .padding(.bottom, 40)
                     
                     // 3D DecoView
-                    Cake3DDecoView(viewModel: viewModel)
+                    Cake3DDecoView(coordinator_deco: coordinator_deco, viewModel: viewModel)
                 }
                 .padding(.top, 86)
                 .padding(.bottom, 20)
@@ -50,7 +52,7 @@ struct CakeDecorationView: View {
                     Button {
                         path.append(.cakeLetteringView)
                         // TODO: 완료 기능 구현 필요(arImage 모델 데이터)
-                       
+                        coordinator_deco.saveDecoEntity()
                     } label: {
                         Text("완료")
                             .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)

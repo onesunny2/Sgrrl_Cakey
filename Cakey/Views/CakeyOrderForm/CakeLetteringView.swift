@@ -35,7 +35,7 @@ struct CakeLetteringView: View {
 //                    Rectangle()
 //                        .fill(.pink)
 //                        .frame(width: 230, height: 230)
-                    Cake3DLetteringView(viewModel: viewModel)
+                    Cake3DLetteringView(viewModel: viewModel, text: $text)
                     //Cake3DDecoView(viewModel: viewModel)
                         .frame(width: 230, height: 230)
                     VStack{
