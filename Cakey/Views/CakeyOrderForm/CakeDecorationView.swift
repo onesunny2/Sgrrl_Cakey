@@ -6,6 +6,7 @@
 //
 
 // TODO: toolBar 위로 뜨게 해야함!
+
 import SwiftUI
 
 struct CakeDecorationView: View {
@@ -14,8 +15,6 @@ struct CakeDecorationView: View {
     @Binding var path: [Destination]
     
     @StateObject var coordinator_deco = Coordinator_deco()
-    
-    //@AppStorage("isOnboarding") var isOnboarding: Bool = false
     @State private var isOnboardingVisible: Bool = true
     
     var body: some View {
@@ -24,14 +23,14 @@ struct CakeDecorationView: View {
                 Color.cakeyYellow1
                     .ignoresSafeArea(.all)
                 
-                ProgressBarCell(currentStep: 3)
+                ProgressBarCell(currentStep: 3)// 이거 위치는 고정되어 있어야해! 아래 씬 사이즈에 따라서 밀려 올라가거나 내려가면 안돼!
                 
                 VStack(spacing: 0) {
                     NoticeCelll(notice1: "케이크 도안을 만들어 보세요!", notice2: "이미지를 케이크에 자유롭게 배치할 수 있어요")
                         .padding(.bottom, 40)
                     
-                    // 3D DecoView
-                    Cake3DDecoView(coordinator_deco: coordinator_deco, viewModel: viewModel)
+                    //Cake3DDecoView(coordinator_deco: coordinator_deco, viewModel: viewModel)
+                    Spacer()
                 }
                 .padding(.top, 86)
                 .padding(.bottom, 20)
@@ -62,14 +61,7 @@ struct CakeDecorationView: View {
             .onTapGesture {
                 hideKeyboard()
             }
-//            .onAppear {
-//                // 첫 접속 시 온보딩 표시
-//                if !isOnboarding{
-//                    isOnboarding = true // 첫 접속 기록 저장
-//                }else{
-//                    isOnboardingVisible = false
-//                }
-//            }
+            Cake3DDecoView(coordinator_deco: coordinator_deco, viewModel: viewModel)
             if isOnboardingVisible {
                 DecoOnboardingView(isVisible: $isOnboardingVisible)
                     .zIndex(1)

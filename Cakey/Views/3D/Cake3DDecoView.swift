@@ -14,7 +14,6 @@ import Combine
 
 // MARK: - CakeDecoView에 들어갈 3D
 struct Cake3DDecoView: View {
-    //@StateObject private var coordinator_deco = Coordinator_deco()
     var coordinator_deco : Coordinator_deco
     @State private var cameraHeight: Float = 0.8
     @State private var activeMode: EditMode = .editMode
@@ -25,47 +24,53 @@ struct Cake3DDecoView: View {
     var viewModel: CakeyViewModel
     
     var body: some View {
-        // MARK: - Cake3D
-        ZStack{
-            ARViewContainer_deco(coordinator_deco: coordinator_deco, cameraHeight: $cameraHeight, activeMode: $activeMode, viewModel: viewModel).ignoresSafeArea()
-            HStack{
-                Spacer()
-                VerticalSlider(value: $cameraHeight, range: sideView.cameraHeight...topView.cameraHeight)
-                    .frame(width: 20, height: 300)
-                    .padding()
-                    .background(.clear)
-            }
-        }
-        
-        // MARK: - DecoMode
-        if activeMode == .editMode {
-            VStack {
-                // MARK: 전체, 개별 삭제
-                HStack(spacing: 10) {
-                    DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.trianglehead.2.clockwise.rotate.90", buttonAction: {
-                        coordinator_deco.deleteAll()
-                    })
-                    DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "multiply",buttonText: "선택 삭제", buttonAction: {
-                        coordinator_deco.deleteOne()
-                    })
-                } .padding(.bottom, 10)
-                
-                // MARK: ImageSelect
-                ImageScrollView(imgList: viewModel.cakeyModel.cakeImages) { imgData in
-                    coordinator_deco.addDecoEntity(imgData: imgData)
+        VStack{
+            // MARK: - Cake3D
+            ZStack{
+                VStack{
+                    Spacer().frame(height: 150)
+                    ARViewContainer_deco(coordinator_deco: coordinator_deco, cameraHeight: $cameraHeight, activeMode: $activeMode, viewModel: viewModel).ignoresSafeArea()
+
                 }
-                .padding(.leading, 23)
+                HStack{
+                    Spacer()
+                    VerticalSlider(value: $cameraHeight, range: sideView.cameraHeight...topView.cameraHeight)
+                        .frame(width: 20, height: 300)
+                        .padding()
+                        .background(.clear)
+                }
             }
-        }
-        
-        // MARK: Mode Select
-        ModeSelectView(activeMode: $activeMode) { mode in
-            withAnimation {
-                activeMode = mode
+            
+            // MARK: - DecoMode
+            if activeMode == .editMode {
+                VStack {
+                    // MARK: 전체, 개별 삭제
+                    HStack(spacing: 10) {
+                        DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.trianglehead.2.clockwise.rotate.90", buttonAction: {
+                            coordinator_deco.deleteAll()
+                        })
+                        DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "multiply",buttonText: "선택 삭제", buttonAction: {
+                            coordinator_deco.deleteOne()
+                        })
+                    } .padding(.bottom, 10)
+                    
+                    // MARK: ImageSelect
+                    ImageScrollView(imgList: viewModel.cakeyModel.cakeImages) { imgData in
+                        coordinator_deco.addDecoEntity(imgData: imgData)
+                    }
+                    .padding(.leading, 23)
+                }
             }
-            coordinator_deco.activeMode = mode
+            
+            // MARK: Mode Select
+            ModeSelectView(activeMode: $activeMode) { mode in
+                withAnimation {
+                    activeMode = mode
+                }
+                coordinator_deco.activeMode = mode
+            }
+            .padding(.top, 20)
         }
-        .padding(.top, 20)
     }
 }
 
@@ -109,12 +114,6 @@ struct ARViewContainer_deco: UIViewRepresentable {
         
         coordinator_deco.cakeParentEntity = cakeParentEntity
         arView.installGestures([.rotation, .scale], for: cakeParentEntity)
-
-        
-        // MARK: DecoAnchor
-        let decoAnchor = AnchorEntity(world: [0,0,0])
-        coordinator_deco.decoAnchor = decoAnchor
-        cakeParentEntity.addChild(decoAnchor)
         
         // MARK: Highlight Anchor
         let highLightAnchor = AnchorEntity(world: [0,0,0])
@@ -124,7 +123,6 @@ struct ARViewContainer_deco: UIViewRepresentable {
         // MARK: CakeAnchor
         let cakeAnchor = AnchorEntity(world: [0, 0, 0])
         cakeAnchor.addChild(cakeParentEntity)
-        cakeAnchor.addChild(decoAnchor)
         arView.scene.addAnchor(cakeAnchor)
         
         // MARK: Virtual Camera
@@ -169,7 +167,6 @@ struct ARViewContainer_deco: UIViewRepresentable {
 
 class Coordinator_deco: NSObject, ObservableObject {
     var arView: ARView?
-    var decoAnchor:  AnchorEntity?
     var highlightAnchor: AnchorEntity?
     var cakeParentEntity: ModelEntity?
     var camera: PerspectiveCamera?
@@ -250,7 +247,7 @@ class Coordinator_deco: NSObject, ObservableObject {
         // cakeParentEntity에 추가
         cakeParentEntity.addChild(plane)
         
-        decoEntities.decoEntities.append(DecoEntity(id: plane.id, image: imgData, position: plane.position(relativeTo: nil),scale: plane.scale(relativeTo: nil), orientation: plane.orientation(relativeTo: nil), transform: plane.transform))
+        decoEntities.decoEntities.append(DecoEntity(id: plane.id, image: imgData, position: plane.position(relativeTo: nil),scale: plane.scale(relativeTo: nil), orientation: plane.orientation(relativeTo: nil)))
     }
     
     // MARK: 전체 삭제 - 버튼 할당
