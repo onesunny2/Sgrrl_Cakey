@@ -115,6 +115,11 @@ struct ARViewContainer_deco: UIViewRepresentable {
         coordinator_deco.decoAnchor = decoAnchor
         cakeParentEntity.addChild(decoAnchor)
         
+        // MARK: Highlight Anchor
+        let highLightAnchor = AnchorEntity(world: [0,0,0])
+        coordinator_deco.highlightAnchor = highLightAnchor
+        arView.scene.addAnchor(highLightAnchor)
+        
         // MARK: CakeAnchor
         let cakeAnchor = AnchorEntity(world: [0, 0, 0])
         cakeAnchor.addChild(cakeParentEntity)
@@ -164,6 +169,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
 class Coordinator_deco: NSObject, ObservableObject {
     var arView: ARView?
     var decoAnchor:  AnchorEntity?
+    var highlightAnchor: AnchorEntity?
     var cakeParentEntity: ModelEntity?
     var camera: PerspectiveCamera?
     var cancellable: AnyCancellable?
@@ -176,7 +182,8 @@ class Coordinator_deco: NSObject, ObservableObject {
         didSet {
             // LongPress된 대상에 blink
             if selectedEntity != oldValue {
-                blinkEntity(selectedEntity)
+                //blinkEntity(selectedEntity)
+                highlightEntity(selectedEntity)
             }
         }
     }
@@ -241,7 +248,8 @@ class Coordinator_deco: NSObject, ObservableObject {
         
         // cakeParentEntity에 추가
         cakeParentEntity.addChild(plane)
-        decoEntities.decoEntities.append(DecoEntity(image: imgData, position: plane.position(relativeTo: nil),scale: plane.scale, orientation: plane.orientation/*(relativeTo: nil)*/, transform: plane.transform))
+        
+        decoEntities.decoEntities.append(DecoEntity(id: plane.id, image: imgData, position: plane.position(relativeTo: nil),scale: plane.scale, orientation: plane.orientation/*(relativeTo: nil)*/, transform: plane.transform))
     }
     
     // MARK: 전체 삭제 - 버튼 할당
@@ -251,6 +259,9 @@ class Coordinator_deco: NSObject, ObservableObject {
         for entity in cakeParentEntity.children.filter({ $0.name.starts(with: "deco") }) {
                cakeParentEntity.removeChild(entity)
            }
+        
+        decoEntities.decoEntities.removeAll()
+        highlightAnchor?.children.removeAll()
     }
     
     
@@ -258,7 +269,17 @@ class Coordinator_deco: NSObject, ObservableObject {
     func deleteOne(){
         guard let selectedEntity = selectedEntity else { return }
         cakeParentEntity?.removeChild(selectedEntity)
+        highlightAnchor?.children.removeAll()
         self.selectedEntity = nil
+        
+        // MARK: 여기 확인!
+            if let index = decoEntities.decoEntities.firstIndex(where: { $0.image.hashValue == selectedEntity.name.hashValue }) {
+  
+                // 배열에서 삭제
+                decoEntities.decoEntities.remove(at: index)
+            } else {
+                print("선택된 엔티티가 decoEntities에 없음")
+            }
     }
     
     // MARK: LongPress 제스처 추가 함수
@@ -275,6 +296,28 @@ class Coordinator_deco: NSObject, ObservableObject {
             selectedEntity = entity
         }
     }
+    
+    // MARK: highlight 함수
+    private func highlightEntity(_ entity: ModelEntity?) {
+        guard let entity = entity else { return }
+        
+        let planeMesh = MeshResource.generatePlane(width: 0.8, depth: 0.8)
+        let plane = ModelEntity(mesh: planeMesh)
+        
+        if let texture = try? TextureResource.load(named: "selectHighlight") {
+                        var material = UnlitMaterial()
+                        material.color = .init(tint: .white, texture: .init(texture))
+                        material.opacityThreshold = 0.1
+                        plane.model?.materials = [material]
+                    }
+        
+        plane.scale = entity.scale(relativeTo: nil)
+        plane.position = entity.position(relativeTo: nil)
+        plane.orientation = entity.orientation(relativeTo: nil)
+        
+        highlightAnchor?.addChild(plane)
+    }
+    
     
     // MARK: blink 함수
     private func blinkEntity(_ entity: ModelEntity?) {
@@ -297,6 +340,7 @@ class Coordinator_deco: NSObject, ObservableObject {
             
             entity.model?.materials = [isRed ? selectedMaterial : originalMaterial!]
         }
+        
     }
     
     // MARK: 모델 사이즈 Clamp
@@ -343,11 +387,6 @@ class Coordinator_deco: NSObject, ObservableObject {
                 entity.position = position
             }
         }
-    }
-
-    // 저장된 엔티티 불러오기
-    func loadCakeEntity() {
-        
     }
     
 }
