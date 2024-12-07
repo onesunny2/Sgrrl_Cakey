@@ -141,9 +141,10 @@ struct ARViewContainer_deco: UIViewRepresentable {
         context.coordinator.cancellable = arView.scene.subscribe(to: SceneEvents.Update.self) { _ in
             // MARK: 카메라 각도 조정
             camera.look(at: cakeParentEntity.position, from: camera.position, relativeTo: nil)
-            // MARK: 모델 사이즈 Clamp
-            context.coordinator.clampCakeSize()
+            print("현재 케이크의 크기:\(cakeParentEntity.scale(relativeTo: nil))")
             
+            // MARK: 모델 사이즈 Clamp
+            coordinator_deco.clampCakeSize()
             coordinator_deco.clampDecoPosition()
         } as? AnyCancellable
         
@@ -347,23 +348,48 @@ class Coordinator_deco: NSObject, ObservableObject {
     
     // MARK: 모델 사이즈 Clamp
     func clampCakeSize() {
-        guard let model = cakeParentEntity else { return }
+        guard let cakeModel = cakeParentEntity else { return }
         
-        let currentScale = model.scale.x
-        var newScale = currentScale
-        
-        if currentScale < 0.5 {
-            newScale = max(currentScale, 0.5)
-        }
-        
-        if currentScale > 2.5 {
-            newScale = min(currentScale, 2.5)
-        }
-        
-        if newScale != currentScale {
-            model.scale = SIMD3(repeating: newScale)
+        let minScale: Float = 0.5
+        let maxScale: Float = 0.9
+        let currentScale = cakeModel.scale(relativeTo: nil).x // x축 기준으로 스케일 가져옴
+
+        if currentScale < minScale {
+            let clampedScale = SIMD3<Float>(repeating: minScale)
+            cakeModel.scale = clampedScale
+            print("스케일이 너무 작아서 \(minScale)로 클램프!")
+        } else if currentScale > maxScale {
+            let clampedScale = SIMD3<Float>(repeating: maxScale)
+            cakeModel.scale = clampedScale
+            print("스케일이 너무 커서 \(maxScale)로 클램프!")
         }
     }
+
+    // TODO: 백로그
+    private func applyScaleWithEaseOut(entity: ModelEntity, targetScale: SIMD3<Float>) {
+        let animationDuration: TimeInterval = 0.3 // 애니메이션 지속 시간
+        let frameInterval: TimeInterval = 0.01   // 업데이트 간격
+        let totalFrames = Int(animationDuration / frameInterval)
+        
+        let currentScale = entity.scale(relativeTo: nil)
+        var frame = 0
+
+        Timer.scheduledTimer(withTimeInterval: frameInterval, repeats: true) { timer in
+            if frame >= totalFrames {
+                timer.invalidate()
+                entity.setScale(targetScale, relativeTo: nil) // 마지막 값 정확히 설정
+                return
+            }
+            
+            let t = Float(frame) / Float(totalFrames) // 0 ~ 1 사이의 값
+            let easeOutProgress = 1 - pow(1 - t, 3)  // Ease-out 곡선
+            let interpolatedScale = mix(currentScale, targetScale, t: easeOutProgress)
+            
+            entity.setScale(interpolatedScale, relativeTo: nil)
+            frame += 1
+        }
+    }
+
     
     // TODO: 동적 사이즈 변경 필요.. position은 했고, scale도 clamp해야함!
     func clampDecoPosition() {
