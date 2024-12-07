@@ -17,7 +17,7 @@ import Combine
 // MARK: - CakeDecoView에 들어갈 3D
 struct Cake3DDecoView: View {
     var coordinator_deco : Coordinator_deco
-    @State private var cameraHeight: Float = 0.8
+    @State private var cameraHeight: Float = 1.5
     @State private var activeMode: EditMode = .editMode
     
     var topView: CameraMode = CameraMode.topView
@@ -55,7 +55,6 @@ struct Cake3DDecoView: View {
                     }
                 }
                 
-               
                 HStack{
                     Spacer()
                     VerticalSlider(value: $cameraHeight, range: sideView.cameraHeight...topView.cameraHeight)
@@ -156,8 +155,8 @@ struct ARViewContainer_deco: UIViewRepresentable {
     
     func updateUIView(_ uiView: ARView, context: Context) {
         // MARK: 슬라이더 연동 Camera 높이값 변동
-        context.coordinator.camera?.position.y = cameraHeight
-        context.coordinator.camera?.position.x = cameraHeight * 0.6
+        context.coordinator.camera?.position.y = cameraHeight * 0.5
+        context.coordinator.camera?.position.x = cameraHeight * 0.2
         //context.coordinator.cakeParentEntity?.scale *= cameraHeight * 1.2
         
         coordinator_deco.updateMode()
