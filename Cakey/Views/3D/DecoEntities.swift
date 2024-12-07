@@ -7,11 +7,13 @@
 
 import Foundation
 import RealityKit
+import SwiftUI
 
 // MARK: Deco의 연속성을 위한 클래스..
 class DecoEntities: ObservableObject {
     static let shared = DecoEntities()
     var decoEntities: [DecoEntity] = []
+    var textEntity = TextEntity()
 }
 
 struct DecoEntity{
@@ -22,9 +24,9 @@ struct DecoEntity{
     var orientation: simd_quatf
 }
 
-// TODO: 추가
 struct TextEntity{
-    var text: String
-    var position: SIMD3<Float>
-    
+    var text: String = ""
+    var color: Color = Color.black
+    var position: SIMD3<Float> = SIMD3<Float>()
+    var scale: SIMD3<Float> = SIMD3<Float>()
 }

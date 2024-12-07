@@ -18,17 +18,20 @@ struct Cake3DLetteringView: View {
     @Binding var text: String
     @Binding var selectedColor: Color
     
+    var coordinator_top : Coordinator_top
+    
     var body: some View {
-        ZStack {
-            ARViewContainer_top(viewModel: viewModel, text: $text, selectedColor: $selectedColor)
+        
+        ARViewContainer_top(coordinator_top: coordinator_top, viewModel: viewModel, text: $text, selectedColor: $selectedColor)
                 .ignoresSafeArea()
                 .frame(height: 250)
-        }
+        
     }
 }
 
 // MARK: - ARViewContainer
 struct ARViewContainer_top: UIViewRepresentable {
+    @ObservedObject var coordinator_top: Coordinator_top
     var topView: CameraMode = CameraMode.quarterView
     var viewModel: CakeyViewModel
     @Binding var text: String
@@ -47,7 +50,8 @@ struct ARViewContainer_top: UIViewRepresentable {
         let selectedMaterial = SimpleMaterial(color: UIColor(selectedColor), isMetallic: false)
         
         cakeModel.model?.materials = [selectedMaterial]
-        context.coordinator.cakeEntity = cakeModel
+        //context.coordinator.cakeEntity = cakeModel
+        coordinator_top.cakeEntity = cakeModel
         
         let cakeTrayModel = try! ModelEntity.loadModel(named: "cakeTray")
         cakeTrayModel.scale = SIMD3(repeating: 0.43)
@@ -58,8 +62,10 @@ struct ARViewContainer_top: UIViewRepresentable {
         cakeParentEntity.addChild(cakeTrayModel)
         
         cakeParentEntity.generateCollisionShapes(recursive: true)
-        context.coordinator.cakeParentEntity = cakeParentEntity
-        context.coordinator.arView = arView
+//        context.coordinator.cakeParentEntity = cakeParentEntity
+//        context.coordinator.arView = arView
+        coordinator_top.cakeParentEntity = cakeParentEntity
+        coordinator_top.arView = arView
         
         let cakeAnchor = AnchorEntity(world: [0, 0, 0])
         cakeAnchor.addChild(cakeParentEntity)
@@ -75,17 +81,23 @@ struct ARViewContainer_top: UIViewRepresentable {
         cameraAnchor.addChild(camera)
         arView.scene.addAnchor(cameraAnchor)
         
-        context.coordinator.loadDecoEntity()
-        context.coordinator.selectedColor = selectedColor
-        context.coordinator.updateTextEntity(text)
+//        context.coordinator.loadDecoEntity()
+//        context.coordinator.selectedColor = selectedColor
+//        context.coordinator.updateTextEntity(text)
+        coordinator_top.loadDecoEntity()
+        coordinator_top.selectedColor = selectedColor
+        coordinator_top.updateTextEntity(text)
         
         return arView
     }
     
     func updateUIView(_ uiView: ARView, context: Context) {
-        context.coordinator.updateTextEntity(text)
-        context.coordinator.selectedColor = selectedColor
-        context.coordinator.updateTextColor()
+//        context.coordinator.updateTextEntity(text)
+//        context.coordinator.selectedColor = selectedColor
+//        context.coordinator.updateTextColor()
+        coordinator_top.updateTextEntity(text)
+        coordinator_top.selectedColor = selectedColor
+        coordinator_top.updateTextColor()
     }
     
     func makeCoordinator() -> Coordinator_top {
@@ -94,7 +106,7 @@ struct ARViewContainer_top: UIViewRepresentable {
 }
 
 // MARK: - Coordinator
-class Coordinator_top: NSObject {
+class Coordinator_top: NSObject, ObservableObject {
     var arView: ARView?
     var cakeEntity: ModelEntity?
     var cakeParentEntity: ModelEntity?
@@ -162,22 +174,16 @@ class Coordinator_top: NSObject {
         // 부모 엔티티에 추가
         cakeParentEntity.addChild(newTextEntity)
         textEntity = newTextEntity
+        decoEntities.textEntity.text = newText
         
         print("텍스트의 크기: \(textEntity?.scale(relativeTo: nil) ?? SIMD3<Float>())")
         print("텍스트의 위치: x=\(xOffset), y=\(baseYPosition), z=\(zOffset)")
     }
-
-
-
     
     func updateTextColor() {
         guard let textEntity = textEntity else { return }
         let textMaterial = SimpleMaterial(color: UIColor(selectedColor ?? .black), isMetallic: false)
         textEntity.model?.materials = [textMaterial]
-    }
-    
-    func updateTextPosition(){
-        
     }
     
     func loadDecoEntity() {
@@ -231,6 +237,11 @@ class Coordinator_top: NSObject {
         print("cakedeco 개수는\(cakeParentEntity.children.count)")
     }
     
-    
+    //TODO: 실행전!
+    func saveTextEntity(){
+        decoEntities.textEntity.color = selectedColor ?? Color.black
+        decoEntities.textEntity.position = textEntity?.position(relativeTo: nil) ?? SIMD3<Float>()
+        decoEntities.textEntity.scale = textEntity?.scale(relativeTo: nil) ?? SIMD3<Float>()
+    }
 }
 

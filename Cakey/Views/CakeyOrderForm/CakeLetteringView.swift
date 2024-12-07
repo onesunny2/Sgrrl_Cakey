@@ -18,6 +18,8 @@ struct CakeLetteringView: View {
     @State private var isKeyboardVisible: Bool = false
     var viewModel: CakeyViewModel
     
+    @StateObject var coordinator_top = Coordinator_top()
+    
     var body: some View {
         
         ZStack {
@@ -31,7 +33,7 @@ struct CakeLetteringView: View {
                     .padding(.bottom, 38)
                 
                 ZStack {
-                    Cake3DLetteringView(viewModel: viewModel, text: $text, selectedColor: $selectedColor)
+                    Cake3DLetteringView(viewModel: viewModel, text: $text, selectedColor: $selectedColor, coordinator_top: coordinator_top)
                 //MARK: text를 3D로 띄워야 함에 따라.. 주석처리해둠!
 //                    VStack{
 //                        Text("\(text)")
@@ -57,6 +59,9 @@ struct CakeLetteringView: View {
                     viewModel.cakeyModel.letteringText = text
                     viewModel.cakeyModel.saveDate = .now
                     viewModel.cakeyModel.isComplete = true
+                    
+                    //MARK: saveText
+                    coordinator_top.saveTextEntity()
                 }, isButtonActive: false)
             }
             .padding(.top, 86)
