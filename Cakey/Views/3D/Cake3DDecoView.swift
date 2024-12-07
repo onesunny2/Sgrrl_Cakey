@@ -10,7 +10,9 @@ import ARKit
 import RealityKit
 import Combine
 
-// 현재 지름 변수만들어서 조정해야 할 것 같음
+// TODO: 반응형, 동적 사이즈 조절
+// TODO: Slider 조정
+// TODO: Mode 업데이트 시, 카메라 원위치
 
 // MARK: - CakeDecoView에 들어갈 3D
 struct Cake3DDecoView: View {
@@ -30,35 +32,36 @@ struct Cake3DDecoView: View {
                 VStack{
                     Spacer().frame(height: 150)
                     ARViewContainer_deco(coordinator_deco: coordinator_deco, cameraHeight: $cameraHeight, activeMode: $activeMode, viewModel: viewModel).ignoresSafeArea()
-
+                    // MARK: - DecoMode
+                    if activeMode == .editMode {
+                        VStack {
+                            
+                            // MARK: 전체, 개별 삭제
+                            HStack(spacing: 10) {
+                                DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.trianglehead.2.clockwise.rotate.90", buttonAction: {
+                                    coordinator_deco.deleteAll()
+                                })
+                                DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "multiply",buttonText: "선택 삭제", buttonAction: {
+                                    coordinator_deco.deleteOne()
+                                })
+                            } .padding(.bottom, 10)
+                            
+                            // MARK: ImageSelect
+                            ImageScrollView(imgList: viewModel.cakeyModel.cakeImages) { imgData in
+                                coordinator_deco.addDecoEntity(imgData: imgData)
+                            }
+                            .padding(.leading, 23)
+                        }
+                    }
                 }
+                
+               
                 HStack{
                     Spacer()
                     VerticalSlider(value: $cameraHeight, range: sideView.cameraHeight...topView.cameraHeight)
                         .frame(width: 20, height: 300)
                         .padding()
                         .background(.clear)
-                }
-            }
-            
-            // MARK: - DecoMode
-            if activeMode == .editMode {
-                VStack {
-                    // MARK: 전체, 개별 삭제
-                    HStack(spacing: 10) {
-                        DecoActionCell(buttonColor: .cakeyOrange3, symbolName: "arrow.trianglehead.2.clockwise.rotate.90", buttonAction: {
-                            coordinator_deco.deleteAll()
-                        })
-                        DecoActionCell(buttonColor: .cakeyOrange1, symbolName: "multiply",buttonText: "선택 삭제", buttonAction: {
-                            coordinator_deco.deleteOne()
-                        })
-                    } .padding(.bottom, 10)
-                    
-                    // MARK: ImageSelect
-                    ImageScrollView(imgList: viewModel.cakeyModel.cakeImages) { imgData in
-                        coordinator_deco.addDecoEntity(imgData: imgData)
-                    }
-                    .padding(.leading, 23)
                 }
             }
             
@@ -186,8 +189,11 @@ class Coordinator_deco: NSObject, ObservableObject {
         }
     }
     
+    // MARK: 수정하기 vs 살펴보기 모드
     func updateMode() {
         guard let cakeParentEntity = cakeParentEntity else { return }
+        // TODO: slider가 기본 0.8 으로 다시 돌아와야 해! 모드를 업데이트할 때마다 처음 켜진 그 각도록 돌아가야 해
+        
         
         // CakeParentEntity안에서 cake tag로 제스처 구분!
         switch activeMode {

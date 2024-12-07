@@ -5,8 +5,6 @@
 //  Created by Lee Wonsun on 11/9/24.
 //
 
-// TODO: toolBar 위로 뜨게 해야함!
-
 import SwiftUI
 
 struct CakeDecorationView: View {
