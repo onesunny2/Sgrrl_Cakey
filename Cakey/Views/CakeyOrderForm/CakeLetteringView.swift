@@ -30,21 +30,16 @@ struct CakeLetteringView: View {
                 NoticeCelll(notice1: "원하는 문구가 있나요?", notice2: "문구를 적고, 케이크 위에 배치해 보세요")
                     .padding(.bottom, 38)
                 
-                // TODO: 라미 케이크 자리(크기는 알아서 조정해줘)
                 ZStack {
-//                    Rectangle()
-//                        .fill(.pink)
-//                        .frame(width: 230, height: 230)
-                    Cake3DLetteringView(viewModel: viewModel, text: $text)
-                    //Cake3DDecoView(viewModel: viewModel)
-                        .frame(width: 230, height: 230)
-                    VStack{
-                        Text("\(text)")
-                            .customStyledFont(font: .cakeyTitle2, color: selectedColor)
-                            .multilineTextAlignment(.center)
-                            .kerning(5)
-                            .lineSpacing(15)
-                    }
+                    Cake3DLetteringView(viewModel: viewModel, text: $text, selectedColor: $selectedColor)
+                //MARK: text를 3D로 띄워야 함에 따라.. 주석처리해둠!
+//                    VStack{
+//                        Text("\(text)")
+//                            .customStyledFont(font: .cakeyTitle2, color: selectedColor)
+//                            .multilineTextAlignment(.center)
+//                            .kerning(5)
+//                            .lineSpacing(15)
+//                    }
                 }
                     .padding(.bottom, 30)
                 
@@ -122,7 +117,3 @@ struct CakeLetteringView: View {
         }
     }
 }
-
-//#Preview {
-//    CakeLetteringView(value: 5, path: .constant([5]))
-//}

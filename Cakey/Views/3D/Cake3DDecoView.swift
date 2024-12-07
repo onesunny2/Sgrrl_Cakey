@@ -11,7 +11,6 @@ import RealityKit
 import Combine
 
 // TODO: 반응형, 동적 사이즈 조절
-// TODO: Slider 조정
 // TODO: Mode 업데이트 시, 카메라 원위치
 
 // MARK: - CakeDecoView에 들어갈 3D
@@ -351,7 +350,7 @@ class Coordinator_deco: NSObject, ObservableObject {
         guard let cakeModel = cakeParentEntity else { return }
         
         let minScale: Float = 0.5
-        let maxScale: Float = 0.9
+        let maxScale: Float = 1.2
         let currentScale = cakeModel.scale(relativeTo: nil).x // x축 기준으로 스케일 가져옴
 
         if currentScale < minScale {
@@ -365,38 +364,14 @@ class Coordinator_deco: NSObject, ObservableObject {
         }
     }
 
-    // TODO: 백로그
-    private func applyScaleWithEaseOut(entity: ModelEntity, targetScale: SIMD3<Float>) {
-        let animationDuration: TimeInterval = 0.3 // 애니메이션 지속 시간
-        let frameInterval: TimeInterval = 0.01   // 업데이트 간격
-        let totalFrames = Int(animationDuration / frameInterval)
-        
-        let currentScale = entity.scale(relativeTo: nil)
-        var frame = 0
-
-        Timer.scheduledTimer(withTimeInterval: frameInterval, repeats: true) { timer in
-            if frame >= totalFrames {
-                timer.invalidate()
-                entity.setScale(targetScale, relativeTo: nil) // 마지막 값 정확히 설정
-                return
-            }
-            
-            let t = Float(frame) / Float(totalFrames) // 0 ~ 1 사이의 값
-            let easeOutProgress = 1 - pow(1 - t, 3)  // Ease-out 곡선
-            let interpolatedScale = mix(currentScale, targetScale, t: easeOutProgress)
-            
-            entity.setScale(interpolatedScale, relativeTo: nil)
-            frame += 1
-        }
-    }
 
     
-    // TODO: 동적 사이즈 변경 필요.. position은 했고, scale도 clamp해야함!
+    // MARK: Clamp 원!
     func clampDecoPosition() {
         
         guard let cakeParentEntity = cakeParentEntity else { return }
         
-        let radius: Float = 0.4 // 원의 반지름
+        let radius: Float = 0.35 // 원의 반지름
         
         // deco 위치 조정
         for entity in cakeParentEntity.children.filter({ $0.name.starts(with: "deco") }) {
@@ -431,6 +406,32 @@ class Coordinator_deco: NSObject, ObservableObject {
             }
         }
     }
+    
+    // TODO: 백로그
+    private func applyScaleWithEaseOut(entity: ModelEntity, targetScale: SIMD3<Float>) {
+        let animationDuration: TimeInterval = 0.3 // 애니메이션 지속 시간
+        let frameInterval: TimeInterval = 0.01   // 업데이트 간격
+        let totalFrames = Int(animationDuration / frameInterval)
+        
+        let currentScale = entity.scale(relativeTo: nil)
+        var frame = 0
+
+        Timer.scheduledTimer(withTimeInterval: frameInterval, repeats: true) { timer in
+            if frame >= totalFrames {
+                timer.invalidate()
+                entity.setScale(targetScale, relativeTo: nil) // 마지막 값 정확히 설정
+                return
+            }
+            
+            let t = Float(frame) / Float(totalFrames) // 0 ~ 1 사이의 값
+            let easeOutProgress = 1 - pow(1 - t, 3)  // Ease-out 곡선
+            let interpolatedScale = mix(currentScale, targetScale, t: easeOutProgress)
+            
+            entity.setScale(interpolatedScale, relativeTo: nil)
+            frame += 1
+        }
+    }
+
 }
 
 
