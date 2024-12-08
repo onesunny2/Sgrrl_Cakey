@@ -246,7 +246,7 @@ struct CakeOrderformView: View {
                         .font(.cakeyBody)
                         .foregroundStyle(.cakeyYellow1)
                     
-                    Text("주문서 저장")
+                    Text("케이크 도안 저장")
                         .customStyledFont(font: .cakeyBody, color: .cakeyYellow1)
                 }
                 .padding(.vertical, 13)
