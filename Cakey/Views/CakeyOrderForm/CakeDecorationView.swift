@@ -14,13 +14,14 @@ struct CakeDecorationView: View {
     
     @StateObject var coordinator_deco = Coordinator_deco()
     @State private var isOnboardingVisible: Bool = true
+    @State private var isFirstLaunch: Bool = false
     
     var body: some View {
         ZStack {
             ZStack {
                 Color.cakeyYellow1
                     .ignoresSafeArea(.all)
-
+                
                 ProgressBarCell(currentStep: 3)
                 
                 VStack(spacing: 0) {
@@ -37,13 +38,16 @@ struct CakeDecorationView: View {
             }
             
             Cake3DDecoView(coordinator_deco: coordinator_deco, viewModel: viewModel)
-               
+            
             // MARK: Onboarding
             if isOnboardingVisible {
                 DecoOnboardingView(isVisible: $isOnboardingVisible)
             }
         }
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            checkFirstLaunch()
+        }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
@@ -51,6 +55,16 @@ struct CakeDecorationView: View {
                 } label: {
                     Image(systemName: "chevron.backward")
                         .font(.cakeyCallout)
+                        .foregroundStyle(.cakeyOrange1)
+                }
+                .opacity(isOnboardingVisible ? 0 : 1)
+            }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isOnboardingVisible = true
+                } label: {
+                    Image(systemName: "questionmark.circle")
                         .foregroundStyle(.cakeyOrange1)
                 }
                 .opacity(isOnboardingVisible ? 0 : 1)
@@ -69,6 +83,18 @@ struct CakeDecorationView: View {
             }
         }
         .animation(.easeInOut, value: isOnboardingVisible)
+    }
+    
+    // MARK: - 앱 처음 실행 여부 체크
+    func checkFirstLaunch() {
+        if UserDefaults.standard.bool(forKey: "hasLaunchedBefore") {
+            isFirstLaunch = false
+            isOnboardingVisible = false
+        } else {
+            isFirstLaunch = true
+            isOnboardingVisible = true
+            UserDefaults.standard.set(true, forKey: "hasLaunchedBefore") // 첫 실행 기록
+        }
     }
 }
 

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DecoOnboardingView: View {
-    @Binding var isVisible: Bool
+    @Binding var isVisible: Bool        // 닫기 버튼용 변수
     @State private var currentStep: Int = 0
 
     var body: some View {
