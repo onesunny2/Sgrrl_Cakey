@@ -10,6 +10,7 @@ import ARKit
 import RealityKit
 import Combine
 
+// 🪵 BackLogs
 // TODO: 반응형, 동적 사이즈 조절
 // TODO: Mode 업데이트 시, 카메라 원위치
 
@@ -31,6 +32,7 @@ struct Cake3DDecoView: View {
                 VStack{
                     Spacer().frame(height: 150)
                     ARViewContainer_deco(coordinator_deco: coordinator_deco, cameraHeight: $cameraHeight, activeMode: $activeMode, viewModel: viewModel).ignoresSafeArea()
+                    
                     // MARK: - DecoMode
                     if activeMode == .editMode {
                         VStack {
@@ -157,13 +159,13 @@ struct ARViewContainer_deco: UIViewRepresentable {
         // MARK: 슬라이더 연동 Camera 높이값 변동
         context.coordinator.camera?.position.y = cameraHeight * 0.5
         context.coordinator.camera?.position.x = cameraHeight * 0.2
-        //context.coordinator.cakeParentEntity?.scale *= cameraHeight * 1.2
         
+        // MARK: 살펴보기 vs 수정하기 모드
         coordinator_deco.updateMode()
     }
     
     func makeCoordinator() -> Coordinator_deco {
-        return Coordinator_deco()  // 코오디네이터 2
+        return Coordinator_deco()  // 코오디네이터 1
     }
 }
 
@@ -175,12 +177,11 @@ class Coordinator_deco: NSObject, ObservableObject {
     var cancellable: AnyCancellable?
     var activeMode: EditMode = .editMode
     var decoEntities = DecoEntities.shared
-       
     
     @Published var selectedEntity: ModelEntity? {
         // MARK: 변경된 직후에 실행되는 관찰자
         didSet {
-            // LongPress된 대상에 blink
+            // LongPress된 대상에 선택 삭제
             if selectedEntity != oldValue {
                 //blinkEntity(selectedEntity)
                 highlightEntity(selectedEntity)
@@ -191,10 +192,9 @@ class Coordinator_deco: NSObject, ObservableObject {
     // MARK: 수정하기 vs 살펴보기 모드
     func updateMode() {
         guard let cakeParentEntity = cakeParentEntity else { return }
-        // TODO: slider가 기본 0.8 으로 다시 돌아와야 해! 모드를 업데이트할 때마다 처음 켜진 그 각도록 돌아가야 해
+        // TODO: Mode 업데이트 시, 카메라 원위치
         
-        
-        // CakeParentEntity안에서 cake tag로 제스처 구분!
+        // MARK: CakeParentEntity 안에서 name으로 제스처 구분!
         switch activeMode {
         case .editMode:
             cakeParentEntity.children.forEach { entity in
@@ -247,6 +247,8 @@ class Coordinator_deco: NSObject, ObservableObject {
         
         plane.generateCollisionShapes(recursive: true)
         arView.installGestures([.all], for: plane)
+        
+        // name으로 imgData 접근할 수 있게!
         plane.name = "deco+\(imgData)"
         
         // cakeParentEntity에 추가
@@ -320,8 +322,29 @@ class Coordinator_deco: NSObject, ObservableObject {
         highlightAnchor?.addChild(plane)
     }
     
+    // TODO: 실행 시킬 위치 찾아야 함!
+    func clearHighlight() {
+        guard let arView = arView else { return }
+
+        let centerLocation = CGPoint(x: arView.bounds.midX, y: arView.bounds.midY)
+        let hitResults = arView.hitTest(centerLocation)
+        
+        // hitTest 결과에서 첫 번째로 맞은 엔티티 가져오기
+        if let tappedEntity = hitResults.first?.entity as? ModelEntity {
+            
+            // 선택된 엔티티와 hitTest로 탐지된 엔티티가 다르면 선택 해제
+            if selectedEntity != tappedEntity {
+                self.selectedEntity = nil
+                highlightAnchor?.children.removeAll()
+            }
+        } else {
+            // hitTest 결과가 없거나, 맞은 엔티티가 없는 경우 하이라이트 초기화
+            self.selectedEntity = nil
+            highlightAnchor?.children.removeAll()
+        }
+    }
     
-    // MARK: blink 함수
+    // MARK: blink 함수 - 안쓰지만 남겨둠!
     private func blinkEntity(_ entity: ModelEntity?) {
         guard let entity = entity else { return }
         
@@ -345,40 +368,35 @@ class Coordinator_deco: NSObject, ObservableObject {
         
     }
     
-    // MARK: 모델 사이즈 Clamp
+    // MARK: 케이크 사이즈 Clamp
     func clampCakeSize() {
         guard let cakeModel = cakeParentEntity else { return }
         
         let minScale: Float = 0.5
         let maxScale: Float = 1.2
-        let currentScale = cakeModel.scale(relativeTo: nil).x // x축 기준으로 스케일 가져옴
+        let currentScale = cakeModel.scale(relativeTo: nil).x
 
         if currentScale < minScale {
             let clampedScale = SIMD3<Float>(repeating: minScale)
             cakeModel.scale = clampedScale
-            print("스케일이 너무 작아서 \(minScale)로 클램프!")
         } else if currentScale > maxScale {
             let clampedScale = SIMD3<Float>(repeating: maxScale)
             cakeModel.scale = clampedScale
-            print("스케일이 너무 커서 \(maxScale)로 클램프!")
         }
     }
 
-
-    
-    // MARK: Clamp 원!
+    // MARK: 데코 위치 Clamp
     func clampDecoPosition() {
         
         guard let cakeParentEntity = cakeParentEntity else { return }
         
-        let radius: Float = 0.35 // 원의 반지름
+        let radius: Float = 0.35 // 대강의 원의 반지름
         
-        // deco 위치 조정
         for entity in cakeParentEntity.children.filter({ $0.name.starts(with: "deco") }) {
             var position = entity.position(relativeTo: cakeParentEntity)
             let distanceSquared = position.x * position.x + position.z * position.z
             
-            // 원 밖으로 나갔을 경우
+            // 원 밖으로 나갔을 경우 위치 제한
             if distanceSquared > radius * radius {
                 print("clampDecoPosition")
                 let distance = sqrt(distanceSquared)
@@ -392,8 +410,8 @@ class Coordinator_deco: NSObject, ObservableObject {
         }
     }
     
+    // MARK: 데코 저장 - 완료 버튼 누르면 실시
     func saveDecoEntity(){
-        print("saveDecoEntity 실행!")
         guard let cakeParentEntity = cakeParentEntity else { return }
         
         for entity in cakeParentEntity.children.filter({ $0.name.starts(with: "deco")}){
@@ -407,10 +425,10 @@ class Coordinator_deco: NSObject, ObservableObject {
         }
     }
     
-    // TODO: 백로그
+    // TODO: 백로그 케이크 사이즈 clamp시 뽀용 애니메이션 적용
     private func applyScaleWithEaseOut(entity: ModelEntity, targetScale: SIMD3<Float>) {
-        let animationDuration: TimeInterval = 0.3 // 애니메이션 지속 시간
-        let frameInterval: TimeInterval = 0.01   // 업데이트 간격
+        let animationDuration: TimeInterval = 0.3
+        let frameInterval: TimeInterval = 0.01
         let totalFrames = Int(animationDuration / frameInterval)
         
         let currentScale = entity.scale(relativeTo: nil)
@@ -419,7 +437,7 @@ class Coordinator_deco: NSObject, ObservableObject {
         Timer.scheduledTimer(withTimeInterval: frameInterval, repeats: true) { timer in
             if frame >= totalFrames {
                 timer.invalidate()
-                entity.setScale(targetScale, relativeTo: nil) // 마지막 값 정확히 설정
+                entity.setScale(targetScale, relativeTo: nil)
                 return
             }
             

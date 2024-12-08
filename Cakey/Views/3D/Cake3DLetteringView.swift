@@ -10,7 +10,8 @@ import ARKit
 import RealityKit
 import Combine
 
-//TODO: 중앙 정렬 계산식 필요!
+// 🪵 BackLogs
+//TODO: 중앙 정렬 계산식 정리 필요!
 
 // MARK: - CakeLetteringView에 들어갈 3D
 struct Cake3DLetteringView: View {
@@ -46,11 +47,10 @@ struct ARViewContainer_top: UIViewRepresentable {
         let cakeModel = try! ModelEntity.loadModel(named: "cakeModel")
         cakeModel.scale = SIMD3(repeating: 0.43)
         
-        let selectedColor = Color(hex:viewModel.cakeyModel.cakeColor!)  // 선택 컬러 적용
+        let selectedColor = Color(hex:viewModel.cakeyModel.cakeColor!)
         let selectedMaterial = SimpleMaterial(color: UIColor(selectedColor), isMetallic: false)
         
         cakeModel.model?.materials = [selectedMaterial]
-        //context.coordinator.cakeEntity = cakeModel
         coordinator_top.cakeEntity = cakeModel
         
         let cakeTrayModel = try! ModelEntity.loadModel(named: "cakeTray")
@@ -62,8 +62,6 @@ struct ARViewContainer_top: UIViewRepresentable {
         cakeParentEntity.addChild(cakeTrayModel)
         
         cakeParentEntity.generateCollisionShapes(recursive: true)
-//        context.coordinator.cakeParentEntity = cakeParentEntity
-//        context.coordinator.arView = arView
         coordinator_top.cakeParentEntity = cakeParentEntity
         coordinator_top.arView = arView
         
@@ -81,20 +79,17 @@ struct ARViewContainer_top: UIViewRepresentable {
         cameraAnchor.addChild(camera)
         arView.scene.addAnchor(cameraAnchor)
         
-//        context.coordinator.loadDecoEntity()
-//        context.coordinator.selectedColor = selectedColor
-//        context.coordinator.updateTextEntity(text)
+        // MARK: 저장된 데코 불러오기
         coordinator_top.loadDecoEntity()
+        // MARK: 레터링 색상 적용
         coordinator_top.selectedColor = selectedColor
+        // MARK: 텍스트 입력에 따른 모델 업데이트
         coordinator_top.updateTextEntity(text)
         
         return arView
     }
     
     func updateUIView(_ uiView: ARView, context: Context) {
-//        context.coordinator.updateTextEntity(text)
-//        context.coordinator.selectedColor = selectedColor
-//        context.coordinator.updateTextColor()
         coordinator_top.updateTextEntity(text)
         coordinator_top.selectedColor = selectedColor
         coordinator_top.updateTextColor()
@@ -180,17 +175,17 @@ class Coordinator_top: NSObject, ObservableObject {
         print("텍스트의 위치: x=\(xOffset), y=\(baseYPosition), z=\(zOffset)")
     }
     
+    //MARK: 텍스트 모델 컬러 변경
     func updateTextColor() {
         guard let textEntity = textEntity else { return }
         let textMaterial = SimpleMaterial(color: UIColor(selectedColor ?? .black), isMetallic: false)
         textEntity.model?.materials = [textMaterial]
     }
     
+    //MARK: 데코 불러오기
     func loadDecoEntity() {
-        print("Lettering - loadDeco 실행!")
-        print("저장된 데코엔티티 개수: \(decoEntities.decoEntities.count)")
         
-        // DecoEntity 데이터 순회
+        // DecoEntities 클래스 순회
         for deco in decoEntities.decoEntities {
             let imgData = deco.image
             let pos = deco.position
@@ -201,13 +196,8 @@ class Coordinator_top: NSObject, ObservableObject {
         }
     }
     
+    // MARK: 데코 추가
     func addDecoEntity(imgData: Data, position: SIMD3<Float>, scale: SIMD3<Float>, orientation: simd_quatf) {
-        
-        print("Lettering - addDeco 실행!")
-        print("레터링뷰에서의 imgData: \(imgData)")
-        print("레터링뷰에서의 position: \(position)")
-        print("레터링뷰에서의 scale: \(scale)")
-        print("레터링뷰에서의 orientation: \(orientation)")
         
         guard let cakeParentEntity = cakeParentEntity else { return }
         
@@ -227,17 +217,14 @@ class Coordinator_top: NSObject, ObservableObject {
             }
         }
         
-        // 위치 조정
         plane.position = position
         plane.scale = scale
         plane.orientation = orientation
         
-        // 부모 엔티티에 추가
         cakeParentEntity.addChild(plane)
-        print("cakedeco 개수는\(cakeParentEntity.children.count)")
     }
     
-    //TODO: 실행전!
+    //TODO: 텍스트 모델 저장
     func saveTextEntity(){
         decoEntities.textEntity.color = selectedColor ?? Color.black
         decoEntities.textEntity.position = textEntity?.position(relativeTo: nil) ?? SIMD3<Float>()
