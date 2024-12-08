@@ -30,8 +30,8 @@
             filePath = "Cakey/Views/3D/Cake3DDecoView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "355"
-            endingLineNumber = "355"
+            startingLineNumber = "367"
+            endingLineNumber = "367"
             landmarkName = "blinkEntity(_:)"
             landmarkType = "7">
          </BreakpointContent>

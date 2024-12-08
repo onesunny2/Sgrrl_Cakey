@@ -150,7 +150,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
         } as? AnyCancellable
         
         coordinator_deco.arView = arView
-        coordinator_deco.setupLongPressGeture()
+        coordinator_deco.initializeGestures()
         coordinator_deco.updateMode()
         return arView
     }
@@ -262,8 +262,8 @@ class Coordinator_deco: NSObject, ObservableObject {
         guard let cakeParentEntity = cakeParentEntity else { return }
         // deco 전체 삭제
         for entity in cakeParentEntity.children.filter({ $0.name.starts(with: "deco") }) {
-               cakeParentEntity.removeChild(entity)
-           }
+            cakeParentEntity.removeChild(entity)
+        }
         
         decoEntities.decoEntities.removeAll()
         highlightAnchor?.children.removeAll()
@@ -278,18 +278,30 @@ class Coordinator_deco: NSObject, ObservableObject {
         self.selectedEntity = nil
         
         // MARK: id 비교 후 삭제 - 성공!
-            if let index = decoEntities.decoEntities.firstIndex(where: { $0.id == selectedEntity.id }) {
-                decoEntities.decoEntities.remove(at: index)
-                print("삭제완료!")
-            } else {
-                print("선택된 엔티티가 decoEntities에 없음")
-            }
+        if let index = decoEntities.decoEntities.firstIndex(where: { $0.id == selectedEntity.id }) {
+            decoEntities.decoEntities.remove(at: index)
+            print("삭제완료!")
+        } else {
+            print("선택된 엔티티가 decoEntities에 없음")
+        }
     }
     
     // MARK: LongPress 제스처 추가 함수
     func setupLongPressGeture(){
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
         arView?.addGestureRecognizer(longPressRecognizer)
+        
+    }
+    
+    // MARK: Tap 제스처 추가 함수
+    func setupTapGesture() {
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        arView?.addGestureRecognizer(tapRecognizer)
+    }
+    
+    func initializeGestures() {
+        setupLongPressGeture()
+        setupTapGesture()
     }
     
     // MARK: LongPress한 물체 select
@@ -301,6 +313,27 @@ class Coordinator_deco: NSObject, ObservableObject {
         }
     }
     
+    // MARK: Tap 제스쳐
+    @objc func handleTap(_ recognizer: UITapGestureRecognizer) {
+        guard let view = arView else { return }
+        let tappedLocation = recognizer.location(in: arView)
+        let hitResults = arView?.hitTest(tappedLocation)
+        
+        if let tappedEntity = hitResults?.first?.entity as? ModelEntity {
+            // 선택된 엔티티와 hitTest로 탐지된 엔티티가 다르면 선택 해제
+            if selectedEntity != tappedEntity {
+                self.selectedEntity = nil
+                highlightAnchor?.children.removeAll()
+            }
+        }else{
+            // hitTest 결과가 없거나, 맞은 엔티티가 없는 경우 하이라이트 초기화
+            self.selectedEntity = nil
+            highlightAnchor?.children.removeAll()
+        }
+        
+    }
+    
+    
     // MARK: highlight 함수
     private func highlightEntity(_ entity: ModelEntity?) {
         guard let entity = entity else { return }
@@ -309,11 +342,11 @@ class Coordinator_deco: NSObject, ObservableObject {
         let plane = ModelEntity(mesh: planeMesh)
         
         if let texture = try? TextureResource.load(named: "selectHighlight") {
-                        var material = UnlitMaterial()
-                        material.color = .init(tint: .white, texture: .init(texture))
-                        material.opacityThreshold = 0.1
-                        plane.model?.materials = [material]
-                    }
+            var material = UnlitMaterial()
+            material.color = .init(tint: .white, texture: .init(texture))
+            material.opacityThreshold = 0.1
+            plane.model?.materials = [material]
+        }
         
         plane.scale = entity.scale(relativeTo: nil)
         plane.position = entity.position(relativeTo: nil)
@@ -322,27 +355,6 @@ class Coordinator_deco: NSObject, ObservableObject {
         highlightAnchor?.addChild(plane)
     }
     
-    // TODO: 실행 시킬 위치 찾아야 함!
-    func clearHighlight() {
-        guard let arView = arView else { return }
-
-        let centerLocation = CGPoint(x: arView.bounds.midX, y: arView.bounds.midY)
-        let hitResults = arView.hitTest(centerLocation)
-        
-        // hitTest 결과에서 첫 번째로 맞은 엔티티 가져오기
-        if let tappedEntity = hitResults.first?.entity as? ModelEntity {
-            
-            // 선택된 엔티티와 hitTest로 탐지된 엔티티가 다르면 선택 해제
-            if selectedEntity != tappedEntity {
-                self.selectedEntity = nil
-                highlightAnchor?.children.removeAll()
-            }
-        } else {
-            // hitTest 결과가 없거나, 맞은 엔티티가 없는 경우 하이라이트 초기화
-            self.selectedEntity = nil
-            highlightAnchor?.children.removeAll()
-        }
-    }
     
     // MARK: blink 함수 - 안쓰지만 남겨둠!
     private func blinkEntity(_ entity: ModelEntity?) {
@@ -375,7 +387,7 @@ class Coordinator_deco: NSObject, ObservableObject {
         let minScale: Float = 0.5
         let maxScale: Float = 1.2
         let currentScale = cakeModel.scale(relativeTo: nil).x
-
+        
         if currentScale < minScale {
             let clampedScale = SIMD3<Float>(repeating: minScale)
             cakeModel.scale = clampedScale
@@ -384,7 +396,7 @@ class Coordinator_deco: NSObject, ObservableObject {
             cakeModel.scale = clampedScale
         }
     }
-
+    
     // MARK: 데코 위치 Clamp
     func clampDecoPosition() {
         
@@ -433,7 +445,7 @@ class Coordinator_deco: NSObject, ObservableObject {
         
         let currentScale = entity.scale(relativeTo: nil)
         var frame = 0
-
+        
         Timer.scheduledTimer(withTimeInterval: frameInterval, repeats: true) { timer in
             if frame >= totalFrames {
                 timer.invalidate()
@@ -449,7 +461,7 @@ class Coordinator_deco: NSObject, ObservableObject {
             frame += 1
         }
     }
-
+    
 }
 
 
