@@ -22,7 +22,7 @@ struct CakeOrderformView: View {
 
                 VStack(spacing: 0) {
                     captureContent()  // 캡처 대상 뷰
-                    
+                    //Cake3DFinalView(viewModel: viewModel)
                     Spacer(minLength: 20)
                     
                     saveButton()  // 캡처에서 제외
@@ -36,7 +36,9 @@ struct CakeOrderformView: View {
             
             // MARK: 뷰 캡쳐해서 모델에 저장하기
             // Cake3DDecoView를 UIHostingController로 감싸기
-            let hostingController = UIHostingController(rootView: arCakeView())
+            //let hostingController = UIHostingController(rootView: arCakeView())
+            let hostingController = UIHostingController(rootView: Cake3DFinalView(viewModel: viewModel))
+            
              let targetSize = CGSize(width: 300, height: 300) // 캡처 크기 설정
              hostingController.view.frame = CGRect(origin: .zero, size: targetSize)
              hostingController.view.backgroundColor = .clear // 배경 설정
@@ -122,7 +124,10 @@ struct CakeOrderformView: View {
             // TODO: 3D 케이크 자리
             Button("케이크만 저장") {
                 // Cake3DDecoView를 UIHostingController로 감싸기
-                let hostingController = UIHostingController(rootView: arCakeView())
+//                let hostingController = UIHostingController(rootView: arCakeView())
+//                hostingController.view.backgroundColor = .clear // 배경 투명 설정
+                
+                let hostingController = UIHostingController(rootView: Cake3DFinalView(viewModel: viewModel))
                 hostingController.view.backgroundColor = .clear // 배경 투명 설정
 
                 // 캡처할 뷰의 크기 설정
@@ -222,7 +227,8 @@ struct CakeOrderformView: View {
             .padding(.leading, 17)
             .padding(.bottom, 28)
             
-            arCakeView()
+//            arCakeView()
+            Cake3DFinalView(viewModel: viewModel)
                 .padding(.bottom, 16)
             
             designKeywordLists()

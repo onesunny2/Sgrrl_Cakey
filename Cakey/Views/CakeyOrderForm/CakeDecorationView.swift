@@ -12,25 +12,42 @@ struct CakeDecorationView: View {
     var viewModel: CakeyViewModel
     @Binding var path: [Destination]
     
+    @StateObject var coordinator_deco = Coordinator_deco()
+    @State private var isOnboardingVisible: Bool = true
+    @State private var isFirstLaunch: Bool = false
     
     var body: some View {
         ZStack {
-            Color.cakeyYellow1
-                .ignoresSafeArea(.all)
-            
-            ProgressBarCell(currentStep: 3)
-            
-            VStack(spacing: 0) {
-                NoticeCelll(notice1: "케이크 도안을 만들어 보세요!", notice2: "이미지를 케이크에 자유롭게 배치할 수 있어요")
-                    .padding(.bottom, 40)
+            ZStack {
+                Color.cakeyYellow1
+                    .ignoresSafeArea(.all)
                 
-                // 3D DecoView
-                Cake3DDecoView(viewModel: viewModel)
+                ProgressBarCell(currentStep: 3)
+                
+                VStack(spacing: 0) {
+                    NoticeCelll(notice1: "케이크 도안을 만들어 보세요!", notice2: "이미지를 케이크에 자유롭게 배치할 수 있어요")
+                        .padding(.bottom, 40)
+                    
+                    Spacer()
+                }
+                .padding(.top, 86)
+                .padding(.bottom, 20)
             }
-            .padding(.top, 86)
-            .padding(.bottom, 20)
+            .onTapGesture {
+                hideKeyboard()
+            }
+            
+            Cake3DDecoView(coordinator_deco: coordinator_deco, viewModel: viewModel)
+            
+            // MARK: Onboarding
+            if isOnboardingVisible {
+                DecoOnboardingView(isVisible: $isOnboardingVisible)
+            }
         }
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            checkFirstLaunch()
+        }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
@@ -40,24 +57,44 @@ struct CakeDecorationView: View {
                         .font(.cakeyCallout)
                         .foregroundStyle(.cakeyOrange1)
                 }
+                .opacity(isOnboardingVisible ? 0 : 1)
+            }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isOnboardingVisible = true
+                } label: {
+                    Image(systemName: "questionmark.circle")
+                        .foregroundStyle(.cakeyOrange1)
+                }
+                .opacity(isOnboardingVisible ? 0 : 1)
             }
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     path.append(.cakeLetteringView)
-                    // TODO: 완료 기능 구현 필요(arImage 모델 데이터)
+                    //MARK: deco 저장
+                    coordinator_deco.saveDecoEntity()
                 } label: {
                     Text("완료")
                         .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
                 }
+                .opacity(isOnboardingVisible ? 0 : 1)
             }
         }
-        .onTapGesture {
-            hideKeyboard()
+        .animation(.easeInOut, value: isOnboardingVisible)
+    }
+    
+    // MARK: - 앱 처음 실행 여부 체크
+    func checkFirstLaunch() {
+        if UserDefaults.standard.bool(forKey: "hasLaunchedBefore") {
+            isFirstLaunch = false
+            isOnboardingVisible = false
+        } else {
+            isFirstLaunch = true
+            isOnboardingVisible = true
+            UserDefaults.standard.set(true, forKey: "hasLaunchedBefore") // 첫 실행 기록
         }
     }
 }
 
-//#Preview {
-//    CakeDecorationView(value: 4, path: .constant([4]))
-//}

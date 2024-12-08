@@ -48,7 +48,6 @@ struct ARViewContainer_color: UIViewRepresentable {
 
         cakeParentEntity.generateCollisionShapes(recursive: true)
         context.coordinator.cakeParentEntity = cakeParentEntity
-        arView.installGestures([.rotation, .scale], for: cakeParentEntity)
         
         let cakeAnchor = AnchorEntity(world: [0, 0, 0])
         cakeAnchor.addChild(cakeParentEntity)
@@ -84,8 +83,3 @@ class Coordinator_color: NSObject {
     var cakeParentEntity: ModelEntity?
     var camera: PerspectiveCamera?
 }
-
-//#Preview {
-//    CakeColorView(value: 1, path: .constant([1]))
-//}
-

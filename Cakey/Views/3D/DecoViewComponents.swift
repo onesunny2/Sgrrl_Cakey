@@ -9,10 +9,11 @@ import SwiftUI
 
 // MARK: - ImageScrollView
 @ViewBuilder
-func ImageScrollView(imgList: [decoElements], action: @escaping (String) -> Void) -> some View {
+func ImageScrollView(imgList: [decoElements], action: @escaping (Data) -> Void) -> some View {
     ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 8) {
-            if imgList.first?.image == nil {
+            // imgList가 비어있거나 이미지가 없는 경우 기본 Placeholder UI 표시
+            if imgList.isEmpty || imgList.allSatisfy({ $0.image == nil }) {
                 ForEach(0..<6) { _ in
                     RoundedRectangle(cornerRadius: 10)
                         .fill(.cakeyOrange2)
@@ -24,13 +25,14 @@ func ImageScrollView(imgList: [decoElements], action: @escaping (String) -> Void
                         }
                 }
             } else {
-                ForEach(imgList.map{ $0.image }, id: \.self) { img in
+                // imgList에 이미지가 있는 경우 표시
+                ForEach(imgList, id: \.self) { decoElement in
                     RoundedRectangle(cornerRadius: 10)
                         .fill(.clear)
                         .frame(width: 80, height: 80)
                         .overlay {
                             ZStack {
-                                if let img = img, let uiImage = UIImage(data: img) {
+                                if let imgData = decoElement.image, let uiImage = UIImage(data: imgData) {
                                     Image(uiImage: uiImage)
                                         .resizable()
                                         .scaledToFill()
@@ -41,6 +43,7 @@ func ImageScrollView(imgList: [decoElements], action: @escaping (String) -> Void
                                         .stroke(Color.cakeyOrange1, lineWidth: 2)
                                         .padding(1)
                                 } else {
+                                    // 이미지 데이터가 없는 경우 기본 Placeholder UI
                                     RoundedRectangle(cornerRadius: 10)
                                         .fill(.cakeyOrange2)
                                         .frame(width: 80, height: 80)
@@ -50,7 +53,12 @@ func ImageScrollView(imgList: [decoElements], action: @escaping (String) -> Void
                                                 .foregroundStyle(.cakeyOrange3)
                                         }
                                 }
-                                
+                            }
+                        }
+                        // 이미지 클릭 시 액션 호출
+                        .onTapGesture {
+                            if let imgData = decoElement.image {
+                                action(imgData)
                             }
                         }
                 }
@@ -59,6 +67,7 @@ func ImageScrollView(imgList: [decoElements], action: @escaping (String) -> Void
         .padding(.trailing, 23)
     }
 }
+
 
 // MARK: - ModeSelectView
 @ViewBuilder
