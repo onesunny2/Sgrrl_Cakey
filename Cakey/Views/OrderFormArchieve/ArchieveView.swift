@@ -27,18 +27,42 @@ struct ArchieveView: View {
                     Spacer()
                 } .padding(.leading, 20)
                 
-                ScrollView {
-                    LazyVGrid(columns: archieveColums, spacing: 16) {
-                        ForEach(cakeyModelList.indices, id: \.self) { index in
-                            ArchieveCell(archieveDate: cakeyModelList[index].saveDate, cakeImage: cakeyModelList[index].cakeArImage ?? Data())
-                                .onTapGesture {
-                                    path.append(.archieveDetailView(cakeyModelList[index]))
-                                }
-                        }
+                if cakeyModelList.isEmpty == true {
+                    VStack(spacing: 0) {
+                        Image(.blank)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 80, height: 204)
+                        
+                        Text("저장된 케이크 도안이 없어요!")
+                            .customStyledFont(font: .cakeyBody, color: .cakeyOrange1)
+                            .padding(.top, 72)
+                        
+                        Text("나만의 케이크를 꾸미고")
+                            .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
+                            .padding(.top, 28)
+                        
+                        Text("3D 케이크 도안을 저장해 보세요")
+                            .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
+                            .padding(.top, 8)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 10)
+                    .padding(.top, 140)
+                } else {
+                    ScrollView {
+                        LazyVGrid(columns: archieveColums, spacing: 16) {
+                            ForEach(cakeyModelList.indices, id: \.self) { index in
+                                ArchieveCell(archieveDate: cakeyModelList[index].saveDate, cakeImage: cakeyModelList[index].cakeArImage ?? Data())
+                                    .onTapGesture {
+                                        path.append(.archieveDetailView(cakeyModelList[index]))
+                                    }
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 10)
+                    }
                 }
+                
+                Spacer()
             }
             .padding(.top, 28)
         }
