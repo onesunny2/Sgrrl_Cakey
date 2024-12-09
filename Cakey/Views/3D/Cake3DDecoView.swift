@@ -313,9 +313,8 @@ class Coordinator_deco: NSObject, ObservableObject {
         }
     }
     
-    // MARK: Tap 제스쳐
+    // MARK: Tap 제스쳐 recognizer추가
     @objc func handleTap(_ recognizer: UITapGestureRecognizer) {
-        guard let view = arView else { return }
         let tappedLocation = recognizer.location(in: arView)
         let hitResults = arView?.hitTest(tappedLocation)
         
@@ -330,7 +329,6 @@ class Coordinator_deco: NSObject, ObservableObject {
             self.selectedEntity = nil
             highlightAnchor?.children.removeAll()
         }
-        
     }
     
     
@@ -402,7 +400,8 @@ class Coordinator_deco: NSObject, ObservableObject {
         
         guard let cakeParentEntity = cakeParentEntity else { return }
         
-        let radius: Float = 0.35 // 대강의 원의 반지름
+        let radius: Float = 0.3 // 대강의 원의 반지름 (기존 값: 0.35)
+        
         
         for entity in cakeParentEntity.children.filter({ $0.name.starts(with: "deco") }) {
             var position = entity.position(relativeTo: cakeParentEntity)
@@ -426,6 +425,17 @@ class Coordinator_deco: NSObject, ObservableObject {
     func saveDecoEntity(){
         guard let cakeParentEntity = cakeParentEntity else { return }
         
+        // MARK: 현재 모델에 존재하지 않는 것 삭제
+        // children과 decoEntity의 배열 개수 비교해서 차이만큼 앞에 거 지우기
+        let decoCount = cakeParentEntity.children.filter { $0.name.starts(with: "deco") }.count
+        
+        if decoEntities.decoEntities.count > decoCount {
+            for index in 0..<(decoEntities.decoEntities.count - decoCount) {
+                decoEntities.decoEntities.remove(at: index)
+            }
+        }
+        
+        // MARK: 저장
         for entity in cakeParentEntity.children.filter({ $0.name.starts(with: "deco")}){
             if let index = decoEntities.decoEntities.firstIndex(where: { $0.id == entity.id }) {
                 decoEntities.decoEntities[index].position = entity.position(relativeTo: nil)

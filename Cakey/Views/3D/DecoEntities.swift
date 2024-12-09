@@ -14,6 +14,14 @@ class DecoEntities: ObservableObject {
     static let shared = DecoEntities()
     var decoEntities: [DecoEntity] = []
     var textEntity = TextEntity()
+    
+    func clearDeco(){
+        decoEntities.removeAll()
+        textEntity.text.removeAll()
+        textEntity.color = Color.black
+        textEntity.position = SIMD3<Float>()
+        textEntity.scale =  SIMD3<Float>()
+    }
 }
 
 struct DecoEntity{
