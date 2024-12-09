@@ -27,18 +27,35 @@ struct ArchieveView: View {
                     Spacer()
                 } .padding(.leading, 20)
                 
-                ScrollView {
-                    LazyVGrid(columns: archieveColums, spacing: 16) {
-                        ForEach(cakeyModelList.indices, id: \.self) { index in
-                            ArchieveCell(archieveDate: cakeyModelList[index].saveDate, cakeImage: cakeyModelList[index].cakeArImage ?? Data())
-                                .onTapGesture {
-                                    path.append(.archieveDetailView(cakeyModelList[index]))
-                                }
+                if cakeyModelList.first.isComplete == false {
+                    
+                } else {
+                    ScrollView {
+                        LazyVGrid(columns: archieveColums, spacing: 16) {
+                            ForEach(cakeyModelList.indices, id: \.self) { index in
+                                ArchieveCell(archieveDate: cakeyModelList[index].saveDate, cakeImage: cakeyModelList[index].cakeArImage ?? Data())
+                                    .onTapGesture {
+                                        path.append(.archieveDetailView(cakeyModelList[index]))
+                                    }
+                            }
                         }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 10)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 10)
+
                 }
+//                ScrollView {
+//                    LazyVGrid(columns: archieveColums, spacing: 16) {
+//                        ForEach(cakeyModelList.indices, id: \.self) { index in
+//                            ArchieveCell(archieveDate: cakeyModelList[index].saveDate, cakeImage: cakeyModelList[index].cakeArImage ?? Data())
+//                                .onTapGesture {
+//                                    path.append(.archieveDetailView(cakeyModelList[index]))
+//                                }
+//                        }
+//                    }
+//                    .padding(.horizontal, 20)
+//                    .padding(.top, 10)
+//                }
             }
             .padding(.top, 28)
         }
