@@ -27,8 +27,11 @@ struct ArchieveView: View {
                     Spacer()
                 } .padding(.leading, 20)
                 
-                if cakeyModelList.first.isComplete == false {
-                    
+                if cakeyModelList.isEmpty == true {
+                    Image(.blank)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 204)
                 } else {
                     ScrollView {
                         LazyVGrid(columns: archieveColums, spacing: 16) {
@@ -42,8 +45,9 @@ struct ArchieveView: View {
                         .padding(.horizontal, 20)
                         .padding(.top, 10)
                     }
-
                 }
+                
+                Spacer()
 //                ScrollView {
 //                    LazyVGrid(columns: archieveColums, spacing: 16) {
 //                        ForEach(cakeyModelList.indices, id: \.self) { index in
