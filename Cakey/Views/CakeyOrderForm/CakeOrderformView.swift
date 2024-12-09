@@ -240,6 +240,8 @@ struct CakeOrderformView: View {
         VStack {
             Button {
                 self.showActionSheet = true
+                // MARK: 최종 저장시 현재 작업중인 decoEntity 비움
+                DecoEntities.shared.clearDeco()
             } label: {
                 HStack(spacing: 3) {
                     Image(systemName: "square.and.arrow.down")
