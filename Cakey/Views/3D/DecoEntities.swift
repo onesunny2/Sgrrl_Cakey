@@ -15,7 +15,6 @@ class DecoEntities: ObservableObject {
     var decoEntities: [DecoEntity] = []
     var textEntity = TextEntity()
     
-    
     func clearDeco(){
         decoEntities.removeAll()
         textEntity.text.removeAll()
