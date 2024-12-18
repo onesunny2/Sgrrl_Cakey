@@ -19,9 +19,10 @@ struct CakeOrderformView: View {
         ZStack {
             Color.cakeyYellow1
                 .ignoresSafeArea(.all)
-
+           
                 VStack(spacing: 0) {
                     captureContent()  // 캡처 대상 뷰
+                    //TODO: 다음 버튼 누를 때, snapshot 이미지로 띄워야함
                     Spacer(minLength: 20)
                     
                     saveButton()  // 캡처에서 제외
@@ -129,6 +130,14 @@ struct CakeOrderformView: View {
                 //MARK: 타이니 테스트뷰
 //                let hostingController = UIHostingController(rootView: arCakeView())
 //                hostingController.view.backgroundColor = .clear // 배경 투명 설정
+                ARVariables.arView.snapshot(saveToHDR: false) { (image) in
+                    
+                    // Compress the image
+                    let compressedImage = UIImage(data: (image?.pngData())!)
+                    // Save in the photo album
+                    UIImageWriteToSavedPhotosAlbum(compressedImage!, nil, nil, nil)
+                }
+                
                 
                 // MARK: 도라미
                 let hostingController = UIHostingController(rootView: Cake3DFinalView(viewModel: viewModel))
@@ -164,6 +173,7 @@ struct CakeOrderformView: View {
         }
     }
     
+    @ViewBuilder
     func orderformTitle() -> some View {
         VStack(alignment: .leading) {
             Text("나의 케이크")

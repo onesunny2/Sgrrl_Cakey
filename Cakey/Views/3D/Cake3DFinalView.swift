@@ -18,14 +18,18 @@ struct Cake3DFinalView: View {
     }
 }
 
+struct ARVariables{
+  static var arView: ARView!
+}
+
 struct ARViewContainer_Final:UIViewRepresentable {
     var viewModel: CakeyViewModel
     var quaterView: CameraMode = CameraMode.quarterView
     
     func makeUIView(context: Context) -> some UIView {
         // MARK: ARView 초기화
-        let arView = ARView(frame: .zero, cameraMode: .nonAR, automaticallyConfigureSession: false)
-        arView.environment.background = .color(.clear)
+        ARVariables.arView = ARView(frame: .zero, cameraMode: .nonAR, automaticallyConfigureSession: false)
+        ARVariables.arView.environment.background = .color(.cakeyYellow1)
         
         // MARK: CakeModel
         let cakeModel = try! ModelEntity.loadModel(named: "cakeModel")
@@ -49,7 +53,7 @@ struct ARViewContainer_Final:UIViewRepresentable {
         
         let cakeAnchor = AnchorEntity(world: [0, 0, 0])
         cakeAnchor.addChild(cakeParentEntity)
-        arView.scene.anchors.append(cakeAnchor)
+        ARVariables.arView.scene.anchors.append(cakeAnchor)
 
         // MARK: Virtual Camera
         let camera = PerspectiveCamera()
@@ -58,9 +62,9 @@ struct ARViewContainer_Final:UIViewRepresentable {
         
         let cameraAnchor = AnchorEntity(world: [0, 0, 0])
         cameraAnchor.addChild(camera)
-        arView.scene.addAnchor(cameraAnchor)
+        ARVariables.arView.scene.addAnchor(cameraAnchor)
         
-        return arView
+        return ARVariables.arView
     }
     
     func updateUIView(_ uiView: UIViewType, context: Context) {
@@ -150,5 +154,4 @@ class Coordinator_final: NSObject {
         cakeParentEntity.addChild(textEntity)
         print("텍스트 엔티티 추가 완료. 텍스트: \(text), 위치: \(textEntity.position), 스케일: \(textEntity.scale)")
     }
-
 }
