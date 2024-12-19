@@ -46,7 +46,9 @@ struct CakeLetteringView: View {
                 
 
                 NextButtonCell(nextValue: {
-                    path.append(.cakeOrderformView)
+                    path.append(.cakeOrderformView);
+                    guard let topstack = CakeStateManager.shared.cakeStack.top() else { return }
+                    CakeStateManager.shared.cakeStack.push(topstack)
                     viewModel.cakeyModel.letteringColor = selectedColor.toHex()
                     viewModel.cakeyModel.letteringText = text
                     viewModel.cakeyModel.saveDate = .now
@@ -75,6 +77,10 @@ struct CakeLetteringView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
+                    // TODO: 여기 디버깅 해야함!
+                    let secondTopstack = CakeStateManager.shared.cakeStack.elements[CakeStateManager.shared.cakeStack.elements.count - 2]
+                    CakeStateManager.shared.cakeStack.push(secondTopstack)
+                    
                     viewModel.cakeyModel.letteringColor = "#000000" // default 검정색
                     viewModel.cakeyModel.letteringText = ""
                     viewModel.cakeyModel.saveDate = .now

@@ -93,6 +93,10 @@ class Coordinator_final: NSObject {
             
             addDecoEntity(imgData: imgData, position: pos, scale: scale, orientation: orientation)
         }
+        
+        // TextENtity도 추가
+        
+        addTextEntity()
     }
     
     func addDecoEntity(imgData: Data, position: SIMD3<Float>, scale: SIMD3<Float>, orientation: simd_quatf) {

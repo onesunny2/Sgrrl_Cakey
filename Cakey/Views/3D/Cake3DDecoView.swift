@@ -48,7 +48,7 @@ struct Cake3DDecoView: View {
                             } .padding(.bottom, 10)
                             
                             // MARK: ImageSelect
-                            ImageScrollView(imgList: CakeStateManager.shared.cakeStack.top()!.decoEntities) { imgData in
+                            ImageScrollView(imgList: viewModel.cakeyModel.cakeImages) { imgData in
                                 coordinator_deco.addDecoEntity(imgData: imgData)
                             }
                             .padding(.leading, 23)

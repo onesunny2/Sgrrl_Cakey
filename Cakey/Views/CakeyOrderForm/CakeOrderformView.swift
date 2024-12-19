@@ -75,6 +75,8 @@ struct CakeOrderformView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
+                    print("현재 스택 개수: \(CakeStateManager.shared.cakeStack.count)")
+                    _ = CakeStateManager.shared.cakeStack.pop()
                     presentationMode.wrappedValue.dismiss()
                 } label: {
                     Image(systemName: "chevron.backward")
