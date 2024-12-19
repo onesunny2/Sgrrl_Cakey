@@ -109,7 +109,7 @@ class Coordinator_top: NSObject, ObservableObject {
     var textEntity: ModelEntity?
     var selectedColor: Color?
     
-    var decoEntities = DecoEntities.shared
+    //var decoEntities = CakeState.shared
     
     func updateTextEntity(_ newText: String) {
         guard let cakeParentEntity = cakeParentEntity else { return }
@@ -169,7 +169,10 @@ class Coordinator_top: NSObject, ObservableObject {
         // 부모 엔티티에 추가
         cakeParentEntity.addChild(newTextEntity)
         textEntity = newTextEntity
-        decoEntities.textEntity.text = newText
+        
+        guard let topstack = CakeStateManager.shared.cakeStack.top() else {return}
+        
+        topstack.textEntity.text = newText
         
         print("텍스트의 크기: \(textEntity?.scale(relativeTo: nil) ?? SIMD3<Float>())")
         print("텍스트의 위치: x=\(xOffset), y=\(baseYPosition), z=\(zOffset)")
@@ -184,16 +187,24 @@ class Coordinator_top: NSObject, ObservableObject {
     
     //MARK: 데코 불러오기
     func loadDecoEntity() {
+        // Stack에 접근해서 가장 top의 decoEntity에 접근해야함.
+        guard let topState = CakeStateManager.shared.cakeStack.top() else { return }
+        print("3DDecoView - loadDecoEntity")
         
-        // DecoEntities 클래스 순회
-        for deco in decoEntities.decoEntities {
-            let imgData = deco.image
-            let pos = deco.position
-            let scale = deco.scale
-            let orientation = deco.orientation
-            
-            addDecoEntity(imgData: imgData, position: pos, scale: scale, orientation: orientation)
+        if(!topState.decoEntities.isEmpty){
+            print("현재 스택에 이미 저장된 decoEntity가 있어서 불러오겠다!")
+            for deco in topState.decoEntities {
+                let imgData = deco.image
+                let pos = deco.position
+                let scale = deco.scale
+                let orientation = deco.orientation
+                
+                addDecoEntity(imgData: imgData, position: pos, scale: scale, orientation: orientation)
+            }
+        }else{
+            print("현재 스택에 decoEntity가 따로 없다!")
         }
+        
     }
     
     // MARK: 데코 추가
@@ -226,9 +237,12 @@ class Coordinator_top: NSObject, ObservableObject {
     
     //TODO: 텍스트 모델 저장
     func saveTextEntity(){
-        decoEntities.textEntity.color = selectedColor ?? Color.black
-        decoEntities.textEntity.position = textEntity?.position(relativeTo: nil) ?? SIMD3<Float>()
-        decoEntities.textEntity.scale = textEntity?.scale(relativeTo: nil) ?? SIMD3<Float>()
+        guard let topStack = CakeStateManager.shared.cakeStack.top() else {return }
+        
+        topStack.textEntity.color = selectedColor ?? Color.black
+        topStack.textEntity.position = textEntity?.position(relativeTo: nil) ?? SIMD3<Float>()
+        topStack.textEntity.scale = textEntity?.scale(relativeTo: nil) ?? SIMD3<Float>()
     }
 }
+
 

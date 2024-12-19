@@ -51,6 +51,8 @@ struct CakeDecorationView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
+                    _ = CakeStateManager.shared.cakeStack.pop()
+                    print("현재 케이크 스택의 개수: \(CakeStateManager.shared.cakeStack.elements.count)")
                     presentationMode.wrappedValue.dismiss()
                 } label: {
                     Image(systemName: "chevron.backward")
@@ -75,6 +77,12 @@ struct CakeDecorationView: View {
                     path.append(.cakeLetteringView)
                     //MARK: deco 저장
                     coordinator_deco.saveDecoEntity()
+                    
+                    guard let topstack = CakeStateManager.shared.cakeStack.top() else { return }
+                    
+                    CakeStateManager.shared.cakeStack.push(topstack)
+                    
+                    print("현재 케이크 스택의 개수: \(CakeStateManager.shared.cakeStack.elements.count)")
                 } label: {
                     Text("완료")
                         .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)

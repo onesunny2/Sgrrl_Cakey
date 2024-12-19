@@ -78,11 +78,14 @@ struct ARViewContainer_Final:UIViewRepresentable {
 
 class Coordinator_final: NSObject {
     var cakeParentEntity: ModelEntity?
-    var decoEntities = DecoEntities.shared
+    //var decoEntities = CakeState.shared
+    var cakeManager = CakeStateManager.shared
     
     func loadDecoEntity() {
+        guard let topStack = cakeManager.cakeStack.top() else {return }
+        
         // DecoEntity 데이터 순회
-        for deco in decoEntities.decoEntities {
+        for deco in topStack.decoEntities {
             let imgData = deco.image
             let pos = deco.position
             let scale = deco.scale
@@ -122,10 +125,11 @@ class Coordinator_final: NSObject {
     }
     
     func addTextEntity() {
+        guard let topStack = cakeManager.cakeStack.top() else { return }
         guard let cakeParentEntity = cakeParentEntity else { return }
         
         // 저장된 텍스트 엔티티 데이터 로드
-        let textData = decoEntities.textEntity
+        let textData = topStack.textEntity
         
         // 텍스트가 비어있는지 확인
         let text = textData.text

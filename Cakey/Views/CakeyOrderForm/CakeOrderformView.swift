@@ -87,6 +87,7 @@ struct CakeOrderformView: View {
                     Button {
                         viewModel.updateCakey()
                         path.removeAll() // 홈으로 돌아가기
+                        CakeStateManager.shared.cakeStack.elements.removeAll()
                     } label: {
                         Image(systemName: "house")
                             .font(.cakeyCallout)
@@ -257,7 +258,7 @@ struct CakeOrderformView: View {
             Button {
                 self.showActionSheet = true
                 // MARK: 최종 저장시 현재 작업중인 decoEntity 비움
-                DecoEntities.shared.clearDeco()
+                CakeStateManager.shared.cakeStack.elements.removeAll()
             } label: {
                 HStack(spacing: 3) {
                     Image(systemName: "square.and.arrow.down")

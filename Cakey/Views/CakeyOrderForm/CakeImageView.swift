@@ -35,7 +35,11 @@ struct CakeImageView: View {
                 Spacer()
                 
                 NextButtonCell(nextValue: {
-                    path.append(.cakeDecorationView)
+                    path.append(.cakeDecorationView);
+                    //TODO: 이부분 확인
+                    CakeStateManager.shared.cakeStack.push(CakeState())
+                    print("현재 케이크 스택의 개수: \(CakeStateManager.shared.cakeStack.elements.count)")
+                    
                     viewModel.cakeyModel.cakeImages = decoImages
                 }, isButtonActive: decoImages[0].image == nil || decoImages[0].description == "")
             }
@@ -46,6 +50,7 @@ struct CakeImageView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
+        
                     presentationMode.wrappedValue.dismiss()
                 } label: {
                     Image(systemName: "chevron.backward")
@@ -57,6 +62,8 @@ struct CakeImageView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
+                    CakeStateManager.shared.cakeStack.push(CakeState())
+                    print("현재 케이크 스택의 개수: \(CakeStateManager.shared.cakeStack.elements.count)")
                     viewModel.cakeyModel.cakeImages = []
                     path.append(.cakeDecorationView)
                 } label: {
