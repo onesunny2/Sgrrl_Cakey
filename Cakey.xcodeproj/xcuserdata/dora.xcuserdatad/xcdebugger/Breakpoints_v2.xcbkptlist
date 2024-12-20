@@ -14,8 +14,8 @@
             filePath = "Cakey/Views/3D/Cake3DLetteringView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "221"
-            endingLineNumber = "221"
+            startingLineNumber = "205"
+            endingLineNumber = "205"
             landmarkName = "addDecoEntity(imgData:position:scale:orientation:)"
             landmarkType = "7">
          </BreakpointContent>
