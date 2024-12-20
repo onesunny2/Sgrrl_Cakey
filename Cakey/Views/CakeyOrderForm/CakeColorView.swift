@@ -47,6 +47,9 @@ struct CakeColorView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
+                    // TODO: 이부분 확인
+                    _ = CakeStateManager.shared.cakeStack.pop()
+                    print("현재 케이크 스택의 개수: \(CakeStateManager.shared.cakeStack.elements.count)")
                     presentationMode.wrappedValue.dismiss()
                 } label: {
                     Image(systemName: "chevron.backward")

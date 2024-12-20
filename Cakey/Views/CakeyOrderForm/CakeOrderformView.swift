@@ -19,54 +19,51 @@ struct CakeOrderformView: View {
         ZStack {
             Color.cakeyYellow1
                 .ignoresSafeArea(.all)
-
+           
                 VStack(spacing: 0) {
                     captureContent()  // 캡처 대상 뷰
                     Spacer(minLength: 20)
-                    
                     saveButton()  // 캡처에서 제외
                 }
                 .padding(.top, 20)
                 .padding(.bottom, 10)
         }
+        //TODO: onAppear 다시 보기
         .onAppear {
             UIPageControl.appearance().currentPageIndicatorTintColor = UIColor.cakeyOrange1 // 현재 페이지 색상
             UIPageControl.appearance().pageIndicatorTintColor = UIColor.cakeyOrange3 // 나머지 페이지 색상
             
-            // MARK: 뷰 캡쳐해서 모델에 저장하기
-            // Cake3DDecoView를 UIHostingController로 감싸기
+// MARK: *** 기존 버전 hostingController.view.captureAsImageData() 주석
+// viewModel에 cakeIamge 저장하는 부분도 captureContent그리는 부분으로 옮겨뒀습니다!
             
-            // MARK: 타이니 테스트뷰
-            //let hostingController = UIHostingController(rootView: arCakeView())
-            // MARK: 도라미
-            let hostingController = UIHostingController(rootView: Cake3DFinalView(viewModel: viewModel))
-            
-             let targetSize = CGSize(width: 300, height: 300) // 캡처 크기 설정
-             hostingController.view.frame = CGRect(origin: .zero, size: targetSize)
-             hostingController.view.backgroundColor = .clear // 배경 설정
-             
-             // UIWindow 가져오기
-             guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let window = windowScene.windows.first else {
-                 print("UIWindow를 가져오지 못했습니다.")
-                 return
-             }
-             window.addSubview(hostingController.view) // 캡처를 위해 화면에 추가
-
-             DispatchQueue.main.async {
-                 hostingController.view.layoutIfNeeded()
-                 
-                 // 캡처 수행
-                 if let imageData = hostingController.view.captureAsImageData() {
-                     viewModel.cakeyModel.cakeArImage = imageData // Data로 저장
-                     print("캡처 완료.")
-                 } else {
-                     print("이미지 데이터 캡처에 실패했습니다.")
-                 }
-                 
-                 // 뷰를 화면에서 제거
-                 hostingController.view.removeFromSuperview()
-             }
+//            let hostingController = UIHostingController(rootView: Cake3DFinalView(viewModel: viewModel))
+//            
+//             let targetSize = CGSize(width: 300, height: 300) // 캡처 크기 설정
+//             hostingController.view.frame = CGRect(origin: .zero, size: targetSize)
+//             hostingController.view.backgroundColor = .clear // 배경 설정
+//             
+//             // UIWindow 가져오기
+//             guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+//                   let window = windowScene.windows.first else {
+//                 print("UIWindow를 가져오지 못했습니다.")
+//                 return
+//             }
+//             window.addSubview(hostingController.view) // 캡처를 위해 화면에 추가
+//
+//             DispatchQueue.main.async {
+//                 hostingController.view.layoutIfNeeded()
+//                 
+//                 // 캡처 수행
+//                 if let imageData = hostingController.view.captureAsImageData() {
+//                     viewModel.cakeyModel.cakeArImage = imageData // Data로 저장
+//                     print("캡처 완료.")
+//                 } else {
+//                     print("이미지 데이터 캡처에 실패했습니다.")
+//                 }
+//                 
+//                 // 뷰를 화면에서 제거
+//                 hostingController.view.removeFromSuperview()
+//             }
         }
         .navigationBarBackButtonHidden(true)
         .toolbarBackground(.cakeyYellow1, for: .navigationBar)
@@ -74,6 +71,8 @@ struct CakeOrderformView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
+                    print("현재 스택 개수: \(CakeStateManager.shared.cakeStack.count)")
+                    _ = CakeStateManager.shared.cakeStack.pop()
                     presentationMode.wrappedValue.dismiss()
                 } label: {
                     Image(systemName: "chevron.backward")
@@ -86,6 +85,7 @@ struct CakeOrderformView: View {
                     Button {
                         viewModel.updateCakey()
                         path.removeAll() // 홈으로 돌아가기
+                        CakeStateManager.shared.cakeStack.elements.removeAll()
                     } label: {
                         Image(systemName: "house")
                             .font(.cakeyCallout)
@@ -123,47 +123,52 @@ struct CakeOrderformView: View {
                      hostingController.view.removeFromSuperview()
                  }
             }
-            // TODO: 3D 케이크 자리
+            
+            // MARK: 케이크 캡처 저장 구현
             Button("케이크만 저장") {
-                // Cake3DDecoView를 UIHostingController로 감싸기
-                //MARK: 타이니 테스트뷰
-//                let hostingController = UIHostingController(rootView: arCakeView())
-//                hostingController.view.backgroundColor = .clear // 배경 투명 설정
+                ARVariables.arView.snapshot(saveToHDR: false) { (image) in
+                  let compressedImage = UIImage(data: (image?.pngData())!)
+                  UIImageWriteToSavedPhotosAlbum(compressedImage!, nil, nil, nil)
+                }
+
+// MARK: *** 기존 버전 hostingController.view.captureAsImage() 남겨둠!
+// 이 버전 주석 풀어도 정상 작동함! 근데 위 함수가 더 예쁘게 프레임 잡힘
                 
-                // MARK: 도라미
-                let hostingController = UIHostingController(rootView: Cake3DFinalView(viewModel: viewModel))
-                hostingController.view.backgroundColor = .clear // 배경 투명 설정
-
-                // 캡처할 뷰의 크기 설정
-                let fixedSize = CGSize(width: 300, height: 250) // arCakeView의 정해진 크기
-                hostingController.view.frame = CGRect(origin: .zero, size: fixedSize)
-
-                // UIWindow 가져오기
-                guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                      let window = windowScene.windows.first else {
-                    print("UIWindow를 가져오지 못했습니다.")
-                    return
-                }
-                window.addSubview(hostingController.view) // 화면에 추가 (캡처를 위해)
-
-                DispatchQueue.main.async {
-                    hostingController.view.layoutIfNeeded()
-                    
-                    // 캡처 수행
-                    if let capturedImage = hostingController.view.captureAsImage() {
-                        saveScreenShotToAlbum(capturedImage) // 캡처 이미지 앨범 저장
-                        print("성공적으로 저장되었습니다.")
-                    } else {
-                        print("이미지 캡처에 실패했습니다.")
-                    }
-
-                    // 뷰를 화면에서 제거
-                    hostingController.view.removeFromSuperview()
-                }
+//                let hostingController = UIHostingController(rootView: captureContent())
+//                hostingController.view.backgroundColor = .clear // 배경 투명 설정
+//
+//                // 캡처할 뷰의 크기 설정
+//                let fixedSize = CGSize(width: 300, height: 300)
+//                // arCakeView의 정해진 크기 (원래 300, 250)
+//                hostingController.view.frame = CGRect(origin: .zero, size: fixedSize)
+//
+//                // UIWindow 가져오기
+//                guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+//                      let window = windowScene.windows.first else {
+//                    print("UIWindow를 가져오지 못했습니다.")
+//                    return
+//                }
+//                window.addSubview(hostingController.view) // 화면에 추가 (캡처를 위해)
+//
+//                DispatchQueue.main.async {
+//                    hostingController.view.layoutIfNeeded()
+//                    
+//                    // 캡처 수행
+//                    if let capturedImage = hostingController.view.captureAsImage() {
+//                        saveScreenShotToAlbum(capturedImage) // 캡처 이미지 앨범 저장
+//                        print("성공적으로 저장되었습니다.")
+//                    } else {
+//                        print("이미지 캡처에 실패했습니다.")
+//                    }
+//
+//                    // 뷰를 화면에서 제거
+//                    hostingController.view.removeFromSuperview()
+//                }
             }
         }
     }
     
+    @ViewBuilder
     func orderformTitle() -> some View {
         VStack(alignment: .leading) {
             Text("나의 케이크")
@@ -221,7 +226,15 @@ struct CakeOrderformView: View {
         }
     }
     
-    // 캡처 대상 뷰
+    // MARK: 우선은 최선의 방법이라 생각되는 것으로 해뒀습니다...
+    // 1: Cake3DFinalView - arView를 띄워야 snapshot 실행가능
+    // 2: 0.5초 뒤 snapshot의 리턴값 UIImage를 Data로 변환해 CakeModel.arImage에 저장
+    // 3: 기존 arView자리에 같은 크기로 snapshot의 리턴값 UIImage 띄움
+
+    
+    @State private var compressedImage: UIImage? = nil
+    @State private var showCompressedImage: Bool = false
+
     func captureContent() -> some View {
         VStack(spacing: 0) {
             HStack {
@@ -231,23 +244,45 @@ struct CakeOrderformView: View {
             .padding(.leading, 17)
             .padding(.bottom, 28)
             
-            //MARK: 타이니 테스트
-//            arCakeView()
-            //MARK: 도라미
-            Cake3DFinalView(viewModel: viewModel)
-                .padding(.bottom, 16)
-            
+            // MARK: 3. 0.5초뒤 snapshot 리턴값으로 뷰 변경!
+            if showCompressedImage, let compressedImage = compressedImage {
+                Image(uiImage: compressedImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 300, height: 300)
+                    .padding(.top, -30)
+                    .padding(.bottom, 16)
+            // MARK: 1. 초기값 arView 띄움!
+            } else {
+                Cake3DFinalView(viewModel: viewModel)
+                    .frame(width: 300, height: 300)
+                    .padding(.top, -30)
+                    .padding(.bottom, 16)
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            ARVariables.arView.snapshot(saveToHDR: false) { image in
+                                if let image = image, let pngData = image.pngData() {
+                                    compressedImage = UIImage(data: pngData)
+                                    // MARK: 2. 0.5초뒤 snapshot 리턴값으로 viewModel 저장
+                                    viewModel.cakeyModel.cakeArImage = pngData
+                                    showCompressedImage = true
+                                } else {
+                                    print("이미지 캡처 실패ㅠ")
+                                }
+                            }
+                        }
+                    }
+            }
             designKeywordLists()
         }
         .background(Color.cakeyYellow1)
     }
+
     
     func saveButton() -> some View {
         VStack {
             Button {
                 self.showActionSheet = true
-                // MARK: 최종 저장시 현재 작업중인 decoEntity 비움
-                DecoEntities.shared.clearDeco()
             } label: {
                 HStack(spacing: 3) {
                     Image(systemName: "square.and.arrow.down")

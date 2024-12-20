@@ -34,14 +34,7 @@ struct CakeLetteringView: View {
                 
                 ZStack {
                     Cake3DLetteringView(viewModel: viewModel, text: $text, selectedColor: $selectedColor, coordinator_top: coordinator_top)
-                //MARK: text를 3D로 띄워야 함에 따라.. 주석처리해둠!
-//                    VStack{
-//                        Text("\(text)")
-//                            .customStyledFont(font: .cakeyTitle2, color: selectedColor)
-//                            .multilineTextAlignment(.center)
-//                            .kerning(5)
-//                            .lineSpacing(15)
-//                    }
+          
                 }
                     .padding(.bottom, 30)
                 
@@ -54,7 +47,13 @@ struct CakeLetteringView: View {
                 
 
                 NextButtonCell(nextValue: {
-                    path.append(.cakeOrderformView)
+                    path.append(.cakeOrderformView);
+                    // T
+                    guard let topstack = CakeStateManager.shared.cakeStack.top() else {return}
+                    topstack.textEntity.text = text
+                    topstack.textEntity.color = selectedColor
+                    
+                    CakeStateManager.shared.cakeStack.push(topstack)
                     viewModel.cakeyModel.letteringColor = selectedColor.toHex()
                     viewModel.cakeyModel.letteringText = text
                     viewModel.cakeyModel.saveDate = .now
@@ -83,11 +82,15 @@ struct CakeLetteringView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
+                    guard let topstack = CakeStateManager.shared.cakeStack.top() else {return}
+                    CakeStateManager.shared.cakeStack.push(topstack)
+                    
                     viewModel.cakeyModel.letteringColor = "#000000" // default 검정색
                     viewModel.cakeyModel.letteringText = ""
                     viewModel.cakeyModel.saveDate = .now
                     viewModel.cakeyModel.isComplete = true
                     path.append(.cakeOrderformView)
+                    
                 } label: {
                     Text("SKIP")
                         .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)

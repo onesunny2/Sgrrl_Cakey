@@ -142,7 +142,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
         context.coordinator.cancellable = arView.scene.subscribe(to: SceneEvents.Update.self) { _ in
             // MARK: 카메라 각도 조정
             camera.look(at: cakeParentEntity.position, from: camera.position, relativeTo: nil)
-            print("현재 케이크의 크기:\(cakeParentEntity.scale(relativeTo: nil))")
+            //print("현재 케이크의 크기:\(cakeParentEntity.scale(relativeTo: nil))")
             
             // MARK: 모델 사이즈 Clamp
             coordinator_deco.clampCakeSize()
@@ -152,6 +152,7 @@ struct ARViewContainer_deco: UIViewRepresentable {
         coordinator_deco.arView = arView
         coordinator_deco.initializeGestures()
         coordinator_deco.updateMode()
+        coordinator_deco.loadDecoEntity()
         return arView
     }
     
@@ -176,14 +177,14 @@ class Coordinator_deco: NSObject, ObservableObject {
     var camera: PerspectiveCamera?
     var cancellable: AnyCancellable?
     var activeMode: EditMode = .editMode
-    var decoEntities = DecoEntities.shared
+    //var decoEntities = CakeState.shared
+    var cakeManager = CakeStateManager.shared
     
     @Published var selectedEntity: ModelEntity? {
         // MARK: 변경된 직후에 실행되는 관찰자
         didSet {
-            // LongPress된 대상에 선택 삭제
+            // LongPress된 대상 선택 삭제
             if selectedEntity != oldValue {
-                //blinkEntity(selectedEntity)
                 highlightEntity(selectedEntity)
             }
         }
@@ -220,7 +221,57 @@ class Coordinator_deco: NSObject, ObservableObject {
         }
     }
     
-    // MARK: 데코 추가 함수
+    //MARK: 데코 불러오기
+    func loadDecoEntity() {
+        // Stack에 접근해서 가장 top의 decoEntity에 접근해야함.
+        guard let topState = cakeManager.cakeStack.top() else { return }
+        print("3DDecoView - loadDecoEntity")
+        
+        if(!topState.decoEntities.isEmpty){
+            print("현재 스택에 이미 저장된 decoEntity가 있어서 불러오겠다!")
+            for deco in topState.decoEntities {
+                let imgData = deco.image
+                let pos = deco.position
+                let scale = deco.scale
+                let orientation = deco.orientation
+                
+                addDecoEntity(imgData: imgData, position: pos, scale: scale, orientation: orientation)
+            }
+        }else{
+            print("현재 스택에 decoEntity가 따로 없다!")
+        }
+        
+    }
+    
+    // MARK: 데코 추가 버전 2
+    func addDecoEntity(imgData: Data, position: SIMD3<Float>, scale: SIMD3<Float>, orientation: simd_quatf) {
+        
+        guard let cakeParentEntity = cakeParentEntity else { return }
+        
+        let planeMesh = MeshResource.generatePlane(width: 1, depth: 1)
+        let plane = ModelEntity(mesh: planeMesh)
+        
+        if let uiImage = UIImage(data: imgData),
+           let cgImage = uiImage.cgImage {
+            do {
+                let texture = try TextureResource.generate(from: cgImage, options: .init(semantic: .color))
+                var material = UnlitMaterial()
+                material.color = .init(tint: .white, texture: .init(texture))
+                material.opacityThreshold = 0.1
+                plane.model?.materials = [material]
+            } catch {
+                print("텍스처 생성 실패: \(error.localizedDescription)")
+            }
+        }
+        
+        plane.position = position
+        plane.scale = scale
+        plane.orientation = orientation
+        
+        cakeParentEntity.addChild(plane)
+    }
+    
+    // MARK: 데코 추가 함수 버전 1
     func addDecoEntity(imgData: Data) {
         
         print("deco뷰에서의 imgData: \(imgData)")
@@ -254,32 +305,36 @@ class Coordinator_deco: NSObject, ObservableObject {
         // cakeParentEntity에 추가
         cakeParentEntity.addChild(plane)
         
-        decoEntities.decoEntities.append(DecoEntity(id: plane.id, image: imgData, position: plane.position(relativeTo: nil),scale: plane.scale(relativeTo: nil), orientation: plane.orientation(relativeTo: nil)))
+        guard let topState = cakeManager.cakeStack.top() else { return }
+        
+        topState.decoEntities.append(DecoEntity(id: plane.id, image: imgData, position: plane.position(relativeTo: nil),scale: plane.scale(relativeTo: nil), orientation: plane.orientation(relativeTo: nil)))
     }
     
     // MARK: 전체 삭제 - 버튼 할당
     func deleteAll() {
         guard let cakeParentEntity = cakeParentEntity else { return }
+        guard let topState = cakeManager.cakeStack.top() else { return }
         // deco 전체 삭제
         for entity in cakeParentEntity.children.filter({ $0.name.starts(with: "deco") }) {
             cakeParentEntity.removeChild(entity)
         }
         
-        decoEntities.decoEntities.removeAll()
+        topState.decoEntities.removeAll()
         highlightAnchor?.children.removeAll()
     }
     
     
     // MARK: 선택 삭제 - 버튼 할당
     func deleteOne(){
+        guard let topState = cakeManager.cakeStack.top() else { return }
         guard let selectedEntity = selectedEntity else { return }
         cakeParentEntity?.removeChild(selectedEntity)
         highlightAnchor?.children.removeAll()
         self.selectedEntity = nil
         
         // MARK: id 비교 후 삭제 - 성공!
-        if let index = decoEntities.decoEntities.firstIndex(where: { $0.id == selectedEntity.id }) {
-            decoEntities.decoEntities.remove(at: index)
+        if let index = topState.decoEntities.firstIndex(where: { $0.id == selectedEntity.id }) {
+            topState.decoEntities.remove(at: index)
             print("삭제완료!")
         } else {
             print("선택된 엔티티가 decoEntities에 없음")
@@ -424,54 +479,19 @@ class Coordinator_deco: NSObject, ObservableObject {
     // MARK: 데코 저장 - 완료 버튼 누르면 실시
     func saveDecoEntity(){
         guard let cakeParentEntity = cakeParentEntity else { return }
-        
-        // MARK: 현재 모델에 존재하지 않는 것 삭제
-        // children과 decoEntity의 배열 개수 비교해서 차이만큼 앞에 거 지우기
-        let decoCount = cakeParentEntity.children.filter { $0.name.starts(with: "deco") }.count
-        
-        if decoEntities.decoEntities.count > decoCount {
-            for index in 0..<(decoEntities.decoEntities.count - decoCount) {
-                decoEntities.decoEntities.remove(at: index)
-            }
-        }
+        guard let topState = cakeManager.cakeStack.top() else { return }
         
         // MARK: 저장
         for entity in cakeParentEntity.children.filter({ $0.name.starts(with: "deco")}){
-            if let index = decoEntities.decoEntities.firstIndex(where: { $0.id == entity.id }) {
-                decoEntities.decoEntities[index].position = entity.position(relativeTo: nil)
-                decoEntities.decoEntities[index].scale = entity.scale(relativeTo: nil)
-                decoEntities.decoEntities[index].orientation = entity.orientation(relativeTo: nil)
+            if let index = topState.decoEntities.firstIndex(where: { $0.id == entity.id }) {
+                topState.decoEntities[index].position = entity.position(relativeTo: nil)
+                topState.decoEntities[index].scale = entity.scale(relativeTo: nil)
+                topState.decoEntities[index].orientation = entity.orientation(relativeTo: nil)
             } else {
                 print("해당 id를 가진 decoEntity를 찾지 못함!")
             }
         }
     }
-    
-    // TODO: 백로그 케이크 사이즈 clamp시 뽀용 애니메이션 적용
-    private func applyScaleWithEaseOut(entity: ModelEntity, targetScale: SIMD3<Float>) {
-        let animationDuration: TimeInterval = 0.3
-        let frameInterval: TimeInterval = 0.01
-        let totalFrames = Int(animationDuration / frameInterval)
-        
-        let currentScale = entity.scale(relativeTo: nil)
-        var frame = 0
-        
-        Timer.scheduledTimer(withTimeInterval: frameInterval, repeats: true) { timer in
-            if frame >= totalFrames {
-                timer.invalidate()
-                entity.setScale(targetScale, relativeTo: nil)
-                return
-            }
-            
-            let t = Float(frame) / Float(totalFrames) // 0 ~ 1 사이의 값
-            let easeOutProgress = 1 - pow(1 - t, 3)  // Ease-out 곡선
-            let interpolatedScale = mix(currentScale, targetScale, t: easeOutProgress)
-            
-            entity.setScale(interpolatedScale, relativeTo: nil)
-            frame += 1
-        }
-    }
-    
 }
 
 

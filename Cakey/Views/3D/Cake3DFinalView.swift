@@ -18,14 +18,18 @@ struct Cake3DFinalView: View {
     }
 }
 
+struct ARVariables{
+  static var arView: ARView!
+}
+
 struct ARViewContainer_Final:UIViewRepresentable {
     var viewModel: CakeyViewModel
     var quaterView: CameraMode = CameraMode.quarterView
     
     func makeUIView(context: Context) -> some UIView {
         // MARK: ARView 초기화
-        let arView = ARView(frame: .zero, cameraMode: .nonAR, automaticallyConfigureSession: false)
-        arView.environment.background = .color(.clear)
+        ARVariables.arView = ARView(frame: .zero, cameraMode: .nonAR, automaticallyConfigureSession: false)
+        ARVariables.arView.environment.background = .color(.cakeyYellow1)
         
         // MARK: CakeModel
         let cakeModel = try! ModelEntity.loadModel(named: "cakeModel")
@@ -49,7 +53,7 @@ struct ARViewContainer_Final:UIViewRepresentable {
         
         let cakeAnchor = AnchorEntity(world: [0, 0, 0])
         cakeAnchor.addChild(cakeParentEntity)
-        arView.scene.anchors.append(cakeAnchor)
+        ARVariables.arView.scene.anchors.append(cakeAnchor)
 
         // MARK: Virtual Camera
         let camera = PerspectiveCamera()
@@ -58,9 +62,9 @@ struct ARViewContainer_Final:UIViewRepresentable {
         
         let cameraAnchor = AnchorEntity(world: [0, 0, 0])
         cameraAnchor.addChild(camera)
-        arView.scene.addAnchor(cameraAnchor)
+        ARVariables.arView.scene.addAnchor(cameraAnchor)
         
-        return arView
+        return ARVariables.arView
     }
     
     func updateUIView(_ uiView: UIViewType, context: Context) {
@@ -74,11 +78,14 @@ struct ARViewContainer_Final:UIViewRepresentable {
 
 class Coordinator_final: NSObject {
     var cakeParentEntity: ModelEntity?
-    var decoEntities = DecoEntities.shared
+    //var decoEntities = CakeState.shared
+    var cakeManager = CakeStateManager.shared
     
     func loadDecoEntity() {
+        guard let topStack = cakeManager.cakeStack.top() else {return }
+        
         // DecoEntity 데이터 순회
-        for deco in decoEntities.decoEntities {
+        for deco in topStack.decoEntities {
             let imgData = deco.image
             let pos = deco.position
             let scale = deco.scale
@@ -86,6 +93,10 @@ class Coordinator_final: NSObject {
             
             addDecoEntity(imgData: imgData, position: pos, scale: scale, orientation: orientation)
         }
+        
+        // TODO: 확인, TextENtity도 추가
+        
+        addTextEntity()
     }
     
     func addDecoEntity(imgData: Data, position: SIMD3<Float>, scale: SIMD3<Float>, orientation: simd_quatf) {
@@ -118,10 +129,11 @@ class Coordinator_final: NSObject {
     }
     
     func addTextEntity() {
+        guard let topStack = cakeManager.cakeStack.top() else { return }
         guard let cakeParentEntity = cakeParentEntity else { return }
         
         // 저장된 텍스트 엔티티 데이터 로드
-        let textData = decoEntities.textEntity
+        let textData = topStack.textEntity
         
         // 텍스트가 비어있는지 확인
         let text = textData.text
@@ -150,5 +162,4 @@ class Coordinator_final: NSObject {
         cakeParentEntity.addChild(textEntity)
         print("텍스트 엔티티 추가 완료. 텍스트: \(text), 위치: \(textEntity.position), 스케일: \(textEntity.scale)")
     }
-
 }

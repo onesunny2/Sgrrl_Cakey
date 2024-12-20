@@ -109,24 +109,40 @@ class Coordinator_top: NSObject, ObservableObject {
     var textEntity: ModelEntity?
     var selectedColor: Color?
     
-    var decoEntities = DecoEntities.shared
+    //var decoEntities = CakeState.shared
     
     func updateTextEntity(_ newText: String) {
         guard let cakeParentEntity = cakeParentEntity else { return }
         
-        // 기존 텍스트 엔티티 삭제
+        // MARK: 기존 텍스트 엔티티 삭제
         if let existingTextEntity = textEntity {
             cakeParentEntity.removeChild(existingTextEntity)
         }
         
-        // 새로운 텍스트 엔티티 생성
+        // MARK: 텍스트를 줄 단위로 분리
+        let lines = newText.split(separator: "\n")
+        // 가장 긴 줄의 글자 수
+        let maxCharsInLine = lines.map { $0.count }.max() ?? 0
+        // 총 줄 수
+        let totalLines = lines.count
+        // 한 글자 너비
+        let charWidth: Float = 0.13874995
+        // 한 글자 높이
+        let lineHeight: Float = 0.13470002
+        
+        
+        // MARK: 텍스트에 따라 위치 계산
+        let xPosition: Float = -charWidth * Float(maxCharsInLine) / 4.0
+        let zPosition: Float = lineHeight * Float(totalLines - 1) / 2.0
+        
+        // MARK: 새로운 텍스트 엔티티 생성
         let textMesh = MeshResource.generateText(
             newText,
             extrusionDepth: 0.01,
             font: UIFont(name: "Hakgyoansim Dunggeunmiso OTF B", size: 0.15) ?? UIFont.systemFont(ofSize: 0.15),
             containerFrame: .zero,
             alignment: .center,
-            lineBreakMode: .byTruncatingTail
+            lineBreakMode: .byWordWrapping
         )
         
         let textMaterial = SimpleMaterial(color: UIColor(selectedColor ?? .black), isMetallic: false)
@@ -134,46 +150,20 @@ class Coordinator_top: NSObject, ObservableObject {
         newTextEntity.transform.rotation = simd_quatf(angle: Float.pi * 1.5, axis: [1, 0, 0])
         newTextEntity.scale = newTextEntity.scale / 2
         
-        // MARK: 중앙정렬 수동 처리..
-        var xOffset: Float = 0.0
-        var zOffset: Float = 0.03
+        // MARK: 텍스트 위치 설정
+        newTextEntity.position.x = xPosition
+        newTextEntity.position.z = zPosition
         let baseYPosition: Float = (0.79 * 0.43 + 0.02) / 0.43 * 0.7
-        
-        var previousLineCharCount = 0
-        
-        // 줄 단위로 처리
-        let lines = newText.split(separator: "\n")
-        for (lineIndex, line) in lines.enumerated() {
-            let currentLineCharCount = line.count
-            
-            // 현재 줄이 이전 줄보다 긴 경우 초과 글자 수만큼 xOffset 조정
-            if currentLineCharCount > previousLineCharCount {
-                let excessCharCount = currentLineCharCount - previousLineCharCount
-                xOffset -= Float(excessCharCount) * 0.04
-            }
-            
-            // 줄바꿈이 발생할 때 zOffset 증가
-            if lineIndex > 0 {
-                zOffset += 0.04
-            }
-            
-            // 현재 줄의 글자 수를 이전 줄 글자 수로 업데이트
-            previousLineCharCount = currentLineCharCount
-        }
-        
-        // 최종 위치 설정
-        newTextEntity.position.x = xOffset
         newTextEntity.position.y = baseYPosition
-        newTextEntity.position.z = zOffset
-        
-        // 부모 엔티티에 추가
+
+        // MARK: 추가
+        print("현재 text는 \(newText)고, x=\(xPosition), z=\(zPosition), 너비=\(textMesh.bounds.max.x - textMesh.bounds.min.x), 높이=\(textMesh.bounds.max.y - textMesh.bounds.min.y)")
         cakeParentEntity.addChild(newTextEntity)
-        textEntity = newTextEntity
-        decoEntities.textEntity.text = newText
         
-        print("텍스트의 크기: \(textEntity?.scale(relativeTo: nil) ?? SIMD3<Float>())")
-        print("텍스트의 위치: x=\(xOffset), y=\(baseYPosition), z=\(zOffset)")
+        textEntity = newTextEntity
+        
     }
+
     
     //MARK: 텍스트 모델 컬러 변경
     func updateTextColor() {
@@ -184,16 +174,23 @@ class Coordinator_top: NSObject, ObservableObject {
     
     //MARK: 데코 불러오기
     func loadDecoEntity() {
+        guard let topState = CakeStateManager.shared.cakeStack.top() else { return }
+        print("3DDecoView - loadDecoEntity")
         
-        // DecoEntities 클래스 순회
-        for deco in decoEntities.decoEntities {
-            let imgData = deco.image
-            let pos = deco.position
-            let scale = deco.scale
-            let orientation = deco.orientation
-            
-            addDecoEntity(imgData: imgData, position: pos, scale: scale, orientation: orientation)
+        if(!topState.decoEntities.isEmpty){
+            print("현재 스택에 이미 저장된 decoEntity가 있어서 불러오겠다!")
+            for deco in topState.decoEntities {
+                let imgData = deco.image
+                let pos = deco.position
+                let scale = deco.scale
+                let orientation = deco.orientation
+                
+                addDecoEntity(imgData: imgData, position: pos, scale: scale, orientation: orientation)
+            }
+        }else{
+            print("현재 스택에 decoEntity가 따로 없다!")
         }
+        
     }
     
     // MARK: 데코 추가
@@ -225,10 +222,14 @@ class Coordinator_top: NSObject, ObservableObject {
     }
     
     //TODO: 텍스트 모델 저장
+    // 이거 시점 고치기!
     func saveTextEntity(){
-        decoEntities.textEntity.color = selectedColor ?? Color.black
-        decoEntities.textEntity.position = textEntity?.position(relativeTo: nil) ?? SIMD3<Float>()
-        decoEntities.textEntity.scale = textEntity?.scale(relativeTo: nil) ?? SIMD3<Float>()
+        guard let topStack = CakeStateManager.shared.cakeStack.top() else {return }
+        
+        topStack.textEntity.color = selectedColor ?? Color.black
+        topStack.textEntity.position = textEntity?.position(relativeTo: nil) ?? SIMD3<Float>()
+        topStack.textEntity.scale = textEntity?.scale(relativeTo: nil) ?? SIMD3<Float>()
     }
 }
+
 
