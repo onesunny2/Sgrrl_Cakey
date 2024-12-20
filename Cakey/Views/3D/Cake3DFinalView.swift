@@ -94,7 +94,7 @@ class Coordinator_final: NSObject {
             addDecoEntity(imgData: imgData, position: pos, scale: scale, orientation: orientation)
         }
         
-        // TextENtity도 추가
+        // TODO: 확인, TextENtity도 추가
         
         addTextEntity()
     }

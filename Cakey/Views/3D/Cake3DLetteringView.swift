@@ -124,9 +124,11 @@ class Coordinator_top: NSObject, ObservableObject {
             newText,
             extrusionDepth: 0.01,
             font: UIFont(name: "Hakgyoansim Dunggeunmiso OTF B", size: 0.15) ?? UIFont.systemFont(ofSize: 0.15),
-            containerFrame: .zero,
+            containerFrame: CGRect(x: 0, y: (0.79 * 0.43 + 0.02) / 0.43 * 0.7, width: 2, height: 1),
+            //containerFrame: .zero,
             alignment: .center,
-            lineBreakMode: .byTruncatingTail
+            lineBreakMode: .byWordWrapping    // 한국어도 처리되는지 모르겠음
+            //lineBreakMode: .byTruncatingTail  // 기존 버전
         )
         
         let textMaterial = SimpleMaterial(color: UIColor(selectedColor ?? .black), isMetallic: false)
@@ -134,39 +136,40 @@ class Coordinator_top: NSObject, ObservableObject {
         newTextEntity.transform.rotation = simd_quatf(angle: Float.pi * 1.5, axis: [1, 0, 0])
         newTextEntity.scale = newTextEntity.scale / 2
         
-        // MARK: 중앙정렬 수동 처리..
-        var xOffset: Float = 0.0
-        var zOffset: Float = 0.03
-        let baseYPosition: Float = (0.79 * 0.43 + 0.02) / 0.43 * 0.7
-        
-        var previousLineCharCount = 0
-        
-        // 줄 단위로 처리
-        let lines = newText.split(separator: "\n")
-        for (lineIndex, line) in lines.enumerated() {
-            let currentLineCharCount = line.count
-            
-            // 현재 줄이 이전 줄보다 긴 경우 초과 글자 수만큼 xOffset 조정
-            if currentLineCharCount > previousLineCharCount {
-                let excessCharCount = currentLineCharCount - previousLineCharCount
-                xOffset -= Float(excessCharCount) * 0.04
-            }
-            
-            // 줄바꿈이 발생할 때 zOffset 증가
-            if lineIndex > 0 {
-                zOffset += 0.04
-            }
-            
-            // 현재 줄의 글자 수를 이전 줄 글자 수로 업데이트
-            previousLineCharCount = currentLineCharCount
-        }
-        
-        // 최종 위치 설정
-        newTextEntity.position.x = xOffset
-        newTextEntity.position.y = baseYPosition
-        newTextEntity.position.z = zOffset
-        
+//        // MARK: 중앙정렬 수동 처리..
+//        var xOffset: Float = 0.0
+//        var zOffset: Float = 0.03
+//        let baseYPosition: Float = (0.79 * 0.43 + 0.02) / 0.43 * 0.7
+//        
+//        var previousLineCharCount = 0
+//        
+//        // 줄 단위로 처리
+//        let lines = newText.split(separator: "\n")
+//        for (lineIndex, line) in lines.enumerated() {
+//            let currentLineCharCount = line.count
+//            
+//            // 현재 줄이 이전 줄보다 긴 경우 초과 글자 수만큼 xOffset 조정
+//            if currentLineCharCount > previousLineCharCount {
+//                let excessCharCount = currentLineCharCount - previousLineCharCount
+//                xOffset -= Float(excessCharCount) * 0.04
+//            }
+//            
+//            // 줄바꿈이 발생할 때 zOffset 증가
+//            if lineIndex > 0 {
+//                zOffset += 0.04
+//            }
+//            
+//            // 현재 줄의 글자 수를 이전 줄 글자 수로 업데이트
+//            previousLineCharCount = currentLineCharCount
+//        }
+//        
+//        // 최종 위치 설정
+//        newTextEntity.position.x = xOffset
+//        newTextEntity.position.y = baseYPosition
+//        newTextEntity.position.z = zOffset
+//        
         // 부모 엔티티에 추가
+        print("현재 text는 \(newText)고, 크기는 \(textMesh.bounds.max.x - textMesh.bounds.min.x)")
         cakeParentEntity.addChild(newTextEntity)
         textEntity = newTextEntity
         
@@ -175,7 +178,7 @@ class Coordinator_top: NSObject, ObservableObject {
         topstack.textEntity.text = newText
         
         print("텍스트의 크기: \(textEntity?.scale(relativeTo: nil) ?? SIMD3<Float>())")
-        print("텍스트의 위치: x=\(xOffset), y=\(baseYPosition), z=\(zOffset)")
+        //print("텍스트의 위치: x=\(xOffset), y=\(baseYPosition), z=\(zOffset)")
     }
     
     //MARK: 텍스트 모델 컬러 변경
@@ -187,7 +190,6 @@ class Coordinator_top: NSObject, ObservableObject {
     
     //MARK: 데코 불러오기
     func loadDecoEntity() {
-        // Stack에 접근해서 가장 top의 decoEntity에 접근해야함.
         guard let topState = CakeStateManager.shared.cakeStack.top() else { return }
         print("3DDecoView - loadDecoEntity")
         

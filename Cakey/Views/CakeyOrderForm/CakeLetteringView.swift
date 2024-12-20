@@ -34,6 +34,7 @@ struct CakeLetteringView: View {
                 
                 ZStack {
                     Cake3DLetteringView(viewModel: viewModel, text: $text, selectedColor: $selectedColor, coordinator_top: coordinator_top)
+          
                 }
                     .padding(.bottom, 30)
                 

@@ -11,6 +11,7 @@ import SwiftUI
 
 // MARK: Deco의 연속성을 위한 클래스..
 // TODO: Observable도 없앨 것
+
 class CakeState: ObservableObject {
     //static let shared = CakeState()
     @Published var decoEntities: [DecoEntity] = []
