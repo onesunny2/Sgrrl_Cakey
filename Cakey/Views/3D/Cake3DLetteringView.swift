@@ -139,7 +139,7 @@ class Coordinator_top: NSObject, ObservableObject {
         let textMesh = MeshResource.generateText(
             newText,
             extrusionDepth: 0.01,
-            font: UIFont(name: "Hakgyoansim Dunggeunmiso OTF B", size: 0.15) ?? UIFont.systemFont(ofSize: 0.15),
+            font: UIFont(name: "Hakgyoansim Dunggeunmiso OTF B", size: 0.15) ?? UIFont.systemFont(ofSize: 0.15, weight: .bold),
             containerFrame: .zero,
             alignment: .center,
             lineBreakMode: .byWordWrapping
