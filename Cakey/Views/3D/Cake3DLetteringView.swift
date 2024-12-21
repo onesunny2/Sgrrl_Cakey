@@ -86,6 +86,12 @@ struct ARViewContainer_top: UIViewRepresentable {
         // MARK: 텍스트 입력에 따른 모델 업데이트
         coordinator_top.updateTextEntity(text)
         
+        // MARK: updateUI에서 감지 못하는 SceneEvent 구독
+        coordinator_top.cancellable = arView.scene.subscribe(to: SceneEvents.Update.self) { _ in
+
+            coordinator_top.clampTextPosition()
+        } as? AnyCancellable
+        
         return arView
     }
     
@@ -108,61 +114,105 @@ class Coordinator_top: NSObject, ObservableObject {
     var camera: PerspectiveCamera?
     var textEntity: ModelEntity?
     var selectedColor: Color?
+    var cancellable: AnyCancellable?
     
     //var decoEntities = CakeState.shared
     
     func updateTextEntity(_ newText: String) {
         guard let cakeParentEntity = cakeParentEntity else { return }
-        
+
         // MARK: 기존 텍스트 엔티티 삭제
         if let existingTextEntity = textEntity {
             cakeParentEntity.removeChild(existingTextEntity)
         }
-        
+
         // MARK: 텍스트를 줄 단위로 분리
         let lines = newText.split(separator: "\n")
-        // 가장 긴 줄의 글자 수
-        let maxCharsInLine = lines.map { $0.count }.max() ?? 0
-        // 총 줄 수
-        let totalLines = lines.count
-        // 한 글자 너비
+        let totalLines = lines.count // 총 줄 수
+
+        // 한글 : 한 글자 너비 및 높이
         let charWidth: Float = 0.13874995
-        // 한 글자 높이
         let lineHeight: Float = 0.13470002
-        
-        
-        // MARK: 텍스트에 따라 위치 계산
-        let xPosition: Float = -charWidth * Float(maxCharsInLine) / 4.0
+        // 영어 : 한 글자 너비
+        let engCharWidth: Float = 0.09705
+
+        // MARK: 각 줄의 최대 너비 계산
+        var maxWidth: Float = 0.0
+        for line in lines {
+            var lineWidth: Float = 0.0
+            for char in line {
+                if char.isASCII {
+                    lineWidth += engCharWidth // 영어
+                } else {
+                    lineWidth += charWidth // 한글
+                }
+            }
+            maxWidth = max(maxWidth, lineWidth)
+        }
+
+        // MARK: 텍스트의 위치 계산
+        let xPosition: Float = -maxWidth / 4.0
         let zPosition: Float = lineHeight * Float(totalLines - 1) / 2.0
-        
+
         // MARK: 새로운 텍스트 엔티티 생성
         let textMesh = MeshResource.generateText(
             newText,
             extrusionDepth: 0.01,
-            font: UIFont(name: "Hakgyoansim Dunggeunmiso OTF B", size: 0.15) ?? UIFont.systemFont(ofSize: 0.15),
+            font: UIFont(name: "Hakgyoansim Dunggeunmiso OTF B", size: 0.15) ?? UIFont.systemFont(ofSize: 0.15, weight: .bold),
             containerFrame: .zero,
             alignment: .center,
             lineBreakMode: .byWordWrapping
         )
-        
+
         let textMaterial = SimpleMaterial(color: UIColor(selectedColor ?? .black), isMetallic: false)
         let newTextEntity = ModelEntity(mesh: textMesh, materials: [textMaterial])
         newTextEntity.transform.rotation = simd_quatf(angle: Float.pi * 1.5, axis: [1, 0, 0])
         newTextEntity.scale = newTextEntity.scale / 2
-        
+
         // MARK: 텍스트 위치 설정
         newTextEntity.position.x = xPosition
         newTextEntity.position.z = zPosition
         let baseYPosition: Float = (0.79 * 0.43 + 0.02) / 0.43 * 0.7
         newTextEntity.position.y = baseYPosition
 
-        // MARK: 추가
-        print("현재 text는 \(newText)고, x=\(xPosition), z=\(zPosition), 너비=\(textMesh.bounds.max.x - textMesh.bounds.min.x), 높이=\(textMesh.bounds.max.y - textMesh.bounds.min.y)")
+
+        // MARK: 부모 엔티티에 추가
+        print("현재 text는 \(newText)고, x=\(xPosition), z=\(zPosition), 너비=\(maxWidth), 높이=\(lineHeight * Float(totalLines))")
+        
+        newTextEntity.generateCollisionShapes(recursive: true)
         cakeParentEntity.addChild(newTextEntity)
-        
+        arView?.installGestures([.translation], for: newTextEntity)
+
         textEntity = newTextEntity
-        
     }
+
+    func clampTextPosition() {
+        guard let textEntity = textEntity else { return }
+
+        let radius: Float = 0.3 // 원의 반지름
+        let centerOffset: SIMD3<Float> = SIMD3(-0.05, -0.02, 0) // 새로운 원의 중점 (x: -0.05, z: 0)
+        var position = textEntity.position(relativeTo: nil)
+        
+        // 원의 새로운 중심과 현재 위치 간의 거리 계산
+        let adjustedPosition = position - centerOffset
+        let distanceSquared = adjustedPosition.x * adjustedPosition.x + adjustedPosition.z * adjustedPosition.z
+
+        // 원 밖으로 나갔을 경우 위치 제한
+        if distanceSquared > radius * radius {
+            print("clampTextPosition: 텍스트가 원 밖으로 벗어남. 위치 조정 중...")
+            let distance = sqrt(distanceSquared)
+            let clampedX = adjustedPosition.x * (radius / distance)
+            let clampedZ = adjustedPosition.z * (radius / distance)
+
+            // 원의 중심을 기준으로 위치를 보정한 후 원래 좌표계로 되돌림
+            position.x = clampedX + centerOffset.x
+            position.z = clampedZ + centerOffset.z
+            textEntity.position = position
+        }
+    }
+
+
+
 
     
     //MARK: 텍스트 모델 컬러 변경
@@ -230,6 +280,8 @@ class Coordinator_top: NSObject, ObservableObject {
         topStack.textEntity.position = textEntity?.position(relativeTo: nil) ?? SIMD3<Float>()
         topStack.textEntity.scale = textEntity?.scale(relativeTo: nil) ?? SIMD3<Float>()
     }
+    
+    
 }
 
 
