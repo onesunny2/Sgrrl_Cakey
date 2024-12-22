@@ -254,7 +254,7 @@ struct CakeOrderformView: View {
                     .padding(.bottom, 16)
             // MARK: 1. 초기값 arView 띄움!
             } else {
-                Cake3DFinalView(viewModel: viewModel)
+                Cake3DFinalView(cakeyModel: viewModel.cakeyModel)
                     .frame(width: 300, height: 300)
                     .padding(.top, -30)
                     .padding(.bottom, 16)
