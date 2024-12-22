@@ -21,7 +21,7 @@ struct ArchieveDetailView: View {
         ZStack {
             Color.cakeyYellow1
                 .ignoresSafeArea(.all)
-            ScrollView(.vertical, showsIndicators: false) {
+
                 VStack(spacing: 0) {
                     captureContent()  // 캡처 대상 뷰
                     
@@ -31,7 +31,6 @@ struct ArchieveDetailView: View {
                 }
                 .padding(.top, 20)
                 .padding(.bottom, 10)
-            }
         }
         .onAppear {
             UIPageControl.appearance().currentPageIndicatorTintColor = UIColor.cakeyOrange1 // 현재 페이지 색상
@@ -116,10 +115,32 @@ struct ArchieveDetailView: View {
             
             // MARK: 케이크 캡처 저장 구현
             Button("케이크만 저장") {
-                ARVariables.arView.snapshot(saveToHDR: false) { (image) in
-                    let compressedImage = UIImage(data: (image?.pngData())!)
-                    UIImageWriteToSavedPhotosAlbum(compressedImage!, nil, nil, nil)
-                }
+                let hostingController = UIHostingController(rootView: cakeArImage())
+                let targetSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.5)
+                 hostingController.view.frame = CGRect(origin: .zero, size: targetSize)
+                hostingController.view.backgroundColor = .cakeyYellow1
+                 
+                 // 현재 화면의 뷰 계층에 추가
+                 guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                       let window = windowScene.windows.first else {
+                     print("Failed to access UIWindow")
+                     return
+                 }
+                 window.addSubview(hostingController.view)
+
+                 // 캡처
+                 DispatchQueue.main.async {
+                     hostingController.view.layoutIfNeeded()
+                     if let capturedImage = hostingController.view.captureAsImage() {
+                         saveScreenShotToAlbum(capturedImage)
+                         print("Image captured and saved successfully.")
+                     } else {
+                         print("Failed to capture image.")
+                     }
+
+                     // 뷰 계층에서 제거
+                     hostingController.view.removeFromSuperview()
+                 }
             }
         }
     }
@@ -200,38 +221,21 @@ struct ArchieveDetailView: View {
             .padding(.leading, 17)
             .padding(.bottom, 28)
             
-            // MARK: 3. 0.5초뒤 snapshot 리턴값으로 뷰 변경!
-            if showCompressedImage, let compressedImage = compressedImage {
-                Image(uiImage: compressedImage)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 300, height: 300)
-                    .padding(.top, -30)
-                    .padding(.bottom, 16)
-            // MARK: 1. 초기값 arView 띄움!
-            } else {
-                Cake3DFinalView(cakeyModel: cakeyModel)
-                    .frame(width: 300, height: 300)
-                    .padding(.top, -30)
-                    .padding(.bottom, 16)
-                    .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            ARVariables.arView.snapshot(saveToHDR: false) { image in
-                                if let image = image, let pngData = image.pngData() {
-                                    compressedImage = UIImage(data: pngData)
-                                    // MARK: 2. 0.5초뒤 snapshot 리턴값으로 viewModel 저장
-                                    cakeyModel.cakeArImage = pngData
-                                    showCompressedImage = true
-                                } else {
-                                    print("이미지 캡처 실패ㅠ")
-                                }
-                            }
-                        }
-                    }
-            }
+            cakeArImage()
+                .padding(.top, -30)
+                .padding(.bottom, 16)
+            
             designKeywordLists()
         }
         .background(Color.cakeyYellow1)
+    }
+    
+    @ViewBuilder
+    func cakeArImage() -> some View {
+        Image(uiImage: UIImage(data: cakeyModel.cakeArImage ?? Data()) ?? UIImage())
+            .resizable()
+            .scaledToFit()
+            .frame(width: 300, height: 300)
     }
     
     func saveButton() -> some View {
