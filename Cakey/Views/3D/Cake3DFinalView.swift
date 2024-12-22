@@ -10,10 +10,11 @@ import ARKit
 import RealityKit
 
 struct Cake3DFinalView: View {
-    var viewModel: CakeyViewModel
+//    var viewModel: CakeyViewModel
+    var cakeyModel: CakeyModel
     
     var body: some View {
-        ARViewContainer_Final(viewModel:viewModel)
+        ARViewContainer_Final(cakeyModel: cakeyModel)
             .ignoresSafeArea()
     }
 }
@@ -23,7 +24,8 @@ struct ARVariables{
 }
 
 struct ARViewContainer_Final:UIViewRepresentable {
-    var viewModel: CakeyViewModel
+//    var viewModel: CakeyViewModel
+    var cakeyModel: CakeyModel
     var quaterView: CameraMode = CameraMode.quarterView
     
     func makeUIView(context: Context) -> some UIView {
@@ -35,7 +37,7 @@ struct ARViewContainer_Final:UIViewRepresentable {
         let cakeModel = try! ModelEntity.loadModel(named: "cakeModel")
         cakeModel.scale = SIMD3(repeating: 0.43)
         
-        let selectedColor = Color(hex:viewModel.cakeyModel.cakeColor!)
+        let selectedColor = Color(hex:cakeyModel.cakeColor!)
         let selectedMaterial = SimpleMaterial(color: UIColor(selectedColor), isMetallic: false)
         cakeModel.model?.materials = [selectedMaterial]
         

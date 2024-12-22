@@ -14,7 +14,7 @@ struct ArchieveDetailView: View {
     @State var isOnLastPage: Bool = true
     @State var isShowActionSheet: Bool = false
     @State var isShowAlert: Bool = false
-    var cakeyModel: CakeyModel
+    @State var cakeyModel: CakeyModel
     var realmManager = RealmManager.shared
     
     var body: some View {
@@ -113,8 +113,14 @@ struct ArchieveDetailView: View {
                      hostingController.view.removeFromSuperview()
                  }
             }
-            // TODO: 3D 케이크 자리
-            Button("케이크만 저장") { }
+            
+            // MARK: 케이크 캡처 저장 구현
+            Button("케이크만 저장") {
+                ARVariables.arView.snapshot(saveToHDR: false) { (image) in
+                    let compressedImage = UIImage(data: (image?.pngData())!)
+                    UIImageWriteToSavedPhotosAlbum(compressedImage!, nil, nil, nil)
+                }
+            }
         }
     }
     
@@ -142,31 +148,47 @@ struct ArchieveDetailView: View {
             .padding(.bottom, 28)
         
         // 키워드 리스트
-        VStack(alignment: .leading, spacing: 8) {
-            ForEach(cakeyModel.cakeImages.map { $0.description }, id: \.self) { keyword in
-                HStack(spacing: 12) {
-                    Circle()
-                        .fill(.cakeyOrange1)
-                        .frame(width: 8, height: 8)
-                    
-                    Text("\(keyword)")
-                        .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
-                        .frame(width: 235, alignment: .leading)
+        if cakeyModel.cakeImages.isEmpty {
+            
+        } else {
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(cakeyModel.cakeImages.map { $0.description }, id: \.self) { keyword in
+                    if keyword != "" {
+                        HStack(spacing: 12) {
+                            Circle()
+                                .fill(.cakeyOrange1)
+                                .frame(width: 8, height: 8)
+                            
+                            Text("\(keyword)")
+                                .customStyledFont(font: .cakeyCallout, color: .cakeyOrange1)
+                                .frame(width: 235, alignment: .leading)
+                        }
+                    }
                 }
             }
-        }
-        .padding(.horizontal, 17)
-        .padding(.vertical, 18)
-        .background {
-            RoundedRectangle(cornerRadius: 40)
-                .strokeBorder(Color.cakeyOrange1, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round, dash: [0.5, 7]))
-        }
-        .padding(8)
-        .background {
-            RoundedRectangle(cornerRadius: 45)
-                .stroke(Color.cakeyOrange1, lineWidth: 2)
+            .padding(.horizontal, 17)
+            .padding(.vertical, 18)
+            .background {
+                RoundedRectangle(cornerRadius: 40)
+                    .strokeBorder(Color.cakeyOrange1, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round, dash: [0.5, 7]))
+            }
+            .padding(8)
+            .background {
+                RoundedRectangle(cornerRadius: 45)
+                    .stroke(Color.cakeyOrange1, lineWidth: 2)
+            }
         }
     }
+    
+    // MARK: 우선은 최선의 방법이라 생각되는 것으로 해뒀습니다...
+    // 1: Cake3DFinalView - arView를 띄워야 snapshot 실행가능
+    // 2: 0.5초 뒤 snapshot의 리턴값 UIImage를 Data로 변환해 CakeModel.arImage에 저장
+    // 3: 기존 arView자리에 같은 크기로 snapshot의 리턴값 UIImage 띄움
+
+    
+    @State private var compressedImage: UIImage? = nil
+    @State private var showCompressedImage: Bool = false
+
     
     // 캡처 대상 뷰
     func captureContent() -> some View {
@@ -178,9 +200,35 @@ struct ArchieveDetailView: View {
             .padding(.leading, 17)
             .padding(.bottom, 28)
             
-            cakeImage()
-                .padding(.bottom, 16)
-            
+            // MARK: 3. 0.5초뒤 snapshot 리턴값으로 뷰 변경!
+            if showCompressedImage, let compressedImage = compressedImage {
+                Image(uiImage: compressedImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 300, height: 300)
+                    .padding(.top, -30)
+                    .padding(.bottom, 16)
+            // MARK: 1. 초기값 arView 띄움!
+            } else {
+                Cake3DFinalView(cakeyModel: cakeyModel)
+                    .frame(width: 300, height: 300)
+                    .padding(.top, -30)
+                    .padding(.bottom, 16)
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            ARVariables.arView.snapshot(saveToHDR: false) { image in
+                                if let image = image, let pngData = image.pngData() {
+                                    compressedImage = UIImage(data: pngData)
+                                    // MARK: 2. 0.5초뒤 snapshot 리턴값으로 viewModel 저장
+                                    cakeyModel.cakeArImage = pngData
+                                    showCompressedImage = true
+                                } else {
+                                    print("이미지 캡처 실패ㅠ")
+                                }
+                            }
+                        }
+                    }
+            }
             designKeywordLists()
         }
         .background(Color.cakeyYellow1)
@@ -188,10 +236,6 @@ struct ArchieveDetailView: View {
     
     func saveButton() -> some View {
         VStack {
-            Text("주문서를 저장하고, 사장님과 공유해보세요!")
-                .customStyledFont(font: .cakeyCaption1, color: .cakeyOrange1)
-                .padding(.bottom, 11)
-            
             Button {
                 self.isShowActionSheet = true
             } label: {
@@ -200,7 +244,7 @@ struct ArchieveDetailView: View {
                         .font(.cakeyBody)
                         .foregroundStyle(.cakeyYellow1)
                     
-                    Text("주문서 저장")
+                    Text("케이크 도안 저장")
                         .customStyledFont(font: .cakeyBody, color: .cakeyYellow1)
                 }
                 .padding(.vertical, 13)
